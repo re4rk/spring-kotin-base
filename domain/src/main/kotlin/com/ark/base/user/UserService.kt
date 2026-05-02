@@ -36,6 +36,12 @@ class UserService(
         user.changePassword(passwordEncoder.encode(newPassword))
     }
 
+    @Transactional
+    fun delete(userId: Long) {
+        val user = userRepository.findById(userId).orElseThrow { UserException.NotFound() }
+        user.delete()
+    }
+
     @Transactional(readOnly = true)
     fun login(command: UserLoginCommand): User {
         val user = userRepository.findByEmail(command.email) ?: throw UserException.LoginFailed()

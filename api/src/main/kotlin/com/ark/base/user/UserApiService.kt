@@ -24,4 +24,6 @@ class UserApiService(
         userService.verifyPassword(userId, request.currentPassword)
         userService.changePassword(userId, request.newPassword)
     }
+
+    fun delete(userId: Long) = userService.delete(userId)
 }

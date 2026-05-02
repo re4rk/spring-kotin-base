@@ -1,6 +1,7 @@
 package com.ark.base.user
 
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -31,4 +32,10 @@ class UserController(
         @PathVariable userId: Long,
         @RequestBody request: ChangePasswordRequest,
     ) = userApiService.changePassword(userId, request)
+
+    @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun delete(
+        @PathVariable userId: Long,
+    ) = userApiService.delete(userId)
 }
