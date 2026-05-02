@@ -13,4 +13,6 @@ sealed class UserException(
     class NameTooLong : UserException(ErrorCode.USER_NAME_TOO_LONG)
 
     class DuplicateEmail : UserException(ErrorCode.USER_DUPLICATE_EMAIL)
+
+    class LoginFailed : UserException(ErrorCode.USER_LOGIN_FAILED)
 }

@@ -11,6 +11,7 @@ import jakarta.persistence.Table
 class User(
     val email: String,
     val name: String,
+    val passwordHash: String,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) {

@@ -43,5 +43,7 @@ class GlobalExceptionHandler {
             ErrorCode.USER_DUPLICATE_EMAIL,
             ErrorCode.STOCK_INSUFFICIENT,
             -> HttpStatus.CONFLICT
+
+            ErrorCode.USER_LOGIN_FAILED -> HttpStatus.UNAUTHORIZED
         }
 }

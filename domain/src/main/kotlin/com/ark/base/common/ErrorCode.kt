@@ -13,6 +13,7 @@ enum class ErrorCode(
     USER_BLANK_NAME("이름은 필수입니다."),
     USER_NAME_TOO_LONG("이름은 100자를 초과할 수 없습니다."),
     USER_DUPLICATE_EMAIL("이미 등록된 이메일입니다."),
+    USER_LOGIN_FAILED("이메일 또는 비밀번호가 올바르지 않습니다."),
 
     // Order
     ORDER_NOT_FOUND("주문을 찾을 수 없습니다."),
