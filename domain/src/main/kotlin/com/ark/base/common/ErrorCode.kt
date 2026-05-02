@@ -1,7 +1,9 @@
 package com.ark.base.common
 
-enum class ErrorCode(val code: String, val message: String) {
-
+enum class ErrorCode(
+    val code: String,
+    val message: String,
+) {
     // Common
     NOT_FOUND("C001", "리소스를 찾을 수 없습니다."),
     INVALID_INPUT("C002", "잘못된 입력입니다."),

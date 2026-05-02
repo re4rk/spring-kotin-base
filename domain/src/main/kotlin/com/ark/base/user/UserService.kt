@@ -10,7 +10,10 @@ class UserService(
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
-    fun register(email: String, name: String): User {
+    fun register(
+        email: String,
+        name: String,
+    ): User {
         val user = userRepository.save(User(email = email, name = name))
         eventPublisher.publishEvent(UserRegisteredEvent(user.id, user.email, user.name))
         return user

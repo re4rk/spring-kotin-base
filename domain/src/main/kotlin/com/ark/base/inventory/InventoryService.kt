@@ -12,7 +12,10 @@ class InventoryService(
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
-    fun decrease(inventoryId: Long, quantity: Int) {
+    fun decrease(
+        inventoryId: Long,
+        quantity: Int,
+    ) {
         val inventory = inventoryRepository.getById(inventoryId, ErrorCode.INVENTORY_NOT_FOUND)
 
         inventory.stock -= quantity
