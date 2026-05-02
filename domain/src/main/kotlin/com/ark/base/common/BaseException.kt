@@ -1,6 +1,6 @@
 package com.ark.base.common
 
-class BaseException(
+open class BaseException(
     val errorCode: ErrorCode,
     override val message: String = errorCode.message,
     override val cause: Throwable? = null,

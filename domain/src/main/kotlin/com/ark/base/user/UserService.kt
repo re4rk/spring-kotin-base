@@ -14,6 +14,7 @@ class UserService(
         email: String,
         name: String,
     ): User {
+        if (userRepository.findByEmail(email) != null) throw UserException.DuplicateEmail()
         val user = userRepository.save(User(email = email, name = name))
         eventPublisher.publishEvent(UserRegisteredEvent(user.id, user.email, user.name))
         return user
