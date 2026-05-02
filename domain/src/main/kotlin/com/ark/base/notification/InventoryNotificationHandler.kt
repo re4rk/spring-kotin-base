@@ -1,0 +1,26 @@
+package com.ark.base.notification
+
+import com.ark.base.inventory.StockSoldOutEvent
+import com.ark.base.notification.infrastructure.EmailSender
+import com.ark.base.notification.infrastructure.KakaoSender
+import org.springframework.stereotype.Component
+import org.springframework.transaction.event.TransactionalEventListener
+
+@Component
+class InventoryNotificationHandler(
+    private val emailSender: EmailSender,
+    private val kakaoSender: KakaoSender,
+) {
+    @TransactionalEventListener
+    fun handle(event: StockSoldOutEvent) {
+        emailSender.send(
+            to = "admin@example.com",
+            subject = "[재고 품절] ${event.productName}",
+            body = "${event.productName} 재고가 모두 소진되었습니다.",
+        )
+        kakaoSender.send(
+            to = "admin",
+            message = "[품절 알림] ${event.productName} 재고 소진",
+        )
+    }
+}
