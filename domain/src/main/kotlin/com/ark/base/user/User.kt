@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 class User(
     val email: String,
     val name: String,
-    val passwordHash: String,
+    var passwordHash: String,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) {
@@ -19,6 +19,10 @@ class User(
         if (email.isBlank() || !email.matches(EMAIL_REGEX)) throw UserException.InvalidEmail()
         if (name.isBlank()) throw UserException.BlankName()
         if (name.length > MAX_NAME_LENGTH) throw UserException.NameTooLong()
+    }
+
+    fun changePassword(newPasswordHash: String) {
+        passwordHash = newPasswordHash
     }
 
     companion object {

@@ -15,4 +15,6 @@ sealed class UserException(
     class DuplicateEmail : UserException(ErrorCode.USER_DUPLICATE_EMAIL)
 
     class LoginFailed : UserException(ErrorCode.USER_LOGIN_FAILED)
+
+    class NotFound : UserException(ErrorCode.USER_NOT_FOUND)
 }

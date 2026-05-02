@@ -19,6 +19,24 @@ class UserService(
     }
 
     @Transactional(readOnly = true)
+    fun verifyPassword(
+        userId: Long,
+        rawPassword: String,
+    ) {
+        val user = userRepository.findById(userId).orElseThrow { UserException.NotFound() }
+        if (!passwordEncoder.matches(rawPassword, user.passwordHash)) throw UserException.LoginFailed()
+    }
+
+    @Transactional
+    fun changePassword(
+        userId: Long,
+        newPassword: String,
+    ) {
+        val user = userRepository.findById(userId).orElseThrow { UserException.NotFound() }
+        user.changePassword(passwordEncoder.encode(newPassword))
+    }
+
+    @Transactional(readOnly = true)
     fun login(command: UserLoginCommand): User {
         val user = userRepository.findByEmail(command.email) ?: throw UserException.LoginFailed()
         if (!passwordEncoder.matches(command.rawPassword, user.passwordHash)) throw UserException.LoginFailed()
