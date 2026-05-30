@@ -4,7 +4,9 @@ data class OrderPlaceRequest(
     val userId: Long,
     val productName: String,
     val quantity: Int,
-)
+) {
+    fun toOrder() = Order(userId = userId, productName = productName, quantity = quantity)
+}
 
 data class OrderResponse(
     val id: Long,

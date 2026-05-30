@@ -9,7 +9,7 @@ class OrderService(
 ) {
     @Transactional
     fun place(request: OrderPlaceRequest): OrderResponse {
-        val order = orderRepository.save(Order(userId = request.userId, productName = request.productName, quantity = request.quantity))
+        val order = orderRepository.save(request.toOrder())
         return OrderResponse.from(order)
     }
 }
