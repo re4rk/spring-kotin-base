@@ -1,10 +1,10 @@
 package com.ark.base.application
 
-import com.ark.base.auth.PasswordResetRequestedEvent
-import com.ark.base.auth.PasswordResetToken
-import com.ark.base.auth.PasswordResetTokenRepository
-import com.ark.base.auth.RefreshTokenConsumeResult
-import com.ark.base.auth.RefreshTokenRepository
+import com.ark.base.auth.password.reset.PasswordResetRequestedEvent
+import com.ark.base.auth.password.reset.PasswordResetToken
+import com.ark.base.auth.password.reset.PasswordResetTokenRepository
+import com.ark.base.auth.refreshToken.RefreshTokenConsumeResult
+import com.ark.base.auth.refreshToken.RefreshTokenRepository
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
 import com.ark.base.common.JwtProvider

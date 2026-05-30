@@ -1,4 +1,4 @@
-package com.ark.base.auth
+package com.ark.base.auth.refreshToken
 
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.core.script.DefaultRedisScript
@@ -50,8 +50,8 @@ class RedisRefreshTokenRepository(
         private const val REUSED_PREFIX = "REUSED:"
         private const val KEYSPACE = "refresh-token"
         private const val USED_KEYSPACE = "refresh-token-used"
-        private const val ENTITY_CLASS = "com.ark.base.auth.RefreshToken"
-        private const val USED_ENTITY_CLASS = "com.ark.base.auth.UsedRefreshToken"
+        private const val ENTITY_CLASS = "com.ark.base.auth.refresh_token.RefreshToken"
+        private const val USED_ENTITY_CLASS = "com.ark.base.auth.refresh_token.UsedRefreshToken"
 
         private val ISSUE_SCRIPT =
             DefaultRedisScript<String>().apply {

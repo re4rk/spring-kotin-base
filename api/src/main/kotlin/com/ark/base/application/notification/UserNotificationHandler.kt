@@ -1,6 +1,6 @@
 package com.ark.base.application.notification
 
-import com.ark.base.auth.PasswordResetRequestedEvent
+import com.ark.base.auth.password.reset.PasswordResetRequestedEvent
 import com.ark.base.notification.EmailSender
 import com.ark.base.notification.KakaoSender
 import com.ark.base.user.UserRegisteredEvent

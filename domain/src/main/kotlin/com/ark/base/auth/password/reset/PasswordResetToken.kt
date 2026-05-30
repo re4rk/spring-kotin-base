@@ -1,4 +1,4 @@
-package com.ark.base.auth
+package com.ark.base.auth.password.reset
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash

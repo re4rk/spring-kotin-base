@@ -1,4 +1,4 @@
-package com.ark.base.auth
+package com.ark.base.auth.refreshToken
 
 interface RefreshTokenRepository {
     fun issue(userId: Long): RefreshToken
