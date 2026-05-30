@@ -30,13 +30,13 @@ class AuthController(
         @RequestBody request: LoginRequest,
     ): TokenResponse = authService.login(request)
 
-    @PostMapping("/password-reset")
+    @PostMapping("/passwords/reset/init")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun requestPasswordReset(
         @RequestBody request: PasswordResetRequest,
     ) = authService.requestPasswordReset(request)
 
-    @PostMapping("/password-reset/confirm")
+    @PostMapping("/passwords/reset/confirm")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun resetPassword(
         @RequestBody request: PasswordResetConfirmRequest,
