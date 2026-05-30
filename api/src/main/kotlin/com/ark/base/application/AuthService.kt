@@ -45,4 +45,11 @@ class AuthService(
         user.changePassword(request.newPassword, passwordEncoder)
         passwordResetTokenRepository.deleteById(request.token)
     }
+
+    @Transactional
+    fun register(request: RegisterRequest): UserResponse {
+        if (userRepository.findByEmail(request.email) != null) throw BaseException(ErrorCode.USER_DUPLICATE_EMAIL)
+        val user = userRepository.save(request.toUser(passwordEncoder))
+        return UserResponse.from(user)
+    }
 }

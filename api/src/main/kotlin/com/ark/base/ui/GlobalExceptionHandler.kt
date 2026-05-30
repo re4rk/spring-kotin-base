@@ -1,5 +1,8 @@
-package com.ark.base.common
+package com.ark.base.ui
 
+import com.ark.base.common.ApiResponse
+import com.ark.base.common.BaseException
+import com.ark.base.common.ErrorCode
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

@@ -1,4 +1,4 @@
-package com.ark.base.controller
+package com.ark.base.ui
 
 import com.ark.base.application.InventoryDecreaseRequest
 import com.ark.base.application.InventoryService

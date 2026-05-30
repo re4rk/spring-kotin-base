@@ -1,4 +1,4 @@
-package com.ark.base.controller
+package com.ark.base.ui
 
 import com.ark.base.application.OrderPlaceRequest
 import com.ark.base.application.OrderResponse

@@ -12,13 +12,6 @@ class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
-    @Transactional
-    fun register(request: RegisterRequest): UserResponse {
-        if (userRepository.findByEmail(request.email) != null) throw BaseException(ErrorCode.USER_DUPLICATE_EMAIL)
-        val user = userRepository.save(request.toUser(passwordEncoder))
-        return UserResponse.from(user)
-    }
-
     @Transactional(readOnly = true)
     fun findByEmail(email: String) = userRepository.findByEmail(email)
 

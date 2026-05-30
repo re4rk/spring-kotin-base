@@ -1,10 +1,12 @@
-package com.ark.base.controller
+package com.ark.base.ui
 
 import com.ark.base.application.AuthService
 import com.ark.base.application.LoginRequest
 import com.ark.base.application.PasswordResetConfirmRequest
 import com.ark.base.application.PasswordResetRequest
+import com.ark.base.application.RegisterRequest
 import com.ark.base.application.TokenResponse
+import com.ark.base.application.UserResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -17,6 +19,12 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
     private val authService: AuthService,
 ) {
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun register(
+        @RequestBody request: RegisterRequest,
+    ): UserResponse = authService.register(request)
+
     @PostMapping("/login")
     fun login(
         @RequestBody request: LoginRequest,

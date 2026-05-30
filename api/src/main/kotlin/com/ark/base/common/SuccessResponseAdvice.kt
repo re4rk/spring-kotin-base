@@ -1,5 +1,6 @@
 package com.ark.base.common
 
+import com.ark.base.ui.GlobalExceptionHandler
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageConverter
