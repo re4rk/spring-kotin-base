@@ -25,9 +25,8 @@ class User(
     var passwordHash: String = passwordEncoder.encode(password)
 
     init {
-        if (email.isBlank() || !email.matches(EMAIL_REGEX)) throw BaseException(ErrorCode.USER_INVALID_EMAIL)
-        if (name.isBlank()) throw BaseException(ErrorCode.USER_BLANK_NAME)
-        if (name.length > MAX_NAME_LENGTH) throw BaseException(ErrorCode.USER_NAME_TOO_LONG)
+        validateEmail(email)
+        validateName(name)
         registerEvent(UserRegisteredEvent(this))
     }
 
@@ -52,5 +51,14 @@ class User(
     companion object {
         private val EMAIL_REGEX = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
         private const val MAX_NAME_LENGTH = 100
+
+        private fun validateEmail(email: String) {
+            if (email.isBlank() || !email.matches(EMAIL_REGEX)) throw BaseException(ErrorCode.USER_INVALID_EMAIL)
+        }
+
+        private fun validateName(name: String) {
+            if (name.isBlank()) throw BaseException(ErrorCode.USER_BLANK_NAME)
+            if (name.length > MAX_NAME_LENGTH) throw BaseException(ErrorCode.USER_NAME_TOO_LONG)
+        }
     }
 }
