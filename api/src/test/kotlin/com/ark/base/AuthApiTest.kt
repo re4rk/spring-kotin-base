@@ -175,7 +175,10 @@ class AuthApiTest : ApiIntegrationTest() {
             }
     }
 
-    private fun loginRefreshToken(email: String, password: String = "password123"): String {
+    private fun loginRefreshToken(
+        email: String,
+        password: String = "password123",
+    ): String {
         val result =
             mockMvc
                 .post("/auth/login") {
