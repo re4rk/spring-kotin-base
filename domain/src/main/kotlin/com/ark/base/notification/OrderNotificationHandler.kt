@@ -1,7 +1,5 @@
 package com.ark.base.notification
 
-import com.ark.base.notification.infrastructure.EmailSender
-import com.ark.base.notification.infrastructure.KakaoSender
 import com.ark.base.order.OrderPlacedEvent
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener

@@ -1,4 +1,4 @@
-package com.ark.base.notification.infrastructure
+package com.ark.base.notification
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
