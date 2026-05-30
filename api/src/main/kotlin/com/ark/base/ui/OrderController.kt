@@ -4,6 +4,8 @@ import com.ark.base.application.OrderPlaceRequest
 import com.ark.base.application.OrderResponse
 import com.ark.base.application.OrderService
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -20,4 +22,24 @@ class OrderController(
     fun place(
         @RequestBody request: OrderPlaceRequest,
     ): OrderResponse = orderService.place(request)
+
+    @PatchMapping("/{orderId}/cancel")
+    fun cancel(
+        @PathVariable orderId: Long,
+    ): OrderResponse = orderService.cancel(orderId)
+
+    @PatchMapping("/{orderId}/confirm")
+    fun confirm(
+        @PathVariable orderId: Long,
+    ): OrderResponse = orderService.confirm(orderId)
+
+    @PatchMapping("/{orderId}/ship")
+    fun ship(
+        @PathVariable orderId: Long,
+    ): OrderResponse = orderService.ship(orderId)
+
+    @PatchMapping("/{orderId}/deliver")
+    fun deliver(
+        @PathVariable orderId: Long,
+    ): OrderResponse = orderService.deliver(orderId)
 }

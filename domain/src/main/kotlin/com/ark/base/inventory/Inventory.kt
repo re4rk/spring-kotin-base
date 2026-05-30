@@ -22,4 +22,8 @@ class Inventory(
             registerEvent(StockSoldOutEvent(id, productId))
         }
     }
+
+    fun increase(quantity: Int) {
+        stock += quantity
+    }
 }

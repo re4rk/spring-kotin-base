@@ -1,6 +1,7 @@
 package com.ark.base.application
 
 import com.ark.base.order.Order
+import com.ark.base.order.OrderStatus
 import com.ark.base.product.Product
 
 data class OrderPlaceRequest(
@@ -23,6 +24,7 @@ data class OrderResponse(
     val productId: Long,
     val productName: String,
     val quantity: Int,
+    val status: OrderStatus,
 ) {
     companion object {
         fun from(order: Order) =
@@ -32,6 +34,7 @@ data class OrderResponse(
                 productId = order.productId,
                 productName = order.productName,
                 quantity = order.quantity,
+                status = order.status,
             )
     }
 }

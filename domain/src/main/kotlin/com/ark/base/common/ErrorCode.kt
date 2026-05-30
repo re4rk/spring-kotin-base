@@ -21,6 +21,8 @@ enum class ErrorCode(
 
     // Order
     ORDER_NOT_FOUND("주문을 찾을 수 없습니다."),
+    ORDER_ALREADY_CANCELLED("이미 취소된 주문입니다."),
+    ORDER_INVALID_STATUS("현재 상태에서 해당 작업을 수행할 수 없습니다."),
 
     // Inventory
     INVENTORY_NOT_FOUND("재고를 찾을 수 없습니다."),
