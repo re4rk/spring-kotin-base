@@ -6,12 +6,25 @@ import com.ark.base.ui.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(javaClass)
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException::class)
+    fun handleOptimisticLock(e: ObjectOptimisticLockingFailureException): ResponseEntity<ApiResponse> {
+        log.warn("Optimistic lock failure", e)
+        return ResponseEntity(
+            ApiResponse.Error(
+                code = ErrorCode.STOCK_CONCURRENT_MODIFICATION.name,
+                message = ErrorCode.STOCK_CONCURRENT_MODIFICATION.message,
+            ),
+            HttpStatus.CONFLICT,
+        )
+    }
 
     @ExceptionHandler(BaseException::class)
     fun handleBaseException(e: BaseException): ResponseEntity<ApiResponse> =
@@ -48,6 +61,7 @@ class GlobalExceptionHandler {
 
             ErrorCode.USER_DUPLICATE_EMAIL,
             ErrorCode.STOCK_INSUFFICIENT,
+            ErrorCode.STOCK_CONCURRENT_MODIFICATION,
             ErrorCode.ORDER_ALREADY_CANCELLED,
             ErrorCode.PRODUCT_ALREADY_DISCONTINUED,
             -> HttpStatus.CONFLICT

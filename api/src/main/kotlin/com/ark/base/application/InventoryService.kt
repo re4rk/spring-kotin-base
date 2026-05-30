@@ -1,6 +1,7 @@
 package com.ark.base.application
 
 import com.ark.base.inventory.InventoryRepository
+import com.ark.base.inventory.getById
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

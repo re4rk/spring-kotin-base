@@ -7,6 +7,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Version
 
 @Entity
 class Inventory(
@@ -15,6 +16,10 @@ class Inventory(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseAggregateEntity<Inventory>() {
+    @Version
+    var version: Long = 0
+        protected set
+
     fun decrease(quantity: Int) {
         if (stock < quantity) throw BaseException(ErrorCode.STOCK_INSUFFICIENT)
         stock -= quantity

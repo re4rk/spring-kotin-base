@@ -8,6 +8,13 @@ import org.junit.jupiter.api.assertThrows
 
 class InventoryTest {
     @Test
+    fun `재고 엔티티는 낙관적 락을 위한 version을 갖는다`() {
+        val inventory = Inventory(productId = 1L, stock = 10)
+
+        assertEquals(0, inventory.version)
+    }
+
+    @Test
     fun `재고를 차감하면 수량이 줄어든다`() {
         val inventory = Inventory(productId = 1L, stock = 10)
 
