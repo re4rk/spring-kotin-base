@@ -2,6 +2,7 @@ package com.ark.base.inventory
 
 import com.ark.base.common.ErrorCode
 import com.ark.base.common.getById
+import com.ark.base.inventory.StockSoldOutEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

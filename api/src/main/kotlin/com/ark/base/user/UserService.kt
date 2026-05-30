@@ -2,6 +2,7 @@ package com.ark.base.user
 
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
+import com.ark.base.user.UserRegisteredEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
