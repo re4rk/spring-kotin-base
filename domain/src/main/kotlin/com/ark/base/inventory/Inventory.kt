@@ -13,7 +13,6 @@ class Inventory(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseAggregateEntity<Inventory>() {
-
     fun decrease(quantity: Int) {
         stock -= quantity
         if (stock <= 0) {

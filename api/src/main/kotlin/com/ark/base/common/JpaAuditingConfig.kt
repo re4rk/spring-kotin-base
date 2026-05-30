@@ -10,14 +10,14 @@ import java.util.Optional
 @Configuration
 @EnableJpaAuditing
 class JpaAuditingConfig {
-
     @Bean
-    fun auditorAware(): AuditorAware<String> = AuditorAware {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            Optional.empty()
-        } else {
-            Optional.ofNullable(authentication.name)
+    fun auditorAware(): AuditorAware<String> =
+        AuditorAware {
+            val authentication = SecurityContextHolder.getContext().authentication
+            if (authentication == null || !authentication.isAuthenticated) {
+                Optional.empty()
+            } else {
+                Optional.ofNullable(authentication.name)
+            }
         }
-    }
 }

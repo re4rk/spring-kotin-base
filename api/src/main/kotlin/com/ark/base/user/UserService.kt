@@ -13,9 +13,10 @@ class UserService(
     @Transactional
     fun register(request: RegisterRequest): UserResponse {
         if (userRepository.findByEmail(request.email) != null) throw BaseException(ErrorCode.USER_DUPLICATE_EMAIL)
-        val user = userRepository.save(
-            User(email = request.email, name = request.name, passwordHash = passwordEncoder.encode(request.password)),
-        )
+        val user =
+            userRepository.save(
+                User(email = request.email, name = request.name, passwordHash = passwordEncoder.encode(request.password)),
+            )
         return UserResponse.from(user)
     }
 

@@ -1,12 +1,5 @@
 package com.ark.base.auth
 
-interface PasswordResetTokenRepository {
-    fun save(
-        token: String,
-        userId: Long,
-    )
+import org.springframework.data.repository.CrudRepository
 
-    fun getUserId(token: String): Long?
-
-    fun delete(token: String)
-}
+interface PasswordResetTokenRepository : CrudRepository<PasswordResetToken, String>

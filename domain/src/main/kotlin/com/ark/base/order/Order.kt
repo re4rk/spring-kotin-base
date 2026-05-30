@@ -16,7 +16,6 @@ class Order(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseAggregateEntity<Order>() {
-
     init {
         registerEvent(OrderPlacedEvent(this))
     }

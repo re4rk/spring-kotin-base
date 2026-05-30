@@ -7,6 +7,7 @@ import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.UserRepository
 import com.ark.base.user.UserResponse
 import com.ark.base.user.UserService
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -18,6 +19,7 @@ class AuthService(
     private val tokenStore: PasswordResetTokenRepository,
     private val jwtProvider: JwtProvider,
     private val userService: UserService,
+    private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional(readOnly = true)
     fun login(request: LoginRequest): TokenResponse {
@@ -29,16 +31,15 @@ class AuthService(
     @Transactional
     fun requestPasswordReset(request: PasswordResetRequest) {
         val user = userRepository.findByEmail(request.email) ?: return
-        val token = UUID.randomUUID().toString()
-        tokenStore.save(token, user.id)
-        user.requestPasswordReset(token)
-        userRepository.save(user)
+        val passwordResetToken = PasswordResetToken(token = UUID.randomUUID().toString(), userId = user.id)
+        tokenStore.save(passwordResetToken)
+        eventPublisher.publishEvent(PasswordResetRequestedEvent(user.email, passwordResetToken.token))
     }
 
     @Transactional
     fun resetPassword(request: PasswordResetConfirmRequest) {
-        val userId = tokenStore.getUserId(request.token) ?: throw BaseException(ErrorCode.USER_RESET_TOKEN_INVALID)
+        val userId = tokenStore.findById(request.token).orElse(null)?.userId ?: throw BaseException(ErrorCode.USER_RESET_TOKEN_INVALID)
         userService.changePassword(userId, request.newPassword)
-        tokenStore.delete(request.token)
+        tokenStore.deleteById(request.token)
     }
 }

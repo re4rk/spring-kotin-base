@@ -8,7 +8,6 @@ interface UserRepository : JpaRepository<User, Long> {
     fun findByEmail(email: String): User?
 
     companion object {
-        fun UserRepository.getById(id: Long): User =
-            findById(id).orElseThrow { BaseException(ErrorCode.USER_NOT_FOUND) }
+        fun UserRepository.getById(id: Long): User = findById(id).orElseThrow { BaseException(ErrorCode.USER_NOT_FOUND) }
     }
 }

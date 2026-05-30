@@ -1,6 +1,5 @@
 package com.ark.base.user
 
-import com.ark.base.auth.PasswordResetRequestedEvent
 import com.ark.base.common.BaseAggregateEntity
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
@@ -22,7 +21,6 @@ class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseAggregateEntity<User>() {
-
     init {
         if (email.isBlank() || !email.matches(EMAIL_REGEX)) throw BaseException(ErrorCode.USER_INVALID_EMAIL)
         if (name.isBlank()) throw BaseException(ErrorCode.USER_BLANK_NAME)
@@ -38,10 +36,6 @@ class User(
 
     fun changePassword(newPasswordHash: String) {
         passwordHash = newPasswordHash
-    }
-
-    fun requestPasswordReset(token: String) {
-        registerEvent(PasswordResetRequestedEvent(email, token))
     }
 
     companion object {

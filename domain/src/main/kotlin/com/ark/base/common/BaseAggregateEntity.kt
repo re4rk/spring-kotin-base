@@ -13,7 +13,6 @@ import java.time.LocalDateTime
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
 abstract class BaseAggregateEntity<T : BaseAggregateEntity<T>> : AbstractAggregateRoot<T>() {
-
     @CreatedDate
     var createdAt: LocalDateTime = LocalDateTime.MIN
         protected set
