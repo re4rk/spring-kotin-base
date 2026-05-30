@@ -4,6 +4,7 @@ import com.ark.base.application.AuthService
 import com.ark.base.application.LoginRequest
 import com.ark.base.application.PasswordResetConfirmRequest
 import com.ark.base.application.PasswordResetRequest
+import com.ark.base.application.RefreshTokenRequest
 import com.ark.base.application.RegisterRequest
 import com.ark.base.application.TokenResponse
 import com.ark.base.application.UserResponse
@@ -29,6 +30,11 @@ class AuthController(
     fun login(
         @RequestBody request: LoginRequest,
     ): TokenResponse = authService.login(request)
+
+    @PostMapping("/refresh")
+    fun refresh(
+        @RequestBody request: RefreshTokenRequest,
+    ): TokenResponse = authService.refresh(request)
 
     @PostMapping("/passwords/reset/init")
     @ResponseStatus(HttpStatus.NO_CONTENT)

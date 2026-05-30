@@ -7,7 +7,11 @@ data class LoginRequest(
 
 data class TokenResponse(
     val accessToken: String,
-    val user: UserResponse,
+    val refreshToken: String,
+)
+
+data class RefreshTokenRequest(
+    val refreshToken: String,
 )
 
 data class PasswordResetRequest(

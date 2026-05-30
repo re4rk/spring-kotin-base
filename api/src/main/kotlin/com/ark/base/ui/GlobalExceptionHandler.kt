@@ -72,6 +72,8 @@ class GlobalExceptionHandler {
 
             ErrorCode.ACCESS_DENIED -> HttpStatus.FORBIDDEN
 
-            ErrorCode.USER_RESET_TOKEN_INVALID -> HttpStatus.BAD_REQUEST
+            ErrorCode.USER_RESET_TOKEN_INVALID,
+            ErrorCode.USER_REFRESH_TOKEN_INVALID,
+            -> HttpStatus.BAD_REQUEST
         }
 }

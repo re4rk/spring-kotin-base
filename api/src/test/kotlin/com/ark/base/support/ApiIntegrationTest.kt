@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 @SpringBootTest(classes = [BaseApplication::class])
 @AutoConfigureMockMvc
 @Transactional
-abstract class ApiIntegrationTest {
+abstract class ApiIntegrationTest : RedisIntegrationTest() {
     @Autowired
     protected lateinit var mockMvc: MockMvc
 

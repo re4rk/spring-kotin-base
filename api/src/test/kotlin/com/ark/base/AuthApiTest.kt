@@ -1,6 +1,8 @@
 package com.ark.base
 
 import com.ark.base.support.ApiIntegrationTest
+import com.jayway.jsonpath.JsonPath
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.post
@@ -60,7 +62,63 @@ class AuthApiTest : ApiIntegrationTest() {
             }.andExpect {
                 status { isOk() }
                 jsonPath("$.data.accessToken") { exists() }
-                jsonPath("$.data.user.email") { value("seller@test.com") }
+                jsonPath("$.data.refreshToken") { exists() }
+            }
+    }
+
+    @Test
+    fun `리프레시 토큰으로 액세스 토큰을 재발급한다`() {
+        val loginResult =
+            mockMvc
+                .post("/auth/login") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content =
+                        """
+                        {
+                          "email": "seller@test.com",
+                          "password": "password123"
+                        }
+                        """.trimIndent()
+                }.andExpect {
+                    status { isOk() }
+                }.andReturn()
+
+        val refreshToken = JsonPath.read<String>(loginResult.response.contentAsString, "$.data.refreshToken")
+
+        val refreshResult =
+            mockMvc
+                .post("/auth/refresh") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content =
+                        """
+                        {
+                          "refreshToken": "$refreshToken"
+                        }
+                        """.trimIndent()
+                }.andExpect {
+                    status { isOk() }
+                    jsonPath("$.data.accessToken") { exists() }
+                    jsonPath("$.data.refreshToken") { exists() }
+                }.andReturn()
+
+        val newRefreshToken = JsonPath.read<String>(refreshResult.response.contentAsString, "$.data.refreshToken")
+        assertNotEquals(refreshToken, newRefreshToken)
+    }
+
+    @Test
+    fun `유효하지 않은 리프레시 토큰이면 400을 반환한다`() {
+        mockMvc
+            .post("/auth/refresh") {
+                contentType = MediaType.APPLICATION_JSON
+                content =
+                    """
+                    {
+                      "refreshToken": "invalid-token"
+                    }
+                    """.trimIndent()
+            }.andExpect {
+                status { isBadRequest() }
+                jsonPath("$.code") { value("USER_REFRESH_TOKEN_INVALID") }
             }
     }
 

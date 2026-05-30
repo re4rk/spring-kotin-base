@@ -4,6 +4,7 @@ import com.ark.base.BaseApplication
 import com.ark.base.common.JwtProvider
 import com.ark.base.inventory.InventoryRepository
 import com.ark.base.support.ApiTestClient
+import com.ark.base.support.RedisIntegrationTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -24,7 +25,7 @@ import java.util.concurrent.TimeUnit
 
 @SpringBootTest(classes = [BaseApplication::class])
 @AutoConfigureMockMvc
-class InventoryConcurrencyTest {
+class InventoryConcurrencyTest : RedisIntegrationTest() {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
