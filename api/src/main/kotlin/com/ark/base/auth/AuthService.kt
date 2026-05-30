@@ -1,6 +1,5 @@
 package com.ark.base.auth
 
-import com.ark.base.auth.PasswordResetRequestedEvent
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
 import com.ark.base.common.JwtProvider
@@ -8,7 +7,6 @@ import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.UserRepository
 import com.ark.base.user.UserResponse
 import com.ark.base.user.UserService
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -18,7 +16,6 @@ class AuthService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val tokenStore: PasswordResetTokenRepository,
-    private val eventPublisher: ApplicationEventPublisher,
     private val jwtProvider: JwtProvider,
     private val userService: UserService,
 ) {
@@ -34,7 +31,8 @@ class AuthService(
         val user = userRepository.findByEmail(request.email) ?: return
         val token = UUID.randomUUID().toString()
         tokenStore.save(token, user.id)
-        eventPublisher.publishEvent(PasswordResetRequestedEvent(user.email, token))
+        user.requestPasswordReset(token)
+        userRepository.save(user)
     }
 
     @Transactional

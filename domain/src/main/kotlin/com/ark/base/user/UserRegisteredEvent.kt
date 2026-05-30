@@ -1,7 +1,7 @@
 package com.ark.base.user
 
-data class UserRegisteredEvent(
-    val userId: Long,
-    val email: String,
-    val name: String,
-)
+class UserRegisteredEvent(private val user: User) {
+    val userId get() = user.id
+    val email get() = user.email
+    val name get() = user.name
+}

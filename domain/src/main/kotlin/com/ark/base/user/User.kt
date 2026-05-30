@@ -1,5 +1,7 @@
 package com.ark.base.user
 
+import com.ark.base.auth.PasswordResetRequestedEvent
+import com.ark.base.common.BaseAggregateEntity
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
 import jakarta.persistence.Entity
@@ -19,22 +21,27 @@ class User(
     var passwordHash: String,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
-) {
-    var deletedAt: LocalDateTime? = null
-        protected set
+) : BaseAggregateEntity<User>() {
 
     init {
         if (email.isBlank() || !email.matches(EMAIL_REGEX)) throw BaseException(ErrorCode.USER_INVALID_EMAIL)
         if (name.isBlank()) throw BaseException(ErrorCode.USER_BLANK_NAME)
         if (name.length > MAX_NAME_LENGTH) throw BaseException(ErrorCode.USER_NAME_TOO_LONG)
+        registerEvent(UserRegisteredEvent(this))
     }
 
-    fun delete() {
+    fun delete(by: String? = null) {
         deletedAt = LocalDateTime.now()
+        deletedBy = by
+        isDeleted = true
     }
 
     fun changePassword(newPasswordHash: String) {
         passwordHash = newPasswordHash
+    }
+
+    fun requestPasswordReset(token: String) {
+        registerEvent(PasswordResetRequestedEvent(email, token))
     }
 
     companion object {
