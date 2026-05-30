@@ -31,15 +31,6 @@ class UserService(
     }
 
     @Transactional
-    fun changePassword(
-        userId: Long,
-        newPassword: String,
-    ) {
-        val user = userRepository.getById(userId)
-        user.changePassword(newPassword, passwordEncoder)
-    }
-
-    @Transactional
     fun delete(userId: Long) {
         val user = userRepository.getById(userId)
         user.delete()

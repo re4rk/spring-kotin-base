@@ -6,7 +6,6 @@ import com.ark.base.common.JwtProvider
 import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.UserRepository
 import com.ark.base.user.UserResponse
-import com.ark.base.user.UserService
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -16,9 +15,8 @@ import java.util.UUID
 class AuthService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val tokenStore: PasswordResetTokenRepository,
+    private val passwordResetTokenRepository: PasswordResetTokenRepository,
     private val jwtProvider: JwtProvider,
-    private val userService: UserService,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional(readOnly = true)
@@ -32,14 +30,17 @@ class AuthService(
     fun requestPasswordReset(request: PasswordResetRequest) {
         val user = userRepository.findByEmail(request.email) ?: return
         val passwordResetToken = PasswordResetToken(token = UUID.randomUUID().toString(), userId = user.id)
-        tokenStore.save(passwordResetToken)
+        passwordResetTokenRepository.save(passwordResetToken)
         eventPublisher.publishEvent(PasswordResetRequestedEvent(user.email, passwordResetToken.token))
     }
 
     @Transactional
     fun resetPassword(request: PasswordResetConfirmRequest) {
-        val userId = tokenStore.findById(request.token).orElse(null)?.userId ?: throw BaseException(ErrorCode.USER_RESET_TOKEN_INVALID)
-        userService.changePassword(userId, request.newPassword)
-        tokenStore.deleteById(request.token)
+        val userId =
+            passwordResetTokenRepository.findById(request.token).orElse(null)?.userId
+                ?: throw BaseException(ErrorCode.USER_RESET_TOKEN_INVALID)
+        val user = userRepository.getById(userId)
+        user.changePassword(request.newPassword, passwordEncoder)
+        passwordResetTokenRepository.deleteById(request.token)
     }
 }
