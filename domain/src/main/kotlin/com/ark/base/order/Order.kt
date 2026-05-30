@@ -11,6 +11,7 @@ import jakarta.persistence.Table
 @Table(name = "orders")
 class Order(
     val userId: Long,
+    val productId: Long,
     val productName: String,
     val quantity: Int,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

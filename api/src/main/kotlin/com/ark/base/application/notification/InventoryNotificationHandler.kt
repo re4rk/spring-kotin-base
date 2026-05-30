@@ -3,6 +3,7 @@ package com.ark.base.application.notification
 import com.ark.base.inventory.StockSoldOutEvent
 import com.ark.base.notification.EmailSender
 import com.ark.base.notification.KakaoSender
+import com.ark.base.product.ProductRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
@@ -10,17 +11,19 @@ import org.springframework.transaction.event.TransactionalEventListener
 class InventoryNotificationHandler(
     private val emailSender: EmailSender,
     private val kakaoSender: KakaoSender,
+    private val productRepository: ProductRepository,
 ) {
     @TransactionalEventListener
     fun handle(event: StockSoldOutEvent) {
+        val productName = productRepository.getById(event.productId).name
         emailSender.send(
             to = "admin@example.com",
-            subject = "[재고 품절] ${event.productName}",
-            body = "${event.productName} 재고가 모두 소진되었습니다.",
+            subject = "[재고 품절] $productName",
+            body = "$productName 재고가 모두 소진되었습니다.",
         )
         kakaoSender.send(
             to = "admin",
-            message = "[품절 알림] ${event.productName} 재고 소진",
+            message = "[품절 알림] $productName 재고 소진",
         )
     }
 }

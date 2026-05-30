@@ -1,8 +1,8 @@
 package com.ark.base.ui
 
-import com.ark.base.ui.ApiResponse
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
+import com.ark.base.ui.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -33,6 +33,7 @@ class GlobalExceptionHandler {
         when (this) {
             ErrorCode.NOT_FOUND,
             ErrorCode.USER_NOT_FOUND,
+            ErrorCode.PRODUCT_NOT_FOUND,
             ErrorCode.ORDER_NOT_FOUND,
             ErrorCode.INVENTORY_NOT_FOUND,
             -> HttpStatus.NOT_FOUND

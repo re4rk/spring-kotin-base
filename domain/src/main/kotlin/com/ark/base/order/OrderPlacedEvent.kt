@@ -5,6 +5,7 @@ class OrderPlacedEvent(
 ) {
     val orderId get() = order.id
     val userId get() = order.userId
+    val productId get() = order.productId
     val productName get() = order.productName
     val quantity get() = order.quantity
 }
