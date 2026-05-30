@@ -13,7 +13,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(BaseException::class)
     fun handleBaseException(e: BaseException): ResponseEntity<ApiResponse> =
         ResponseEntity(
-            ErrorResponse(code = e.errorCode.name, message = e.errorCode.message),
+            ApiResponse.Error(code = e.errorCode.name, message = e.errorCode.message),
             e.errorCode.toHttpStatus(),
         )
 
@@ -21,7 +21,7 @@ class GlobalExceptionHandler {
     fun handleException(e: Exception): ResponseEntity<ApiResponse> {
         log.error("Unhandled exception", e)
         return ResponseEntity(
-            ErrorResponse(code = "S001", message = "서버 내부 오류가 발생했습니다."),
+            ApiResponse.Error(code = "S001", message = "서버 내부 오류가 발생했습니다."),
             HttpStatus.INTERNAL_SERVER_ERROR,
         )
     }

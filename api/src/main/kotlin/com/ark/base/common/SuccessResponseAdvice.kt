@@ -22,5 +22,5 @@ class SuccessResponseAdvice : ResponseBodyAdvice<Any> {
         selectedConverterType: Class<out HttpMessageConverter<*>>,
         request: ServerHttpRequest,
         response: ServerHttpResponse,
-    ): ApiResponse = body as? SuccessResponse<*> ?: SuccessResponse(body)
+    ): ApiResponse = body as? ApiResponse.Success<*> ?: ApiResponse.Success(body)
 }
