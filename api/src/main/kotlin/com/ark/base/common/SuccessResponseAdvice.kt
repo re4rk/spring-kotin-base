@@ -1,6 +1,5 @@
 package com.ark.base.common
 
-import com.ark.base.ui.GlobalExceptionHandler
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageConverter
@@ -14,7 +13,7 @@ class SuccessResponseAdvice : ResponseBodyAdvice<Any> {
     override fun supports(
         returnType: MethodParameter,
         converterType: Class<out HttpMessageConverter<*>>,
-    ): Boolean = returnType.declaringClass != GlobalExceptionHandler::class.java
+    ): Boolean = true
 
     override fun beforeBodyWrite(
         body: Any?,
@@ -23,5 +22,5 @@ class SuccessResponseAdvice : ResponseBodyAdvice<Any> {
         selectedConverterType: Class<out HttpMessageConverter<*>>,
         request: ServerHttpRequest,
         response: ServerHttpResponse,
-    ): ApiResponse = body as? ApiResponse.Success<*> ?: ApiResponse.Success(body)
+    ): ApiResponse = body as? ApiResponse ?: ApiResponse.Success(body)
 }
