@@ -52,7 +52,12 @@ class GlobalExceptionHandler {
             ErrorCode.PRODUCT_ALREADY_DISCONTINUED,
             -> HttpStatus.CONFLICT
 
-            ErrorCode.USER_LOGIN_FAILED -> HttpStatus.UNAUTHORIZED
+            ErrorCode.USER_LOGIN_FAILED,
+            ErrorCode.UNAUTHORIZED,
+            -> HttpStatus.UNAUTHORIZED
+
+            ErrorCode.ACCESS_DENIED -> HttpStatus.FORBIDDEN
+
             ErrorCode.USER_RESET_TOKEN_INVALID -> HttpStatus.BAD_REQUEST
         }
 }

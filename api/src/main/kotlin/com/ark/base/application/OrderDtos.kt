@@ -5,17 +5,18 @@ import com.ark.base.order.OrderStatus
 import com.ark.base.product.Product
 
 data class OrderPlaceRequest(
-    val userId: Long,
     val productId: Long,
     val quantity: Int,
 ) {
-    fun toOrder(product: Product) =
-        Order(
-            userId = userId,
-            productId = product.id,
-            productName = product.name,
-            quantity = quantity,
-        )
+    fun toOrder(
+        product: Product,
+        userId: Long,
+    ) = Order(
+        userId = userId,
+        productId = product.id,
+        productName = product.name,
+        quantity = quantity,
+    )
 }
 
 data class OrderResponse(

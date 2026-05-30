@@ -7,3 +7,7 @@ spring:
       ddl-auto: create-drop
   flyway:
     enabled: false
+
+jwt:
+  secret: test-secret-key-minimum-256-bits-long-for-hmac
+  expiration-ms: 3600000

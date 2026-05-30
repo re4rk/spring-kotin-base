@@ -21,4 +21,14 @@ class JwtProvider(
             .expiration(Date(System.currentTimeMillis() + expirationMs))
             .signWith(signingKey)
             .compact()
+
+    fun parseUserId(token: String): Long =
+        Jwts
+            .parser()
+            .verifyWith(signingKey)
+            .build()
+            .parseSignedClaims(token)
+            .payload
+            .subject
+            .toLong()
 }

@@ -16,12 +16,15 @@ class OrderService(
     private val inventoryRepository: InventoryRepository,
 ) {
     @Transactional
-    fun place(request: OrderPlaceRequest): OrderResponse {
+    fun place(
+        request: OrderPlaceRequest,
+        buyerId: Long,
+    ): OrderResponse {
         val product = productRepository.getById(request.productId)
         if (!product.status.isOrderable) throw BaseException(ErrorCode.PRODUCT_INVALID_STATUS)
         val inventory = inventoryRepository.getByProductId(request.productId)
         inventory.decrease(request.quantity)
-        val order = orderRepository.save(request.toOrder(product))
+        val order = orderRepository.save(request.toOrder(product, buyerId))
         return OrderResponse.from(order)
     }
 
