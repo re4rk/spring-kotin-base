@@ -30,7 +30,7 @@ class UserService(
     ) {
         val user = userRepository.getById(userId)
         if (!passwordEncoder.matches(request.currentPassword, user.passwordHash)) throw BaseException(ErrorCode.USER_LOGIN_FAILED)
-        user.changePassword(passwordEncoder.encode(request.newPassword))
+        user.changePassword(request.newPassword, passwordEncoder)
     }
 
     @Transactional
@@ -39,7 +39,7 @@ class UserService(
         newPassword: String,
     ) {
         val user = userRepository.getById(userId)
-        user.changePassword(passwordEncoder.encode(newPassword))
+        user.changePassword(newPassword, passwordEncoder)
     }
 
     @Transactional

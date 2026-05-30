@@ -34,8 +34,11 @@ class User(
         isDeleted = true
     }
 
-    fun changePassword(newPasswordHash: String) {
-        passwordHash = newPasswordHash
+    fun changePassword(
+        newPassword: String,
+        passwordEncoder: PasswordEncoder,
+    ) {
+        passwordHash = passwordEncoder.encode(newPassword)
     }
 
     companion object {
