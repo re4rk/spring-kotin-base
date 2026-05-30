@@ -24,7 +24,7 @@ class AuthService(
     @Transactional(readOnly = true)
     fun login(request: LoginRequest): TokenResponse {
         val user = userRepository.findByEmail(request.email) ?: throw BaseException(ErrorCode.USER_LOGIN_FAILED)
-        if (!passwordEncoder.matches(request.password, user.passwordHash)) throw BaseException(ErrorCode.USER_LOGIN_FAILED)
+        if (!user.matchesPassword(request.password, passwordEncoder)) throw BaseException(ErrorCode.USER_LOGIN_FAILED)
         return TokenResponse(accessToken = jwtProvider.generate(user.id), user = UserResponse.from(user))
     }
 

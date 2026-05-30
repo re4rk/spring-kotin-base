@@ -13,10 +13,7 @@ class UserService(
     @Transactional
     fun register(request: RegisterRequest): UserResponse {
         if (userRepository.findByEmail(request.email) != null) throw BaseException(ErrorCode.USER_DUPLICATE_EMAIL)
-        val user =
-            userRepository.save(
-                User(email = request.email, name = request.name, passwordHash = passwordEncoder.encode(request.password)),
-            )
+        val user = userRepository.save(request.toUser(passwordEncoder))
         return UserResponse.from(user)
     }
 
@@ -29,7 +26,7 @@ class UserService(
         request: ChangePasswordRequest,
     ) {
         val user = userRepository.getById(userId)
-        if (!passwordEncoder.matches(request.currentPassword, user.passwordHash)) throw BaseException(ErrorCode.USER_LOGIN_FAILED)
+        if (!user.matchesPassword(request.currentPassword, passwordEncoder)) throw BaseException(ErrorCode.USER_LOGIN_FAILED)
         user.changePassword(request.newPassword, passwordEncoder)
     }
 

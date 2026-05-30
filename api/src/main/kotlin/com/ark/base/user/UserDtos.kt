@@ -4,7 +4,15 @@ data class RegisterRequest(
     val email: String,
     val name: String,
     val password: String,
-)
+) {
+    fun toUser(passwordEncoder: PasswordEncoder) =
+        User(
+            email = email,
+            name = name,
+            password = password,
+            passwordEncoder = passwordEncoder,
+        )
+}
 
 data class ChangePasswordRequest(
     val currentPassword: String,
