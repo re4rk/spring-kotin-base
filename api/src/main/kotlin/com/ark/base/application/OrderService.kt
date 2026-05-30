@@ -1,5 +1,7 @@
 package com.ark.base.application
 
+import com.ark.base.common.BaseException
+import com.ark.base.common.ErrorCode
 import com.ark.base.inventory.InventoryRepository
 import com.ark.base.inventory.getByProductId
 import com.ark.base.order.OrderRepository
@@ -16,6 +18,7 @@ class OrderService(
     @Transactional
     fun place(request: OrderPlaceRequest): OrderResponse {
         val product = productRepository.getById(request.productId)
+        if (!product.status.isOrderable) throw BaseException(ErrorCode.PRODUCT_INVALID_STATUS)
         val inventory = inventoryRepository.getByProductId(request.productId)
         inventory.decrease(request.quantity)
         val order = orderRepository.save(request.toOrder(product))

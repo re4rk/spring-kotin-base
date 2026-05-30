@@ -1,6 +1,7 @@
 package com.ark.base.application
 
 import com.ark.base.product.Product
+import com.ark.base.product.ProductStatus
 
 data class ProductCreateRequest(
     val name: String,
@@ -13,11 +14,18 @@ data class ProductResponse(
     val name: String,
     val price: Long,
     val stock: Int,
+    val status: ProductStatus,
 ) {
     companion object {
         fun from(
             product: Product,
             stock: Int,
-        ) = ProductResponse(id = product.id, name = product.name, price = product.price, stock = stock)
+        ) = ProductResponse(
+            id = product.id,
+            name = product.name,
+            price = product.price,
+            stock = stock,
+            status = product.status,
+        )
     }
 }

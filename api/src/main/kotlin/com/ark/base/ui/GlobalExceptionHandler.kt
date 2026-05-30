@@ -43,11 +43,13 @@ class GlobalExceptionHandler {
             ErrorCode.USER_BLANK_NAME,
             ErrorCode.USER_NAME_TOO_LONG,
             ErrorCode.ORDER_INVALID_STATUS,
+            ErrorCode.PRODUCT_INVALID_STATUS,
             -> HttpStatus.BAD_REQUEST
 
             ErrorCode.USER_DUPLICATE_EMAIL,
             ErrorCode.STOCK_INSUFFICIENT,
             ErrorCode.ORDER_ALREADY_CANCELLED,
+            ErrorCode.PRODUCT_ALREADY_DISCONTINUED,
             -> HttpStatus.CONFLICT
 
             ErrorCode.USER_LOGIN_FAILED -> HttpStatus.UNAUTHORIZED
