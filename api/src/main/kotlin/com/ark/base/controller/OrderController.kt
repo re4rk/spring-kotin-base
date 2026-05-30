@@ -1,5 +1,8 @@
-package com.ark.base.order
+package com.ark.base.controller
 
+import com.ark.base.application.OrderPlaceRequest
+import com.ark.base.application.OrderResponse
+import com.ark.base.application.OrderService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

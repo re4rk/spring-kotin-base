@@ -1,4 +1,6 @@
-package com.ark.base.order
+package com.ark.base.application
+
+import com.ark.base.order.Order
 
 data class OrderPlaceRequest(
     val userId: Long,

@@ -1,5 +1,6 @@
-package com.ark.base.inventory
+package com.ark.base.application
 
+import com.ark.base.inventory.InventoryRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

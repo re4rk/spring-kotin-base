@@ -1,5 +1,7 @@
-package com.ark.base.inventory
+package com.ark.base.controller
 
+import com.ark.base.application.InventoryDecreaseRequest
+import com.ark.base.application.InventoryService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable

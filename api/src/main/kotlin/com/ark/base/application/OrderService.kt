@@ -1,5 +1,6 @@
-package com.ark.base.order
+package com.ark.base.application
 
+import com.ark.base.order.OrderRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

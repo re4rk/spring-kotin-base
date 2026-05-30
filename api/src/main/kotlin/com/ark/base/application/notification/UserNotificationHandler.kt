@@ -1,6 +1,8 @@
-package com.ark.base.notification
+package com.ark.base.application.notification
 
 import com.ark.base.auth.PasswordResetRequestedEvent
+import com.ark.base.notification.EmailSender
+import com.ark.base.notification.KakaoSender
 import com.ark.base.user.UserRegisteredEvent
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener

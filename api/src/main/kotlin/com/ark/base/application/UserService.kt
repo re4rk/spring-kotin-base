@@ -1,7 +1,9 @@
-package com.ark.base.user
+package com.ark.base.application
 
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
+import com.ark.base.user.PasswordEncoder
+import com.ark.base.user.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,7 +20,7 @@ class UserService(
     }
 
     @Transactional(readOnly = true)
-    fun findByEmail(email: String): User? = userRepository.findByEmail(email)
+    fun findByEmail(email: String) = userRepository.findByEmail(email)
 
     @Transactional
     fun changePassword(

@@ -1,4 +1,7 @@
-package com.ark.base.user
+package com.ark.base.application
+
+import com.ark.base.user.PasswordEncoder
+import com.ark.base.user.User
 
 data class RegisterRequest(
     val email: String,

@@ -1,5 +1,10 @@
-package com.ark.base.auth
+package com.ark.base.controller
 
+import com.ark.base.application.AuthService
+import com.ark.base.application.LoginRequest
+import com.ark.base.application.PasswordResetConfirmRequest
+import com.ark.base.application.PasswordResetRequest
+import com.ark.base.application.TokenResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

@@ -1,6 +1,4 @@
-package com.ark.base.auth
-
-import com.ark.base.user.UserResponse
+package com.ark.base.application
 
 data class LoginRequest(
     val email: String,
