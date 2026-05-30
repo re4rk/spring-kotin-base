@@ -15,7 +15,8 @@ class InventoryNotificationHandler(
 ) {
     @TransactionalEventListener
     fun handle(event: StockSoldOutEvent) {
-        val productName = productRepository.getById(event.productId).name
+        val product = productRepository.getById(event.productId)
+        val productName = product.name
         emailSender.send(
             to = "admin@example.com",
             subject = "[재고 품절] $productName",
