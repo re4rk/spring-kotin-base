@@ -1,7 +1,23 @@
 package com.ark.base.application
 
 import com.ark.base.product.Product
+import com.ark.base.product.ProductQueryFilter
 import com.ark.base.product.ProductStatus
+
+data class ProductQueryFilterRequest(
+    val status: ProductStatus? = null,
+    val name: String? = null,
+    val minPrice: Long? = null,
+    val maxPrice: Long? = null,
+) {
+    fun toQueryFilter() =
+        ProductQueryFilter(
+            status = status,
+            name = name?.takeIf { it.isNotBlank() },
+            minPrice = minPrice,
+            maxPrice = maxPrice,
+        )
+}
 
 data class ProductCreateRequest(
     val name: String,

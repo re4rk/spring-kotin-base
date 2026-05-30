@@ -14,10 +14,8 @@ class ProductService(
     private val inventoryRepository: InventoryRepository,
 ) {
     @Transactional(readOnly = true)
-    fun findAll(): List<ProductResponse> =
-        productRepository.findAll().map { product ->
-            toResponse(product)
-        }
+    fun findAllByFilter(request: ProductQueryFilterRequest): List<ProductResponse> =
+        productRepository.findAllByFilter(request.toQueryFilter()).map { product -> toResponse(product) }
 
     @Transactional(readOnly = true)
     fun findById(productId: Long): ProductResponse {
