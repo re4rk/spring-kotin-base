@@ -10,9 +10,9 @@ class OrderService(
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
-    fun place(command: OrderPlaceCommand): Order {
-        val order = orderRepository.save(command.toOrder())
+    fun place(request: OrderPlaceRequest): OrderResponse {
+        val order = orderRepository.save(Order(userId = request.userId, productName = request.productName, quantity = request.quantity))
         eventPublisher.publishEvent(OrderPlacedEvent(order.id, order.userId, order.productName, order.quantity))
-        return order
+        return OrderResponse.from(order)
     }
 }

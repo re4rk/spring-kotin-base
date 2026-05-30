@@ -1,6 +1,6 @@
 package com.ark.base.auth
 
-interface PasswordResetTokenStore {
+interface PasswordResetTokenRepository {
     fun save(
         token: String,
         userId: Long,

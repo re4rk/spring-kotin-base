@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
 @Component
-class RedisPasswordResetTokenStore(
+class RedisPasswordResetTokenRepository(
     private val redisTemplate: StringRedisTemplate,
-) : PasswordResetTokenStore {
+) : PasswordResetTokenRepository {
     override fun save(
         token: String,
         userId: Long,

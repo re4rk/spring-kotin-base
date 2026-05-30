@@ -5,9 +5,7 @@ import com.ark.base.user.UserResponse
 data class LoginRequest(
     val email: String,
     val password: String,
-) {
-    fun toUserLoginCommand() = UserLoginCommand(email = email, rawPassword = password)
-}
+)
 
 data class TokenResponse(
     val accessToken: String,

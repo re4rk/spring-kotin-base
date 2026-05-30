@@ -1,7 +1,5 @@
 package com.ark.base.auth
 
-import com.ark.base.common.JwtProvider
-import com.ark.base.user.UserResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -13,22 +11,21 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/auth")
 class AuthController(
     private val authService: AuthService,
-    private val passwordResetService: PasswordResetService,
-    private val jwtProvider: JwtProvider,
 ) {
     @PostMapping("/login")
-    fun login(@RequestBody request: LoginRequest): TokenResponse {
-        val user = authService.login(request.toUserLoginCommand())
-        return TokenResponse(accessToken = jwtProvider.generate(user.id), user = UserResponse.from(user))
-    }
+    fun login(
+        @RequestBody request: LoginRequest,
+    ): TokenResponse = authService.login(request)
 
     @PostMapping("/password-reset")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun requestPasswordReset(@RequestBody request: PasswordResetRequest) =
-        passwordResetService.request(request.email)
+    fun requestPasswordReset(
+        @RequestBody request: PasswordResetRequest,
+    ) = authService.requestPasswordReset(request)
 
     @PostMapping("/password-reset/confirm")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun resetPassword(@RequestBody request: PasswordResetConfirmRequest) =
-        passwordResetService.reset(request.token, request.newPassword)
+    fun resetPassword(
+        @RequestBody request: PasswordResetConfirmRequest,
+    ) = authService.resetPassword(request)
 }

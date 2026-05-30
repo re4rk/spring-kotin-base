@@ -1,5 +1,7 @@
 package com.ark.base.user
 
+import com.ark.base.common.BaseException
+import com.ark.base.common.ErrorCode
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -22,9 +24,9 @@ class User(
         protected set
 
     init {
-        if (email.isBlank() || !email.matches(EMAIL_REGEX)) throw UserException.InvalidEmail()
-        if (name.isBlank()) throw UserException.BlankName()
-        if (name.length > MAX_NAME_LENGTH) throw UserException.NameTooLong()
+        if (email.isBlank() || !email.matches(EMAIL_REGEX)) throw BaseException(ErrorCode.USER_INVALID_EMAIL)
+        if (name.isBlank()) throw BaseException(ErrorCode.USER_BLANK_NAME)
+        if (name.length > MAX_NAME_LENGTH) throw BaseException(ErrorCode.USER_NAME_TOO_LONG)
     }
 
     fun delete() {
