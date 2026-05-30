@@ -1,5 +1,6 @@
-package com.ark.base.common
+package com.ark.base.ui
 
+import com.ark.base.ui.ApiResponse
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageConverter

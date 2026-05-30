@@ -1,6 +1,6 @@
 package com.ark.base.ui
 
-import com.ark.base.common.ApiResponse
+import com.ark.base.ui.ApiResponse
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
 import org.slf4j.LoggerFactory

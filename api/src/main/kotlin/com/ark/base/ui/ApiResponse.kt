@@ -1,4 +1,4 @@
-package com.ark.base.common
+package com.ark.base.ui
 
 sealed interface ApiResponse {
     data class Success<T>(
