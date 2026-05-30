@@ -7,19 +7,23 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
+import java.util.UUID
 
 class ProductApiTest : ApiIntegrationTest() {
     @Test
     fun `상품 목록은 인증 없이 조회할 수 있다`() {
-        createProduct(sellerToken)
+        val uniqueName = "Public List Product ${UUID.randomUUID()}"
+        val productId = createProduct(sellerToken, name = uniqueName)
 
         mockMvc
             .get("/products") {
                 accept = MediaType.APPLICATION_JSON
+                param("name", uniqueName)
             }.andExpect {
                 status { isOk() }
                 jsonPath("$.data") { isArray() }
                 jsonPath("$.data.length()") { value(1) }
+                jsonPath("$.data[0].id") { value(productId) }
             }
     }
 

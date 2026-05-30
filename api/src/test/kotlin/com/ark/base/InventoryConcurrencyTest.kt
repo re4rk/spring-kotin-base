@@ -1,9 +1,9 @@
 package com.ark.base
 
+import com.ark.base.BaseApplication
 import com.ark.base.common.JwtProvider
 import com.ark.base.inventory.InventoryRepository
 import com.ark.base.support.ApiTestClient
-import com.ark.base.BaseApplication
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -120,16 +120,15 @@ class InventoryConcurrencyTest {
     private fun placeOrder(
         token: String,
         targetProductId: Long = productId,
-    ) =
-        mockMvc.post("/orders") {
-            contentType = MediaType.APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-            content =
-                """
-                {
-                  "productId": $targetProductId,
-                  "quantity": 1
-                }
-                """.trimIndent()
-        }
+    ) = mockMvc.post("/orders") {
+        contentType = MediaType.APPLICATION_JSON
+        header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+        content =
+            """
+            {
+              "productId": $targetProductId,
+              "quantity": 1
+            }
+            """.trimIndent()
+    }
 }
