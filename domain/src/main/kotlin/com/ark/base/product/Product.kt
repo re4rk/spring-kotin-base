@@ -19,6 +19,8 @@ class Product(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseAggregateEntity<Product>() {
+    val isOrderable: Boolean get() = status.isOrderable
+
     init {
         registerEvent(ProductCreatedEvent(this))
     }

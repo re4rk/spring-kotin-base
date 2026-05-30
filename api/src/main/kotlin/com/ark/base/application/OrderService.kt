@@ -21,7 +21,7 @@ class OrderService(
         buyerId: Long,
     ): OrderResponse {
         val product = productRepository.getById(request.productId)
-        if (!product.status.isOrderable) throw BaseException(ErrorCode.PRODUCT_INVALID_STATUS)
+        if (!product.isOrderable) throw BaseException(ErrorCode.PRODUCT_INVALID_STATUS)
         val inventory = inventoryRepository.getByProductId(request.productId)
         inventory.decrease(request.quantity)
         val order = orderRepository.save(request.toOrder(product, buyerId))
