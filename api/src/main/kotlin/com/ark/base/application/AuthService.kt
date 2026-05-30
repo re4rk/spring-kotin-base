@@ -3,7 +3,7 @@ package com.ark.base.application
 import com.ark.base.auth.PasswordResetRequestedEvent
 import com.ark.base.auth.PasswordResetToken
 import com.ark.base.auth.PasswordResetTokenRepository
-import com.ark.base.auth.RefreshToken
+import com.ark.base.auth.RefreshTokenConsumeResult
 import com.ark.base.auth.RefreshTokenRepository
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
@@ -28,7 +28,7 @@ class AuthService(
     fun login(request: LoginRequest): TokenResponse {
         val user = userRepository.findByEmail(request.email) ?: throw BaseException(ErrorCode.USER_LOGIN_FAILED)
         if (!user.matchesPassword(request.password, passwordEncoder)) throw BaseException(ErrorCode.USER_LOGIN_FAILED)
-        val refreshToken = refreshTokenRepository.save(RefreshToken(token = UUID.randomUUID().toString(), userId = user.id))
+        val refreshToken = refreshTokenRepository.issue(user.id)
         return TokenResponse(
             accessToken = jwtProvider.generate(user.id),
             refreshToken = refreshToken.token,
@@ -37,16 +37,21 @@ class AuthService(
 
     @Transactional
     fun refresh(request: RefreshTokenRequest): TokenResponse {
-        val stored =
-            refreshTokenRepository.findById(request.refreshToken).orElse(null)
-                ?: throw BaseException(ErrorCode.USER_REFRESH_TOKEN_INVALID)
-        refreshTokenRepository.deleteById(request.refreshToken)
-        val user = userRepository.getById(stored.userId)
-        val refreshToken = refreshTokenRepository.save(RefreshToken(token = UUID.randomUUID().toString(), userId = user.id))
-        return TokenResponse(
-            accessToken = jwtProvider.generate(user.id),
-            refreshToken = refreshToken.token,
-        )
+        when (val result = refreshTokenRepository.consume(request.refreshToken)) {
+            is RefreshTokenConsumeResult.Success -> {
+                val user = userRepository.getById(result.userId)
+                val refreshToken = refreshTokenRepository.issue(user.id)
+                return TokenResponse(
+                    accessToken = jwtProvider.generate(user.id),
+                    refreshToken = refreshToken.token,
+                )
+            }
+            is RefreshTokenConsumeResult.Reused -> {
+                refreshTokenRepository.revokeAll(result.userId)
+                throw BaseException(ErrorCode.USER_REFRESH_TOKEN_REUSED)
+            }
+            RefreshTokenConsumeResult.Invalid -> throw BaseException(ErrorCode.USER_REFRESH_TOKEN_INVALID)
+        }
     }
 
     @Transactional

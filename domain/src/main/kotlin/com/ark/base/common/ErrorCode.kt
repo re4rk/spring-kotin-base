@@ -18,6 +18,7 @@ enum class ErrorCode(
     USER_LOGIN_FAILED("이메일 또는 비밀번호가 올바르지 않습니다."),
     USER_RESET_TOKEN_INVALID("유효하지 않거나 만료된 토큰입니다."),
     USER_REFRESH_TOKEN_INVALID("유효하지 않거나 만료된 리프레시 토큰입니다."),
+    USER_REFRESH_TOKEN_REUSED("리프레시 토큰이 재사용되어 모든 세션이 무효화되었습니다."),
 
     // Product
     PRODUCT_NOT_FOUND("상품을 찾을 수 없습니다."),

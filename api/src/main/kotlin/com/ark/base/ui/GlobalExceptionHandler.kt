@@ -74,6 +74,7 @@ class GlobalExceptionHandler {
 
             ErrorCode.USER_RESET_TOKEN_INVALID,
             ErrorCode.USER_REFRESH_TOKEN_INVALID,
+            ErrorCode.USER_REFRESH_TOKEN_REUSED,
             -> HttpStatus.BAD_REQUEST
         }
 }

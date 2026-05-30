@@ -106,6 +106,41 @@ class AuthApiTest : ApiIntegrationTest() {
     }
 
     @Test
+    fun `재로그인하면 이전 refresh token은 무효화된다`() {
+        val firstRefreshToken = loginRefreshToken("seller@test.com")
+        loginRefreshToken("seller@test.com")
+
+        refreshWithToken(firstRefreshToken).andExpect {
+            status { isBadRequest() }
+            jsonPath("$.code") { value("USER_REFRESH_TOKEN_INVALID") }
+        }
+    }
+
+    @Test
+    fun `사용된 refresh token 재사용 시 모든 세션이 무효화된다`() {
+        val originalRefreshToken = loginRefreshToken("seller@test.com")
+        val rotatedRefreshToken =
+            JsonPath.read<String>(
+                refreshWithToken(originalRefreshToken)
+                    .andExpect { status { isOk() } }
+                    .andReturn()
+                    .response
+                    .contentAsString,
+                "$.data.refreshToken",
+            )
+
+        refreshWithToken(originalRefreshToken).andExpect {
+            status { isBadRequest() }
+            jsonPath("$.code") { value("USER_REFRESH_TOKEN_REUSED") }
+        }
+
+        refreshWithToken(rotatedRefreshToken).andExpect {
+            status { isBadRequest() }
+            jsonPath("$.code") { value("USER_REFRESH_TOKEN_INVALID") }
+        }
+    }
+
+    @Test
     fun `유효하지 않은 리프레시 토큰이면 400을 반환한다`() {
         mockMvc
             .post("/auth/refresh") {
@@ -139,4 +174,33 @@ class AuthApiTest : ApiIntegrationTest() {
                 jsonPath("$.code") { value("USER_LOGIN_FAILED") }
             }
     }
+
+    private fun loginRefreshToken(email: String, password: String = "password123"): String {
+        val result =
+            mockMvc
+                .post("/auth/login") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content =
+                        """
+                        {
+                          "email": "$email",
+                          "password": "$password"
+                        }
+                        """.trimIndent()
+                }.andExpect {
+                    status { isOk() }
+                }.andReturn()
+        return JsonPath.read(result.response.contentAsString, "$.data.refreshToken")
+    }
+
+    private fun refreshWithToken(refreshToken: String) =
+        mockMvc.post("/auth/refresh") {
+            contentType = MediaType.APPLICATION_JSON
+            content =
+                """
+                {
+                  "refreshToken": "$refreshToken"
+                }
+                """.trimIndent()
+        }
 }
