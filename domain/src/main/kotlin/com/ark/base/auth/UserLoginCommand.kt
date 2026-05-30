@@ -1,4 +1,4 @@
-package com.ark.base.user
+package com.ark.base.auth
 
 data class UserLoginCommand(
     val email: String,

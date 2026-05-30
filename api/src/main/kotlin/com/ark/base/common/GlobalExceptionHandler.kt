@@ -45,5 +45,6 @@ class GlobalExceptionHandler {
             -> HttpStatus.CONFLICT
 
             ErrorCode.USER_LOGIN_FAILED -> HttpStatus.UNAUTHORIZED
+            ErrorCode.USER_RESET_TOKEN_INVALID -> HttpStatus.BAD_REQUEST
         }
 }

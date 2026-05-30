@@ -1,5 +1,6 @@
 package com.ark.base.notification
 
+import com.ark.base.auth.PasswordResetRequestedEvent
 import com.ark.base.notification.infrastructure.EmailSender
 import com.ark.base.notification.infrastructure.KakaoSender
 import com.ark.base.user.UserRegisteredEvent
@@ -11,6 +12,15 @@ class UserNotificationHandler(
     private val emailSender: EmailSender,
     private val kakaoSender: KakaoSender,
 ) {
+    @TransactionalEventListener
+    fun handle(event: PasswordResetRequestedEvent) {
+        emailSender.send(
+            to = event.email,
+            subject = "비밀번호 재설정",
+            body = "비밀번호 재설정 토큰: ${event.resetToken}",
+        )
+    }
+
     @TransactionalEventListener
     fun handle(event: UserRegisteredEvent) {
         emailSender.send(
