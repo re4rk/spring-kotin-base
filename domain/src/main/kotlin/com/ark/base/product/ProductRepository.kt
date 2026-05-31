@@ -14,6 +14,7 @@ interface ProductRepository : JpaRepository<Product, Long> {
           AND (:#{#query.name} IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :#{#query.name}, '%')))
           AND (:#{#query.minPrice} IS NULL OR p.price >= :#{#query.minPrice})
           AND (:#{#query.maxPrice} IS NULL OR p.price <= :#{#query.maxPrice})
+          AND (:#{#query.category} IS NULL OR p.category = :#{#query.category})
         """,
     )
     fun findAllByFilter(

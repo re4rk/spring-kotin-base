@@ -51,10 +51,13 @@ CREATE TABLE users
 -- =============================================================================
 CREATE TABLE product
 (
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY    COMMENT '상품 PK',
-    name       VARCHAR(255) NOT NULL                COMMENT '상품명',
-    price      BIGINT       NOT NULL                COMMENT '가격 (원 단위)',
-    status     VARCHAR(50)  NOT NULL                COMMENT '상태: DRAFT|PENDING|ON_SALE|SOLD_OUT|DISCONTINUED',
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY    COMMENT '상품 PK',
+    name          VARCHAR(255) NOT NULL                COMMENT '상품명',
+    price         BIGINT       NOT NULL                COMMENT '가격 (원 단위)',
+    status        VARCHAR(50)  NOT NULL                COMMENT '상태: DRAFT|PENDING|ON_SALE|SOLD_OUT|DISCONTINUED',
+    description   TEXT                                 COMMENT '상품 설명',
+    category      VARCHAR(100)                         COMMENT '카테고리',
+    thumbnail_url VARCHAR(500)                         COMMENT '썸네일 이미지 URL',
 
     -- audit
     created_at DATETIME(6)  NOT NULL                COMMENT '생성 일시',

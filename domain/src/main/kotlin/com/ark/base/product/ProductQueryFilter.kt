@@ -5,4 +5,5 @@ data class ProductQueryFilter(
     val name: String? = null,
     val minPrice: Long? = null,
     val maxPrice: Long? = null,
+    val category: String? = null,
 )

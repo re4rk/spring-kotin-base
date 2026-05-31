@@ -31,6 +31,22 @@ class ProductService(
     }
 
     @Transactional
+    fun update(
+        productId: Long,
+        request: ProductUpdateRequest,
+    ): ProductResponse {
+        val product = productRepository.findByIdOrThrow(productId)
+        product.update(
+            name = request.name,
+            price = request.price,
+            description = request.description,
+            category = request.category,
+            thumbnailUrl = request.thumbnailUrl,
+        )
+        return toResponse(product)
+    }
+
+    @Transactional
     fun submit(productId: Long): ProductResponse = transition(productId) { it.submit() }
 
     @Transactional

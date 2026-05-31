@@ -4,6 +4,7 @@ import com.ark.base.application.ProductCreateRequest
 import com.ark.base.application.ProductQueryFilterRequest
 import com.ark.base.application.ProductResponse
 import com.ark.base.application.ProductService
+import com.ark.base.application.ProductUpdateRequest
 import com.ark.base.ui.auth.AccessType
 import com.ark.base.ui.auth.Authorize
 import org.springframework.http.HttpStatus
@@ -37,6 +38,13 @@ class ProductController(
     fun create(
         @RequestBody request: ProductCreateRequest,
     ): ProductResponse = productService.create(request)
+
+    @Authorize(AccessType.PRODUCT_OWNER, param = "productId")
+    @PatchMapping("/{productId}")
+    fun update(
+        @PathVariable productId: Long,
+        @RequestBody request: ProductUpdateRequest,
+    ): ProductResponse = productService.update(productId, request)
 
     @Authorize(AccessType.PRODUCT_OWNER, param = "productId")
     @PatchMapping("/{productId}/submit")

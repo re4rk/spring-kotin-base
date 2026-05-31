@@ -12,14 +12,31 @@ import jakarta.persistence.Id
 
 @Entity
 class Product(
-    val name: String,
-    val price: Long,
+    var name: String,
+    var price: Long,
+    var description: String? = null,
+    var category: String? = null,
+    var thumbnailUrl: String? = null,
     @Enumerated(EnumType.STRING)
     var status: ProductStatus = ProductStatus.DRAFT,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseAggregateEntity<Product>() {
     val isOrderable: Boolean get() = status.isOrderable
+
+    fun update(
+        name: String,
+        price: Long,
+        description: String?,
+        category: String?,
+        thumbnailUrl: String?,
+    ) {
+        this.name = name
+        this.price = price
+        this.description = description
+        this.category = category
+        this.thumbnailUrl = thumbnailUrl
+    }
 
     init {
         registerEvent(ProductCreatedEvent(this))
