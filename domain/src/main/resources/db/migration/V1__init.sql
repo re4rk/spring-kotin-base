@@ -74,6 +74,63 @@ CREATE TABLE product
   COMMENT = '상품';
 
 -- =============================================================================
+-- product_option_group: 상품 옵션 그룹
+--   - product 와 N:1 관계 (product_id FK)
+--   - 예: 색상, 사이즈
+-- =============================================================================
+CREATE TABLE product_option_group
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY    COMMENT '옵션 그룹 PK',
+    product_id BIGINT       NOT NULL                COMMENT '상품 ID (product.id 참조)',
+    name       VARCHAR(100) NOT NULL                COMMENT '옵션 그룹명 (예: 색상, 사이즈)',
+    sort_order INT          NOT NULL DEFAULT 0      COMMENT '노출 순서',
+
+    -- audit
+    created_at DATETIME(6)  NOT NULL                COMMENT '생성 일시',
+    created_by VARCHAR(255)                         COMMENT '생성 주체',
+    updated_at DATETIME(6)  NOT NULL                COMMENT '마지막 수정 일시',
+    updated_by VARCHAR(255)                         COMMENT '마지막 수정 주체',
+
+    -- soft delete
+    deleted_at DATETIME(6)                          COMMENT '삭제 일시',
+    deleted_by VARCHAR(255)                         COMMENT '삭제 주체',
+    is_deleted BOOLEAN      NOT NULL DEFAULT FALSE  COMMENT '삭제 여부'
+) DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = '상품 옵션 그룹';
+
+-- =============================================================================
+-- product_option: 상품 옵션
+--   - product_option_group 과 N:1 관계
+--   - extra_price: 기본 가격에 더해지는 추가 금액
+--   - stock: 옵션별 독립 재고 (version: 낙관적 락)
+--   - 예: 빨강 +0원, XL +1000원
+-- =============================================================================
+CREATE TABLE product_option
+(
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY    COMMENT '옵션 PK',
+    option_group_id BIGINT       NOT NULL                COMMENT '옵션 그룹 ID (product_option_group.id 참조)',
+    name            VARCHAR(100) NOT NULL                COMMENT '옵션명 (예: 빨강, XL)',
+    extra_price     BIGINT       NOT NULL DEFAULT 0      COMMENT '추가 금액 (원 단위, 기본 가격에 합산)',
+    stock           INT          NOT NULL                COMMENT '옵션별 재고 수량',
+    sort_order      INT          NOT NULL DEFAULT 0      COMMENT '노출 순서',
+    version         BIGINT       NOT NULL DEFAULT 0      COMMENT 'Hibernate 낙관적 락 버전',
+
+    -- audit
+    created_at      DATETIME(6)  NOT NULL                COMMENT '생성 일시',
+    created_by      VARCHAR(255)                         COMMENT '생성 주체',
+    updated_at      DATETIME(6)  NOT NULL                COMMENT '마지막 수정 일시',
+    updated_by      VARCHAR(255)                         COMMENT '마지막 수정 주체',
+
+    -- soft delete
+    deleted_at      DATETIME(6)                          COMMENT '삭제 일시',
+    deleted_by      VARCHAR(255)                         COMMENT '삭제 주체',
+    is_deleted      BOOLEAN      NOT NULL DEFAULT FALSE  COMMENT '삭제 여부'
+) DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = '상품 옵션 (옵션별 추가금액 및 재고)';
+
+-- =============================================================================
 -- inventory: 상품 재고
 --   - product 와 1:1 관계 (product_id FK 없이 ID 참조, 도메인 레이어에서 정합성 관리)
 --   - version: Hibernate @Version 낙관적 락 — 동시 재고 차감 충돌 감지

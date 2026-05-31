@@ -31,6 +31,26 @@ class ProductService(
     }
 
     @Transactional
+    fun addOptionGroup(
+        productId: Long,
+        request: ProductOptionGroupCreateRequest,
+    ): ProductResponse {
+        val product = productRepository.findByIdOrThrow(productId)
+        product.addOptionGroup(request.toOptionGroup())
+        return toResponse(product)
+    }
+
+    @Transactional
+    fun removeOptionGroup(
+        productId: Long,
+        groupId: Long,
+    ): ProductResponse {
+        val product = productRepository.findByIdOrThrow(productId)
+        product.removeOptionGroup(groupId)
+        return toResponse(product)
+    }
+
+    @Transactional
     fun update(
         productId: Long,
         request: ProductUpdateRequest,

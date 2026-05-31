@@ -1,6 +1,7 @@
 package com.ark.base.ui
 
 import com.ark.base.application.ProductCreateRequest
+import com.ark.base.application.ProductOptionGroupCreateRequest
 import com.ark.base.application.ProductQueryFilterRequest
 import com.ark.base.application.ProductResponse
 import com.ark.base.application.ProductService
@@ -8,6 +9,7 @@ import com.ark.base.application.ProductUpdateRequest
 import com.ark.base.ui.auth.AccessType
 import com.ark.base.ui.auth.Authorize
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PatchMapping
@@ -45,6 +47,21 @@ class ProductController(
         @PathVariable productId: Long,
         @RequestBody request: ProductUpdateRequest,
     ): ProductResponse = productService.update(productId, request)
+
+    @Authorize(AccessType.PRODUCT_OWNER, param = "productId")
+    @PostMapping("/{productId}/option-groups")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun addOptionGroup(
+        @PathVariable productId: Long,
+        @RequestBody request: ProductOptionGroupCreateRequest,
+    ): ProductResponse = productService.addOptionGroup(productId, request)
+
+    @Authorize(AccessType.PRODUCT_OWNER, param = "productId")
+    @DeleteMapping("/{productId}/option-groups/{groupId}")
+    fun removeOptionGroup(
+        @PathVariable productId: Long,
+        @PathVariable groupId: Long,
+    ): ProductResponse = productService.removeOptionGroup(productId, groupId)
 
     @Authorize(AccessType.PRODUCT_OWNER, param = "productId")
     @PatchMapping("/{productId}/submit")

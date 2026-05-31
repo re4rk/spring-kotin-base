@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Option 테스트</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a1a; }
+
+    header {
+      background: #1e293b;
+      color: #fff;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 { font-size: 18px; font-weight: 600; }
+    header .badge {
+      font-size: 12px;
+      background: #3b82f6;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .token-bar {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 8px 32px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .token-bar .dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; }
+    .token-bar .dot.on { background: #22c55e; }
+    #token-display { font-family: monospace; color: #e2e8f0; }
+
+    .layout { display: grid; grid-template-columns: 360px 1fr; grid-template-rows: 1fr; gap: 0; height: calc(100vh - 89px); }
+
+    .sidebar {
+      background: #fff;
+      border-right: 1px solid #e2e8f0;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 0;
+    }
+
+    .main {
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 0;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .card-header {
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-header h2 { font-size: 14px; font-weight: 600; color: #374151; }
+    .card-header .method {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    .method.post { background: #dcfce7; color: #166534; }
+    .method.get  { background: #dbeafe; color: #1e40af; }
+    .method.del  { background: #fee2e2; color: #991b1b; }
+    .card-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+
+    label { font-size: 12px; font-weight: 500; color: #6b7280; display: block; margin-bottom: 4px; }
+    input, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .15s;
+    }
+    input:focus, textarea:focus { border-color: #3b82f6; }
+    textarea { resize: vertical; font-family: monospace; font-size: 12px; min-height: 120px; }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    button {
+      padding: 9px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    button:hover { opacity: .85; }
+    button:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-primary { background: #3b82f6; color: #fff; width: 100%; }
+    .btn-danger  { background: #ef4444; color: #fff; width: 100%; }
+
+    /* product list */
+    .product-list { display: flex; flex-direction: column; gap: 12px; }
+    .product-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .product-card.selected { border-color: #3b82f6; }
+    .product-card-header {
+      padding: 10px 14px;
+      background: #f8fafc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .product-card-header .name { font-weight: 600; font-size: 14px; }
+    .product-card-header .price { font-size: 13px; color: #6b7280; }
+    .product-card-body { padding: 10px 14px; }
+    .meta { font-size: 12px; color: #9ca3af; margin-bottom: 8px; }
+
+    /* option groups */
+    .option-groups { display: flex; flex-direction: column; gap: 8px; }
+    .og {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .og-header {
+      padding: 8px 12px;
+      background: #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .og-header .og-name { font-size: 13px; font-weight: 600; }
+    .og-header .og-id { font-size: 11px; color: #94a3b8; font-family: monospace; }
+    .og-delete {
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #fee2e2;
+      color: #991b1b;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .og-delete:hover { background: #fecaca; }
+    .options-row {
+      padding: 8px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .opt-chip {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .opt-chip .extra { color: #0369a1; font-weight: 600; }
+    .opt-chip .stock { color: #6b7280; }
+
+    /* log */
+    .log {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #94a3b8;
+      min-height: 80px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .log .entry { margin-bottom: 4px; line-height: 1.5; }
+    .log .ok  { color: #4ade80; }
+    .log .err { color: #f87171; }
+    .log .info { color: #60a5fa; }
+    .log .dim { color: #475569; }
+
+    .empty { text-align: center; color: #9ca3af; font-size: 13px; padding: 24px 0; }
+    .selected-banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #1d4ed8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Product Option 테스트</h1>
+  <span class="badge">localhost:8080</span>
+</header>
+
+<div class="token-bar">
+  <span class="dot" id="token-dot"></span>
+  <span>Access Token:</span>
+  <span id="token-display">없음 — 먼저 로그인하세요</span>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- 로그인 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="method post">POST</span>
+        <h2>로그인</h2>
+      </div>
+      <div class="card-body">
+        <div>
+          <label>Email</label>
+          <input id="email" value="test@example.com">
+        </div>
+        <div>
+          <label>Password</label>
+          <input id="password" type="password" value="password123">
+        </div>
+        <button class="btn-primary" onclick="login()">로그인</button>
+      </div>
+    </div>
+
+    <!-- 상품 생성 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="method post">POST</span>
+        <h2>상품 생성</h2>
+      </div>
+      <div class="card-body">
+        <div>
+          <label>상품명</label>
+          <input id="p-name" value="테스트 티셔츠">
+        </div>
+        <div class="row">
+          <div>
+            <label>가격 (원)</label>
+            <input id="p-price" type="number" value="29000">
+          </div>
+          <div>
+            <label>초기 재고</label>
+            <input id="p-stock" type="number" value="0">
+          </div>
+        </div>
+        <div>
+          <label>카테고리</label>
+          <input id="p-category" value="의류">
+        </div>
+        <div>
+          <label>설명</label>
+          <input id="p-desc" value="편안한 일상복">
+        </div>
+        <button class="btn-primary" onclick="createProduct()">상품 생성</button>
+      </div>
+    </div>
+
+    <!-- 옵션 그룹 추가 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="method post">POST</span>
+        <h2>옵션 그룹 추가</h2>
+      </div>
+      <div class="card-body">
+        <div id="selected-product-banner" class="selected-banner" style="display:none">
+          📦 선택된 상품 ID: <strong id="selected-product-id-label"></strong>
+        </div>
+        <div>
+          <label>그룹명</label>
+          <input id="og-name" value="색상">
+        </div>
+        <div>
+          <label>옵션 목록 (JSON)</label>
+          <textarea id="og-options">[
+  { "name": "화이트", "extraPrice": 0, "stock": 20, "sortOrder": 0 },
+  { "name": "블랙",   "extraPrice": 0, "stock": 15, "sortOrder": 1 },
+  { "name": "네이비", "extraPrice": 0, "stock": 10, "sortOrder": 2 }
+]</textarea>
+        </div>
+        <button class="btn-primary" onclick="addOptionGroup()">옵션 그룹 추가</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- 상품 목록 -->
+    <div class="card">
+      <div class="card-header" style="justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="method get">GET</span>
+          <h2>상품 목록 <span id="product-count" style="color:#9ca3af;font-weight:400"></span></h2>
+        </div>
+        <button onclick="fetchProducts()" style="background:#f1f5f9;color:#374151;font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #e2e8f0">새로고침</button>
+      </div>
+      <div class="card-body">
+        <div id="product-list" class="product-list">
+          <p class="empty">상품이 없습니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 로그 -->
+    <div class="card">
+      <div class="card-header" style="justify-content:space-between">
+        <h2>요청 로그</h2>
+        <button onclick="clearLog()" style="background:#f1f5f9;color:#374151;font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #e2e8f0">지우기</button>
+      </div>
+      <div class="card-body" style="padding:0">
+        <div id="log" class="log"><span class="dim">// 요청 결과가 여기에 표시됩니다</span></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const BASE = 'http://localhost:8080';
+  let token = null;
+  let selectedProductId = null;
+
+  /* ── 로그 ── */
+  function log(msg, type = 'info') {
+    const el = document.getElementById('log');
+    const line = document.createElement('div');
+    line.className = `entry ${type}`;
+    line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    el.appendChild(line);
+    el.scrollTop = el.scrollHeight;
+  }
+  function clearLog() {
+    document.getElementById('log').innerHTML = '<span class="dim">// 지워졌습니다</span>';
+  }
+
+  /* ── 토큰 표시 ── */
+  function setToken(t) {
+    token = t;
+    const dot = document.getElementById('token-dot');
+    const disp = document.getElementById('token-display');
+    if (t) {
+      dot.classList.add('on');
+      disp.textContent = t.substring(0, 40) + '...';
+    } else {
+      dot.classList.remove('on');
+      disp.textContent = '없음';
+    }
+  }
+
+  /* ── fetch 헬퍼 ── */
+  async function api(method, path, body) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(BASE + path, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const text = await res.text();
+    let json;
+    try { json = JSON.parse(text); } catch { json = { raw: text }; }
+    return { status: res.status, ok: res.ok, json };
+  }
+
+  /* ── 로그인 ── */
+  async function login() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    log(`POST /auth/login (${email})`);
+    try {
+      const { status, ok, json } = await api('POST', '/auth/login', { email, password });
+      if (ok) {
+        setToken(json.data?.accessToken);
+        log(`✓ 로그인 성공 (${status})`, 'ok');
+        fetchProducts();
+      } else {
+        log(`✗ 로그인 실패 (${status}): ${json.message ?? JSON.stringify(json)}`, 'err');
+      }
+    } catch (e) {
+      log(`✗ 네트워크 오류: ${e.message}`, 'err');
+    }
+  }
+
+  /* ── 상품 생성 ── */
+  async function createProduct() {
+    if (!token) { log('✗ 먼저 로그인하세요', 'err'); return; }
+    const body = {
+      name: document.getElementById('p-name').value,
+      price: Number(document.getElementById('p-price').value),
+      initialStock: Number(document.getElementById('p-stock').value),
+      category: document.getElementById('p-category').value || null,
+      description: document.getElementById('p-desc').value || null,
+    };
+    log(`POST /products "${body.name}"`);
+    try {
+      const { status, ok, json } = await api('POST', '/products', body);
+      if (ok) {
+        log(`✓ 상품 생성 성공 (ID: ${json.data?.id ?? json.id})`, 'ok');
+        fetchProducts();
+      } else {
+        log(`✗ 상품 생성 실패 (${status}): ${json.message ?? JSON.stringify(json)}`, 'err');
+      }
+    } catch (e) {
+      log(`✗ 네트워크 오류: ${e.message}`, 'err');
+    }
+  }
+
+  /* ── 상품 목록 조회 ── */
+  async function fetchProducts() {
+    log('GET /products');
+    try {
+      const { status, ok, json } = await api('GET', '/products');
+      if (ok) {
+        const products = json.data ?? json;
+        document.getElementById('product-count').textContent = `(${products.length}개)`;
+        renderProducts(products);
+        log(`✓ ${products.length}개 상품 로드 (${status})`, 'ok');
+      } else {
+        log(`✗ 조회 실패 (${status})`, 'err');
+      }
+    } catch (e) {
+      log(`✗ 네트워크 오류: ${e.message}`, 'err');
+    }
+  }
+
+  /* ── 단일 상품 조회 ── */
+  async function fetchProduct(id) {
+    const { ok, json } = await api('GET', `/products/${id}`);
+    return ok ? (json.data ?? json) : null;
+  }
+
+  /* ── 상품 목록 렌더 ── */
+  function renderProducts(products) {
+    const el = document.getElementById('product-list');
+    if (!products.length) {
+      el.innerHTML = '<p class="empty">상품이 없습니다.</p>';
+      return;
+    }
+    el.innerHTML = '';
+    products.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'product-card' + (p.id === selectedProductId ? ' selected' : '');
+      card.onclick = () => selectProduct(p.id);
+      card.innerHTML = `
+        <div class="product-card-header">
+          <span class="name">${p.name}</span>
+          <span class="price">${p.price.toLocaleString()}원</span>
+        </div>
+        <div class="product-card-body">
+          <div class="meta">ID: ${p.id} · ${p.status} · 재고: ${p.stock}${p.category ? ' · ' + p.category : ''}</div>
+          <div id="og-area-${p.id}">${renderOptionGroups(p.optionGroups ?? [], p.id)}</div>
+        </div>`;
+      el.appendChild(card);
+    });
+  }
+
+  function renderOptionGroups(groups, productId) {
+    if (!groups.length) return '<span style="font-size:12px;color:#9ca3af">옵션 없음</span>';
+    return `<div class="option-groups">${groups.map(g => `
+      <div class="og">
+        <div class="og-header">
+          <div>
+            <span class="og-name">${g.name}</span>
+            <span class="og-id"> #${g.id}</span>
+          </div>
+          <button class="og-delete" onclick="event.stopPropagation(); removeOptionGroup(${productId}, ${g.id})">삭제</button>
+        </div>
+        <div class="options-row">
+          ${g.options.map(o => `
+            <span class="opt-chip">
+              ${o.name}
+              <span class="extra">${o.extraPrice > 0 ? '+' + o.extraPrice.toLocaleString() + '원' : '기본'}</span>
+              <span class="stock">재고 ${o.stock}</span>
+            </span>`).join('')}
+        </div>
+      </div>`).join('')}</div>`;
+  }
+
+  /* ── 상품 선택 ── */
+  function selectProduct(id) {
+    selectedProductId = id;
+    document.getElementById('selected-product-banner').style.display = 'flex';
+    document.getElementById('selected-product-id-label').textContent = id;
+    document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    log(`상품 선택: ID ${id}`, 'info');
+  }
+
+  /* ── 옵션 그룹 추가 ── */
+  async function addOptionGroup() {
+    if (!token) { log('✗ 먼저 로그인하세요', 'err'); return; }
+    if (!selectedProductId) { log('✗ 상품을 먼저 선택하세요 (상품 카드 클릭)', 'err'); return; }
+    let options;
+    try { options = JSON.parse(document.getElementById('og-options').value); }
+    catch { log('✗ 옵션 JSON 형식 오류', 'err'); return; }
+    const body = { name: document.getElementById('og-name').value, options };
+    log(`POST /products/${selectedProductId}/option-groups "${body.name}" (옵션 ${options.length}개)`);
+    try {
+      const { status, ok, json } = await api('POST', `/products/${selectedProductId}/option-groups`, body);
+      if (ok) {
+        log(`✓ 옵션 그룹 추가 성공 (${status})`, 'ok');
+        refreshProductCard(selectedProductId);
+      } else {
+        log(`✗ 실패 (${status}): ${json.message ?? JSON.stringify(json)}`, 'err');
+      }
+    } catch (e) {
+      log(`✗ 네트워크 오류: ${e.message}`, 'err');
+    }
+  }
+
+  /* ── 옵션 그룹 삭제 ── */
+  async function removeOptionGroup(productId, groupId) {
+    if (!token) { log('✗ 먼저 로그인하세요', 'err'); return; }
+    log(`DELETE /products/${productId}/option-groups/${groupId}`);
+    try {
+      const { status, ok, json } = await api('DELETE', `/products/${productId}/option-groups/${groupId}`);
+      if (ok) {
+        log(`✓ 옵션 그룹 삭제 성공 (${status})`, 'ok');
+        refreshProductCard(productId);
+      } else {
+        log(`✗ 실패 (${status}): ${json.message ?? JSON.stringify(json)}`, 'err');
+      }
+    } catch (e) {
+      log(`✗ 네트워크 오류: ${e.message}`, 'err');
+    }
+  }
+
+  /* ── 단일 상품 카드만 갱신 ── */
+  async function refreshProductCard(productId) {
+    const p = await fetchProduct(productId);
+    if (!p) return;
+    const area = document.getElementById(`og-area-${productId}`);
+    if (area) area.innerHTML = renderOptionGroups(p.optionGroups ?? [], productId);
+  }
+
+  /* ── 초기 로드 ── */
+  fetchProducts();
+</script>
+</body>
+</html>
