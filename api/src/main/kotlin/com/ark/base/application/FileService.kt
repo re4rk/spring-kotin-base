@@ -2,9 +2,9 @@ package com.ark.base.application
 
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
+import com.ark.base.file.FileClient
 import com.ark.base.file.FileMetadata
 import com.ark.base.file.FileMetadataRepository
-import com.ark.base.file.FileClient
 import com.ark.base.file.findByIdOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
