@@ -2,26 +2,28 @@ package com.ark.base.application
 
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
+import com.ark.base.common.afterTransactionCommit
 import com.ark.base.file.FileClient
 import com.ark.base.file.FileMetadataRepository
 import com.ark.base.file.findByIdOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionTemplate
 import org.springframework.web.multipart.MultipartFile
 
 @Service
 class FileService(
     private val fileClient: FileClient,
     private val fileMetadataRepository: FileMetadataRepository,
+    private val transactionTemplate: TransactionTemplate
 ) {
-    @Transactional
     fun upload(request: FileRequest): FileResponse {
         validate(request.file)
         val stored =
             runCatching { fileClient.upload(request.toFileUpload()) }
                 .getOrElse { throw BaseException(ErrorCode.FILE_UPLOAD_FAILED) }
 
-        val metadata = fileMetadataRepository.save(request.toFileMetadata(stored))
+        val metadata = transactionTemplate.execute { fileMetadataRepository.save(request.toFileMetadata(stored)) }
         return FileResponse.from(metadata, stored.url)
     }
 
@@ -38,7 +40,7 @@ class FileService(
         val metadata = fileMetadataRepository.findByIdOrThrow(fileId)
 
         metadata.delete()
-        fileClient.delete(metadata.path)
+        afterTransactionCommit { fileClient.delete(metadata.path) }
     }
 
     private fun validate(file: MultipartFile) {
