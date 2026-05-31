@@ -1,6 +1,5 @@
 package com.ark.base.application
 
-import com.ark.base.inventory.Inventory
 import com.ark.base.inventory.InventoryRepository
 import com.ark.base.product.Product
 import com.ark.base.product.ProductRepository
@@ -25,8 +24,8 @@ class ProductService(
 
     @Transactional
     fun create(request: ProductCreateRequest): ProductResponse {
-        val product = productRepository.save(Product(name = request.name, price = request.price))
-        val inventory = inventoryRepository.save(Inventory(productId = product.id, stock = request.initialStock))
+        val product = productRepository.save(request.toProduct())
+        val inventory = inventoryRepository.save(request.toInventory(product))
         return ProductResponse.from(product, inventory.stock)
     }
 

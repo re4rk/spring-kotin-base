@@ -2,6 +2,7 @@ package com.ark.base.infra
 
 import com.ark.base.common.MinioProperties
 import com.ark.base.file.FileClient
+import com.ark.base.file.FileUpload
 import com.ark.base.file.StoredFile
 import io.minio.BucketExistsArgs
 import io.minio.GetPresignedObjectUrlArgs
@@ -11,7 +12,6 @@ import io.minio.PutObjectArgs
 import io.minio.RemoveObjectArgs
 import io.minio.http.Method
 import org.springframework.stereotype.Component
-import java.io.InputStream
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -24,13 +24,8 @@ class MinioFileClient(
         ensureBucketExists()
     }
 
-    override fun upload(
-        originalName: String,
-        contentType: String,
-        size: Long,
-        inputStream: InputStream,
-    ): StoredFile {
-        val extension = originalName.substringAfterLast('.', "")
+    override fun upload(upload: FileUpload): StoredFile {
+        val extension = upload.originalName.substringAfterLast('.', "")
         val storedName = if (extension.isNotEmpty()) "${UUID.randomUUID()}.$extension" else "${UUID.randomUUID()}"
 
         minioClient.putObject(
@@ -38,8 +33,8 @@ class MinioFileClient(
                 .builder()
                 .bucket(minioProperties.bucket)
                 .`object`(storedName)
-                .stream(inputStream, size, -1)
-                .contentType(contentType)
+                .stream(upload.inputStream, upload.size, -1)
+                .contentType(upload.contentType)
                 .build(),
         )
 

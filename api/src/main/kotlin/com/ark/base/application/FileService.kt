@@ -3,7 +3,6 @@ package com.ark.base.application
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
 import com.ark.base.file.FileClient
-import com.ark.base.file.FileMetadata
 import com.ark.base.file.FileMetadataRepository
 import com.ark.base.file.findByIdOrThrow
 import org.springframework.stereotype.Service
@@ -17,30 +16,14 @@ class FileService(
 ) {
     @Transactional
     fun upload(request: FileRequest): FileResponse {
-        val file = request.file
-        validate(file)
+        validate(request.file)
         val stored =
             try {
-                fileClient.upload(
-                    originalName = file.originalFilename ?: "unknown",
-                    contentType = file.contentType!!,
-                    size = file.size,
-                    inputStream = file.inputStream,
-                )
+                fileClient.upload(request.toFileUpload())
             } catch (e: Exception) {
                 throw BaseException(ErrorCode.FILE_UPLOAD_FAILED)
             }
-        val metadata =
-            fileMetadataRepository.save(
-                FileMetadata(
-                    originalName = file.originalFilename ?: "unknown",
-                    storedName = stored.storedName,
-                    mimeType = file.contentType!!,
-                    size = file.size,
-                    bucket = stored.bucket,
-                    path = stored.path,
-                ),
-            )
+        val metadata = fileMetadataRepository.save(request.toFileMetadata(stored))
         return FileResponse.from(metadata, stored.url)
     }
 

@@ -1,5 +1,6 @@
 package com.ark.base.application
 
+import com.ark.base.inventory.Inventory
 import com.ark.base.product.Product
 import com.ark.base.product.ProductQueryFilter
 import com.ark.base.product.ProductStatus
@@ -23,7 +24,11 @@ data class ProductCreateRequest(
     val name: String,
     val price: Long,
     val initialStock: Int,
-)
+) {
+    fun toProduct() = Product(name = name, price = price)
+
+    fun toInventory(product: Product) = Inventory(productId = product.id, stock = initialStock)
+}
 
 data class ProductResponse(
     val id: Long,

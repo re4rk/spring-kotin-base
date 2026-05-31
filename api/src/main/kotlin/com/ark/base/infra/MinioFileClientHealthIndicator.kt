@@ -1,6 +1,7 @@
 package com.ark.base.infra
 
 import com.ark.base.common.MinioProperties
+import com.ark.base.file.FileUpload
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
@@ -33,14 +34,7 @@ class MinioFileClientHealthIndicator(
         }
 
     private fun probeUploadAndDelete(): String {
-        val payload = HEALTH_CHECK_PAYLOAD
-        val stored =
-            minioFileClient.upload(
-                originalName = HEALTH_CHECK_FILE_NAME,
-                contentType = "text/plain",
-                size = payload.size.toLong(),
-                inputStream = ByteArrayInputStream(payload),
-            )
+        val stored = minioFileClient.upload(fileUpload)
         minioFileClient.delete(stored.path)
         return stored.path
     }
@@ -48,5 +42,12 @@ class MinioFileClientHealthIndicator(
     companion object {
         private const val HEALTH_CHECK_FILE_NAME = "_healthcheck/probe.txt"
         private val HEALTH_CHECK_PAYLOAD = "ok".toByteArray()
+        private val fileUpload =
+            FileUpload(
+                originalName = HEALTH_CHECK_FILE_NAME,
+                contentType = "text/plain",
+                size = HEALTH_CHECK_PAYLOAD.size.toLong(),
+                inputStream = ByteArrayInputStream(HEALTH_CHECK_PAYLOAD),
+            )
     }
 }
