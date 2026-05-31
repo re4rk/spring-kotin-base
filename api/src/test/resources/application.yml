@@ -11,3 +11,15 @@ spring:
 jwt:
   secret: test-secret-key-minimum-256-bits-long-for-hmac
   expiration-ms: 3600000
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  health:
+    minio:
+      enabled: false
+    group:
+      readiness:
+        include: readinessState, db, redis

@@ -23,5 +23,10 @@ class SuccessResponseAdvice : ResponseBodyAdvice<Any> {
         selectedConverterType: Class<out HttpMessageConverter<*>>,
         request: ServerHttpRequest,
         response: ServerHttpResponse,
-    ): ApiResponse = body as? ApiResponse ?: ApiResponse.Success(body)
+    ): Any? {
+        if (request.uri.path.startsWith("/actuator")) {
+            return body
+        }
+        return body as? ApiResponse ?: ApiResponse.Success(body)
+    }
 }

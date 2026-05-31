@@ -33,3 +33,23 @@ minio:
   access-key: ${MINIO_ACCESS_KEY:minioadmin}
   secret-key: ${MINIO_SECRET_KEY:minioadmin}
   bucket: ${MINIO_BUCKET:files}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+      show-components: always
+  health:
+    minio:
+      enabled: true
+    group:
+      readiness:
+        include: readinessState, db, redis, minioFileClient
+      liveness:
+        include: livenessState

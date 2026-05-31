@@ -1,7 +1,7 @@
 package com.ark.base.infra
 
 import com.ark.base.common.MinioProperties
-import com.ark.base.file.FileStorage
+import com.ark.base.file.FileClient
 import com.ark.base.file.StoredFile
 import io.minio.BucketExistsArgs
 import io.minio.GetPresignedObjectUrlArgs
@@ -16,10 +16,10 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 @Component
-class MinioFileStorage(
+class MinioFileClient(
     private val minioClient: MinioClient,
     private val minioProperties: MinioProperties,
-) : FileStorage {
+) : FileClient {
     init {
         ensureBucketExists()
     }

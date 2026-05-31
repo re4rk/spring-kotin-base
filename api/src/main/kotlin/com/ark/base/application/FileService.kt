@@ -4,7 +4,7 @@ import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
 import com.ark.base.file.FileMetadata
 import com.ark.base.file.FileMetadataRepository
-import com.ark.base.file.FileStorage
+import com.ark.base.file.FileClient
 import com.ark.base.file.findByIdOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile
 
 @Service
 class FileService(
-    private val fileStorage: FileStorage,
+    private val fileClient: FileClient,
     private val fileMetadataRepository: FileMetadataRepository,
 ) {
     @Transactional
@@ -21,7 +21,7 @@ class FileService(
         validate(file)
         val stored =
             try {
-                fileStorage.upload(
+                fileClient.upload(
                     originalName = file.originalFilename ?: "unknown",
                     contentType = file.contentType!!,
                     size = file.size,
@@ -47,14 +47,14 @@ class FileService(
     @Transactional(readOnly = true)
     fun findById(fileId: Long): FileResponse {
         val metadata = fileMetadataRepository.findByIdOrThrow(fileId)
-        return FileResponse.from(metadata, fileStorage.getUrl(metadata.path))
+        return FileResponse.from(metadata, fileClient.getUrl(metadata.path))
     }
 
     @Transactional
     fun delete(fileId: Long) {
         val metadata = fileMetadataRepository.findByIdOrThrow(fileId)
         metadata.delete()
-        fileStorage.delete(metadata.path)
+        fileClient.delete(metadata.path)
     }
 
     private fun validate(file: MultipartFile) {

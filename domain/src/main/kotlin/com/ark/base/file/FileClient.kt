@@ -2,7 +2,7 @@ package com.ark.base.file
 
 import java.io.InputStream
 
-interface FileStorage {
+interface FileClient {
     fun upload(
         originalName: String,
         contentType: String,
