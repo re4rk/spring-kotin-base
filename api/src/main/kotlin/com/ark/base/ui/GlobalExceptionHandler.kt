@@ -49,6 +49,7 @@ class GlobalExceptionHandler {
             ErrorCode.PRODUCT_NOT_FOUND,
             ErrorCode.ORDER_NOT_FOUND,
             ErrorCode.INVENTORY_NOT_FOUND,
+            ErrorCode.FILE_NOT_FOUND,
             -> HttpStatus.NOT_FOUND
 
             ErrorCode.INVALID_INPUT,
@@ -57,6 +58,8 @@ class GlobalExceptionHandler {
             ErrorCode.USER_NAME_TOO_LONG,
             ErrorCode.ORDER_INVALID_STATUS,
             ErrorCode.PRODUCT_INVALID_STATUS,
+            ErrorCode.FILE_INVALID_TYPE,
+            ErrorCode.FILE_EMPTY,
             -> HttpStatus.BAD_REQUEST
 
             ErrorCode.USER_DUPLICATE_EMAIL,
@@ -76,5 +79,7 @@ class GlobalExceptionHandler {
             ErrorCode.USER_REFRESH_TOKEN_INVALID,
             ErrorCode.USER_REFRESH_TOKEN_REUSED,
             -> HttpStatus.BAD_REQUEST
+
+            ErrorCode.FILE_UPLOAD_FAILED -> HttpStatus.INTERNAL_SERVER_ERROR
         }
 }

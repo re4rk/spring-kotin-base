@@ -34,4 +34,10 @@ enum class ErrorCode(
     INVENTORY_NOT_FOUND("재고를 찾을 수 없습니다."),
     STOCK_INSUFFICIENT("재고가 부족합니다."),
     STOCK_CONCURRENT_MODIFICATION("재고가 다른 요청에 의해 변경되었습니다. 다시 시도해 주세요."),
+
+    // File
+    FILE_NOT_FOUND("파일을 찾을 수 없습니다."),
+    FILE_INVALID_TYPE("지원하지 않는 파일 형식입니다. 이미지 파일만 업로드 가능합니다."),
+    FILE_EMPTY("파일이 비어있습니다."),
+    FILE_UPLOAD_FAILED("파일 업로드에 실패했습니다."),
 }

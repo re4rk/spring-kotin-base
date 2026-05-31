@@ -1,0 +1,85 @@
+### 1. 회원가입 (최초 1회)
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "name": "테스트",
+  "password": "password123"
+}
+
+###
+
+### 2. 로그인 → 토큰 저장
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+> {%
+  client.global.set("access_token", response.body.data.accessToken);
+%}
+
+###
+
+### 3. 파일 업로드
+POST http://localhost:8080/files
+Content-Type: multipart/form-data; boundary=boundary
+Authorization: Bearer {{access_token}}
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="image.png"
+Content-Type: image/png
+
+< ./image.png
+--boundary--
+
+> {%
+  client.global.set("file_id", response.body.data.id);
+  client.test("업로드 성공", function () {
+    client.assert(response.status === 201, "status 201 expected");
+    client.assert(response.body.data.id !== undefined, "id 존재");
+    client.assert(response.body.data.url !== undefined, "url 존재");
+    client.assert(response.body.data.mimeType === "image/png", "mimeType = image/png");
+  });
+%}
+
+###
+
+### 4. 파일 조회
+GET http://localhost:8080/files/{{file_id}}
+Authorization: Bearer {{access_token}}
+
+> {%
+  client.test("조회 성공", function () {
+    client.assert(response.status === 200, "status 200 expected");
+    client.assert(response.body.data.id == client.global.get("file_id"), "id 일치");
+  });
+%}
+
+###
+
+### 5. 파일 삭제
+DELETE http://localhost:8080/files/{{file_id}}
+Authorization: Bearer {{access_token}}
+
+> {%
+  client.test("삭제 성공", function () {
+    client.assert(response.status === 204, "status 204 expected");
+  });
+%}
+
+###
+
+### 6. 삭제 후 조회 → 404 확인
+GET http://localhost:8080/files/{{file_id}}
+Authorization: Bearer {{access_token}}
+
+> {%
+  client.test("삭제 후 404", function () {
+    client.assert(response.status === 404, "status 404 expected");
+  });
+%}
