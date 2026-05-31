@@ -23,10 +23,13 @@ class OrderService(
         buyerId: Long,
     ): OrderResponse {
         val product = productRepository.findByIdOrThrow(request.productId)
-        if (!product.isOrderable) throw BaseException(ErrorCode.PRODUCT_INVALID_STATUS)
         val inventory = inventoryRepository.findByProductIdOrThrow(request.productId)
+
+        if (!product.isOrderable) throw BaseException(ErrorCode.PRODUCT_INVALID_STATUS)
+
         inventory.decrease(request.quantity)
         val order = orderRepository.save(request.toOrder(product, buyerId))
+
         return OrderResponse.from(order)
     }
 
@@ -34,29 +37,37 @@ class OrderService(
     fun cancel(orderId: Long): OrderResponse {
         val order = orderRepository.findByIdOrThrow(orderId)
         val inventory = inventoryRepository.findByProductIdOrThrow(order.productId)
+
         order.cancel()
         inventory.increase(order.quantity)
+
         return OrderResponse.from(order)
     }
 
     @Transactional
     fun confirm(orderId: Long): OrderResponse {
         val order = orderRepository.findByIdOrThrow(orderId)
+
         order.confirm()
+
         return OrderResponse.from(order)
     }
 
     @Transactional
     fun ship(orderId: Long): OrderResponse {
         val order = orderRepository.findByIdOrThrow(orderId)
+
         order.ship()
+
         return OrderResponse.from(order)
     }
 
     @Transactional
     fun deliver(orderId: Long): OrderResponse {
         val order = orderRepository.findByIdOrThrow(orderId)
+
         order.deliver()
+
         return OrderResponse.from(order)
     }
 }

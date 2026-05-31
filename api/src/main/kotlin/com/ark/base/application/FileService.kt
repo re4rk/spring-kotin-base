@@ -18,11 +18,9 @@ class FileService(
     fun upload(request: FileRequest): FileResponse {
         validate(request.file)
         val stored =
-            try {
-                fileClient.upload(request.toFileUpload())
-            } catch (e: Exception) {
-                throw BaseException(ErrorCode.FILE_UPLOAD_FAILED)
-            }
+            runCatching { fileClient.upload(request.toFileUpload()) }
+                .getOrElse { throw BaseException(ErrorCode.FILE_UPLOAD_FAILED) }
+
         val metadata = fileMetadataRepository.save(request.toFileMetadata(stored))
         return FileResponse.from(metadata, stored.url)
     }
@@ -30,12 +28,15 @@ class FileService(
     @Transactional(readOnly = true)
     fun findById(fileId: Long): FileResponse {
         val metadata = fileMetadataRepository.findByIdOrThrow(fileId)
-        return FileResponse.from(metadata, fileClient.getUrl(metadata.path))
+        val url = fileClient.getUrl(metadata.path)
+
+        return FileResponse.from(metadata, url)
     }
 
     @Transactional
     fun delete(fileId: Long) {
         val metadata = fileMetadataRepository.findByIdOrThrow(fileId)
+
         metadata.delete()
         fileClient.delete(metadata.path)
     }

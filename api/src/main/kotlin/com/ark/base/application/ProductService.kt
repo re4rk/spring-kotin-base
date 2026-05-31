@@ -26,6 +26,7 @@ class ProductService(
     fun create(request: ProductCreateRequest): ProductResponse {
         val product = productRepository.save(request.toProduct())
         val inventory = inventoryRepository.save(request.toInventory(product))
+
         return ProductResponse.from(product, inventory.stock)
     }
 

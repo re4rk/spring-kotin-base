@@ -23,7 +23,10 @@ class UserService(
         request: ChangePasswordRequest,
     ) {
         val user = userRepository.findByIdOrThrow(userId)
-        if (!user.matchesPassword(request.currentPassword, passwordEncoder)) throw BaseException(ErrorCode.USER_LOGIN_FAILED)
+
+        if (!user.matchesPassword(request.currentPassword, passwordEncoder)) {
+            throw BaseException(ErrorCode.USER_LOGIN_FAILED)
+        }
         user.changePassword(request.newPassword, passwordEncoder)
     }
 

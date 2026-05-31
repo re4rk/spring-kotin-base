@@ -3,6 +3,7 @@ package com.ark.base.application
 import com.ark.base.auth.password.reset.PasswordResetRequestedEvent
 import com.ark.base.auth.password.reset.PasswordResetToken
 import com.ark.base.auth.password.reset.PasswordResetTokenRepository
+import com.ark.base.auth.password.reset.findByIdOrThrow
 import com.ark.base.auth.refreshToken.RefreshTokenConsumeResult
 import com.ark.base.auth.refreshToken.RefreshTokenRepository
 import com.ark.base.common.BaseException
@@ -28,12 +29,12 @@ class AuthService(
     @Transactional
     fun login(request: LoginRequest): TokenResponse {
         val user = userRepository.findByEmail(request.email) ?: throw BaseException(ErrorCode.USER_LOGIN_FAILED)
+
         if (!user.matchesPassword(request.password, passwordEncoder)) throw BaseException(ErrorCode.USER_LOGIN_FAILED)
+
+        val accessToken = jwtProvider.generate(user.id)
         val refreshToken = refreshTokenRepository.issue(user.id)
-        return TokenResponse(
-            accessToken = jwtProvider.generate(user.id),
-            refreshToken = refreshToken.token,
-        )
+        return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token)
     }
 
     @Transactional
@@ -41,11 +42,9 @@ class AuthService(
         when (val result = refreshTokenRepository.consume(request.refreshToken)) {
             is RefreshTokenConsumeResult.Success -> {
                 val user = userRepository.findByIdOrThrow(result.userId)
+                val accessToken = jwtProvider.generate(user.id)
                 val refreshToken = refreshTokenRepository.issue(user.id)
-                return TokenResponse(
-                    accessToken = jwtProvider.generate(user.id),
-                    refreshToken = refreshToken.token,
-                )
+                return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token)
             }
             is RefreshTokenConsumeResult.Reused -> {
                 refreshTokenRepository.revokeAll(result.userId)
@@ -65,11 +64,11 @@ class AuthService(
 
     @Transactional
     fun resetPassword(request: PasswordResetConfirmRequest) {
-        val userId =
-            passwordResetTokenRepository.findById(request.token).orElse(null)?.userId
-                ?: throw BaseException(ErrorCode.USER_RESET_TOKEN_INVALID)
+        val userId = passwordResetTokenRepository.findByIdOrThrow(request.token).userId
         val user = userRepository.findByIdOrThrow(userId)
+
         user.changePassword(request.newPassword, passwordEncoder)
+
         passwordResetTokenRepository.deleteById(request.token)
     }
 
