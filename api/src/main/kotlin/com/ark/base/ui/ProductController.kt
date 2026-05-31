@@ -5,6 +5,7 @@ import com.ark.base.application.ProductOptionGroupCreateRequest
 import com.ark.base.application.ProductQueryFilterRequest
 import com.ark.base.application.ProductResponse
 import com.ark.base.application.ProductService
+import com.ark.base.application.ProductSkuCreateRequest
 import com.ark.base.application.ProductUpdateRequest
 import com.ark.base.ui.auth.AccessType
 import com.ark.base.ui.auth.Authorize
@@ -62,6 +63,21 @@ class ProductController(
         @PathVariable productId: Long,
         @PathVariable groupId: Long,
     ): ProductResponse = productService.removeOptionGroup(productId, groupId)
+
+    @Authorize(AccessType.PRODUCT_OWNER, param = "productId")
+    @PostMapping("/{productId}/skus")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun addSku(
+        @PathVariable productId: Long,
+        @RequestBody request: ProductSkuCreateRequest,
+    ): ProductResponse = productService.addSku(productId, request)
+
+    @Authorize(AccessType.PRODUCT_OWNER, param = "productId")
+    @DeleteMapping("/{productId}/skus/{skuId}")
+    fun removeSku(
+        @PathVariable productId: Long,
+        @PathVariable skuId: Long,
+    ): ProductResponse = productService.removeSku(productId, skuId)
 
     @Authorize(AccessType.PRODUCT_OWNER, param = "productId")
     @PatchMapping("/{productId}/submit")

@@ -49,6 +49,7 @@ class GlobalExceptionHandler {
             ErrorCode.PRODUCT_NOT_FOUND,
             ErrorCode.PRODUCT_OPTION_GROUP_NOT_FOUND,
             ErrorCode.PRODUCT_OPTION_NOT_FOUND,
+            ErrorCode.PRODUCT_SKU_NOT_FOUND,
             ErrorCode.ORDER_NOT_FOUND,
             ErrorCode.INVENTORY_NOT_FOUND,
             ErrorCode.FILE_NOT_FOUND,

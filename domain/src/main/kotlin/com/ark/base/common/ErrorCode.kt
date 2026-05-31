@@ -26,6 +26,7 @@ enum class ErrorCode(
     PRODUCT_INVALID_STATUS("현재 상태에서 해당 작업을 수행할 수 없습니다."),
     PRODUCT_OPTION_GROUP_NOT_FOUND("상품 옵션 그룹을 찾을 수 없습니다."),
     PRODUCT_OPTION_NOT_FOUND("상품 옵션을 찾을 수 없습니다."),
+    PRODUCT_SKU_NOT_FOUND("상품 SKU를 찾을 수 없습니다."),
 
     // Order
     ORDER_NOT_FOUND("주문을 찾을 수 없습니다."),

@@ -102,19 +102,15 @@ CREATE TABLE product_option_group
 -- =============================================================================
 -- product_option: 상품 옵션
 --   - product_option_group 과 N:1 관계
---   - extra_price: 기본 가격에 더해지는 추가 금액
---   - stock: 옵션별 독립 재고 (version: 낙관적 락)
---   - 예: 빨강 +0원, XL +1000원
+--   - 재고·추가금액은 product_sku 에서 조합 단위로 관리
+--   - 예: 빨강, XL
 -- =============================================================================
 CREATE TABLE product_option
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY    COMMENT '옵션 PK',
     option_group_id BIGINT       NOT NULL                COMMENT '옵션 그룹 ID (product_option_group.id 참조)',
     name            VARCHAR(100) NOT NULL                COMMENT '옵션명 (예: 빨강, XL)',
-    extra_price     BIGINT       NOT NULL DEFAULT 0      COMMENT '추가 금액 (원 단위, 기본 가격에 합산)',
-    stock           INT          NOT NULL                COMMENT '옵션별 재고 수량',
     sort_order      INT          NOT NULL DEFAULT 0      COMMENT '노출 순서',
-    version         BIGINT       NOT NULL DEFAULT 0      COMMENT 'Hibernate 낙관적 락 버전',
 
     -- audit
     created_at      DATETIME(6)  NOT NULL                COMMENT '생성 일시',
@@ -128,7 +124,47 @@ CREATE TABLE product_option
     is_deleted      BOOLEAN      NOT NULL DEFAULT FALSE  COMMENT '삭제 여부'
 ) DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci
-  COMMENT = '상품 옵션 (옵션별 추가금액 및 재고)';
+  COMMENT = '상품 옵션 (이름·순서 정의)';
+
+-- =============================================================================
+-- product_sku: 상품 SKU (옵션 조합별 재고·추가금액)
+--   - product 와 N:1 관계 (product_id FK)
+--   - 조합 예: 사이즈:S + 색상:빨강 → stock 10, extraPrice 0
+--   - version: Hibernate 낙관적 락
+-- =============================================================================
+CREATE TABLE product_sku
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY    COMMENT 'SKU PK',
+    product_id  BIGINT       NOT NULL                COMMENT '상품 ID (product.id 참조)',
+    extra_price BIGINT       NOT NULL DEFAULT 0      COMMENT '추가 금액 (원 단위)',
+    stock       INT          NOT NULL                COMMENT '재고 수량',
+    version     BIGINT       NOT NULL DEFAULT 0      COMMENT 'Hibernate 낙관적 락 버전',
+
+    -- audit
+    created_at  DATETIME(6)  NOT NULL                COMMENT '생성 일시',
+    created_by  VARCHAR(255)                         COMMENT '생성 주체',
+    updated_at  DATETIME(6)  NOT NULL                COMMENT '마지막 수정 일시',
+    updated_by  VARCHAR(255)                         COMMENT '마지막 수정 주체',
+
+    -- soft delete
+    deleted_at  DATETIME(6)                          COMMENT '삭제 일시',
+    deleted_by  VARCHAR(255)                         COMMENT '삭제 주체',
+    is_deleted  BOOLEAN      NOT NULL DEFAULT FALSE  COMMENT '삭제 여부'
+) DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = '상품 SKU (옵션 조합별 재고)';
+
+-- =============================================================================
+-- product_sku_option: SKU ↔ 옵션 매핑 (ManyToMany 조인 테이블)
+-- =============================================================================
+CREATE TABLE product_sku_option
+(
+    sku_id    BIGINT NOT NULL COMMENT 'SKU ID (product_sku.id 참조)',
+    option_id BIGINT NOT NULL COMMENT '옵션 ID (product_option.id 참조)',
+    PRIMARY KEY (sku_id, option_id)
+) DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = 'SKU-옵션 매핑';
 
 -- =============================================================================
 -- inventory: 상품 재고

@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Product Option 테스트</title>
+  <title>Product Option / SKU 테스트</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
@@ -38,7 +38,7 @@
     .token-bar .dot.on { background: #22c55e; }
     #token-display { font-family: monospace; color: #e2e8f0; }
 
-    .layout { display: grid; grid-template-columns: 360px 1fr; grid-template-rows: 1fr; gap: 0; height: calc(100vh - 89px); }
+    .layout { display: grid; grid-template-columns: 380px 1fr; grid-template-rows: 1fr; gap: 0; height: calc(100vh - 89px); }
 
     .sidebar {
       background: #fff;
@@ -100,9 +100,10 @@
       transition: border-color .15s;
     }
     input:focus, textarea:focus { border-color: #3b82f6; }
-    textarea { resize: vertical; font-family: monospace; font-size: 12px; min-height: 120px; }
+    textarea { resize: vertical; font-family: monospace; font-size: 12px; min-height: 100px; }
 
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 
     button {
       padding: 9px 16px;
@@ -137,18 +138,26 @@
     }
     .product-card-header .name { font-weight: 600; font-size: 14px; }
     .product-card-header .price { font-size: 13px; color: #6b7280; }
-    .product-card-body { padding: 10px 14px; }
-    .meta { font-size: 12px; color: #9ca3af; margin-bottom: 8px; }
+    .product-card-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 10px; }
+    .meta { font-size: 12px; color: #9ca3af; }
 
     /* option groups */
-    .option-groups { display: flex; flex-direction: column; gap: 8px; }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 4px;
+    }
+    .option-groups { display: flex; flex-direction: column; gap: 6px; }
     .og {
       border: 1px solid #e2e8f0;
       border-radius: 6px;
       overflow: hidden;
     }
     .og-header {
-      padding: 8px 12px;
+      padding: 7px 12px;
       background: #f1f5f9;
       display: flex;
       justify-content: space-between;
@@ -179,12 +188,50 @@
       border-radius: 20px;
       padding: 3px 10px;
       font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      color: #0369a1;
     }
-    .opt-chip .extra { color: #0369a1; font-weight: 600; }
-    .opt-chip .stock { color: #6b7280; }
+    .opt-chip .opt-id { color: #94a3b8; font-size: 10px; font-family: monospace; margin-left: 4px; }
+
+    /* skus */
+    .sku-list { display: flex; flex-direction: column; gap: 6px; }
+    .sku-row {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .sku-info { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; flex: 1; }
+    .sku-combo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .sku-tag {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 12px;
+      color: #166534;
+    }
+    .sku-stock { font-size: 12px; color: #6b7280; white-space: nowrap; }
+    .sku-extra { font-size: 12px; color: #0369a1; font-weight: 600; white-space: nowrap; }
+    .sku-id { font-size: 10px; color: #94a3b8; font-family: monospace; white-space: nowrap; }
+    .sku-delete {
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #fee2e2;
+      color: #991b1b;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .sku-delete:hover { background: #fecaca; }
 
     /* log */
     .log {
@@ -204,7 +251,7 @@
     .log .info { color: #60a5fa; }
     .log .dim { color: #475569; }
 
-    .empty { text-align: center; color: #9ca3af; font-size: 13px; padding: 24px 0; }
+    .empty { text-align: center; color: #9ca3af; font-size: 12px; padding: 12px 0; }
     .selected-banner {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
@@ -221,7 +268,7 @@
 <body>
 
 <header>
-  <h1>Product Option 테스트</h1>
+  <h1>Product Option / SKU 테스트</h1>
   <span class="badge">localhost:8080</span>
 </header>
 
@@ -302,14 +349,42 @@
           <input id="og-name" value="색상">
         </div>
         <div>
-          <label>옵션 목록 (JSON)</label>
+          <label>옵션 목록 (JSON) — 이름·순서만</label>
           <textarea id="og-options">[
-  { "name": "화이트", "extraPrice": 0, "stock": 20, "sortOrder": 0 },
-  { "name": "블랙",   "extraPrice": 0, "stock": 15, "sortOrder": 1 },
-  { "name": "네이비", "extraPrice": 0, "stock": 10, "sortOrder": 2 }
+  { "name": "화이트", "sortOrder": 0 },
+  { "name": "블랙",   "sortOrder": 1 },
+  { "name": "네이비", "sortOrder": 2 }
 ]</textarea>
         </div>
         <button class="btn-primary" onclick="addOptionGroup()">옵션 그룹 추가</button>
+      </div>
+    </div>
+
+    <!-- SKU 추가 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="method post">POST</span>
+        <h2>SKU 추가 (조합별 재고)</h2>
+      </div>
+      <div class="card-body">
+        <div id="selected-product-banner-sku" class="selected-banner" style="display:none">
+          📦 선택된 상품 ID: <strong id="selected-product-id-label-sku"></strong>
+        </div>
+        <div>
+          <label>옵션 ID 목록 (쉼표 구분, 상품 카드에서 확인)</label>
+          <input id="sku-option-ids" placeholder="예: 1,3">
+        </div>
+        <div class="row">
+          <div>
+            <label>재고</label>
+            <input id="sku-stock" type="number" value="10">
+          </div>
+          <div>
+            <label>추가금액 (원)</label>
+            <input id="sku-extra-price" type="number" value="0">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="addSku()">SKU 추가</button>
       </div>
     </div>
 
@@ -473,7 +548,7 @@
     products.forEach(p => {
       const card = document.createElement('div');
       card.className = 'product-card' + (p.id === selectedProductId ? ' selected' : '');
-      card.onclick = () => selectProduct(p.id);
+      card.onclick = (e) => selectProduct(p.id, e.currentTarget);
       card.innerHTML = `
         <div class="product-card-header">
           <span class="name">${p.name}</span>
@@ -482,40 +557,64 @@
         <div class="product-card-body">
           <div class="meta">ID: ${p.id} · ${p.status} · 재고: ${p.stock}${p.category ? ' · ' + p.category : ''}</div>
           <div id="og-area-${p.id}">${renderOptionGroups(p.optionGroups ?? [], p.id)}</div>
+          <div id="sku-area-${p.id}">${renderSkus(p.skus ?? [], p.id)}</div>
         </div>`;
       el.appendChild(card);
     });
   }
 
   function renderOptionGroups(groups, productId) {
-    if (!groups.length) return '<span style="font-size:12px;color:#9ca3af">옵션 없음</span>';
-    return `<div class="option-groups">${groups.map(g => `
-      <div class="og">
-        <div class="og-header">
-          <div>
-            <span class="og-name">${g.name}</span>
-            <span class="og-id"> #${g.id}</span>
+    if (!groups.length) return '<div class="section-label">옵션 그룹</div><p class="empty">옵션 그룹 없음</p>';
+    return `
+      <div class="section-label">옵션 그룹</div>
+      <div class="option-groups">${groups.map(g => `
+        <div class="og">
+          <div class="og-header">
+            <div>
+              <span class="og-name">${g.name}</span>
+              <span class="og-id"> #${g.id}</span>
+            </div>
+            <button class="og-delete" onclick="event.stopPropagation(); removeOptionGroup(${productId}, ${g.id})">삭제</button>
           </div>
-          <button class="og-delete" onclick="event.stopPropagation(); removeOptionGroup(${productId}, ${g.id})">삭제</button>
-        </div>
-        <div class="options-row">
-          ${g.options.map(o => `
-            <span class="opt-chip">
-              ${o.name}
-              <span class="extra">${o.extraPrice > 0 ? '+' + o.extraPrice.toLocaleString() + '원' : '기본'}</span>
-              <span class="stock">재고 ${o.stock}</span>
-            </span>`).join('')}
-        </div>
-      </div>`).join('')}</div>`;
+          <div class="options-row">
+            ${g.options.map(o => `
+              <span class="opt-chip">
+                ${o.name}<span class="opt-id">#${o.id}</span>
+              </span>`).join('')}
+          </div>
+        </div>`).join('')}
+      </div>`;
+  }
+
+  function renderSkus(skus, productId) {
+    if (!skus.length) return '<div class="section-label" style="margin-top:6px">SKU</div><p class="empty">SKU 없음</p>';
+    return `
+      <div class="section-label" style="margin-top:6px">SKU</div>
+      <div class="sku-list">${skus.map(s => `
+        <div class="sku-row">
+          <div class="sku-info">
+            <div class="sku-combo">
+              ${s.options.map(o => `<span class="sku-tag">${o.name}</span>`).join('')}
+            </div>
+            <span class="sku-stock">재고 ${s.stock}</span>
+            ${s.extraPrice > 0 ? `<span class="sku-extra">+${s.extraPrice.toLocaleString()}원</span>` : ''}
+          </div>
+          <span class="sku-id">#${s.id}</span>
+          <button class="sku-delete" onclick="event.stopPropagation(); removeSku(${productId}, ${s.id})">삭제</button>
+        </div>`).join('')}
+      </div>`;
   }
 
   /* ── 상품 선택 ── */
-  function selectProduct(id) {
+  function selectProduct(id, cardEl) {
     selectedProductId = id;
-    document.getElementById('selected-product-banner').style.display = 'flex';
+    ['selected-product-banner', 'selected-product-banner-sku'].forEach(bannerId => {
+      document.getElementById(bannerId).style.display = 'flex';
+    });
     document.getElementById('selected-product-id-label').textContent = id;
+    document.getElementById('selected-product-id-label-sku').textContent = id;
     document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
-    event.currentTarget.classList.add('selected');
+    cardEl.classList.add('selected');
     log(`상품 선택: ID ${id}`, 'info');
   }
 
@@ -558,12 +657,58 @@
     }
   }
 
+  /* ── SKU 추가 ── */
+  async function addSku() {
+    if (!token) { log('✗ 먼저 로그인하세요', 'err'); return; }
+    if (!selectedProductId) { log('✗ 상품을 먼저 선택하세요 (상품 카드 클릭)', 'err'); return; }
+    const rawIds = document.getElementById('sku-option-ids').value.trim();
+    if (!rawIds) { log('✗ 옵션 ID를 입력하세요', 'err'); return; }
+    const optionIds = rawIds.split(',').map(s => Number(s.trim())).filter(n => !isNaN(n) && n > 0);
+    if (!optionIds.length) { log('✗ 유효한 옵션 ID가 없습니다', 'err'); return; }
+    const body = {
+      optionIds,
+      stock: Number(document.getElementById('sku-stock').value),
+      extraPrice: Number(document.getElementById('sku-extra-price').value),
+    };
+    log(`POST /products/${selectedProductId}/skus (optionIds: [${optionIds}], stock: ${body.stock})`);
+    try {
+      const { status, ok, json } = await api('POST', `/products/${selectedProductId}/skus`, body);
+      if (ok) {
+        log(`✓ SKU 추가 성공 (${status})`, 'ok');
+        refreshProductCard(selectedProductId);
+      } else {
+        log(`✗ 실패 (${status}): ${json.message ?? JSON.stringify(json)}`, 'err');
+      }
+    } catch (e) {
+      log(`✗ 네트워크 오류: ${e.message}`, 'err');
+    }
+  }
+
+  /* ── SKU 삭제 ── */
+  async function removeSku(productId, skuId) {
+    if (!token) { log('✗ 먼저 로그인하세요', 'err'); return; }
+    log(`DELETE /products/${productId}/skus/${skuId}`);
+    try {
+      const { status, ok, json } = await api('DELETE', `/products/${productId}/skus/${skuId}`);
+      if (ok) {
+        log(`✓ SKU 삭제 성공 (${status})`, 'ok');
+        refreshProductCard(productId);
+      } else {
+        log(`✗ 실패 (${status}): ${json.message ?? JSON.stringify(json)}`, 'err');
+      }
+    } catch (e) {
+      log(`✗ 네트워크 오류: ${e.message}`, 'err');
+    }
+  }
+
   /* ── 단일 상품 카드만 갱신 ── */
   async function refreshProductCard(productId) {
     const p = await fetchProduct(productId);
     if (!p) return;
-    const area = document.getElementById(`og-area-${productId}`);
-    if (area) area.innerHTML = renderOptionGroups(p.optionGroups ?? [], productId);
+    const ogArea = document.getElementById(`og-area-${productId}`);
+    if (ogArea) ogArea.innerHTML = renderOptionGroups(p.optionGroups ?? [], productId);
+    const skuArea = document.getElementById(`sku-area-${productId}`);
+    if (skuArea) skuArea.innerHTML = renderSkus(p.skus ?? [], productId);
   }
 
   /* ── 초기 로드 ── */

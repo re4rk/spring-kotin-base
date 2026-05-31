@@ -1,9 +1,12 @@
 package com.ark.base.application
 
+import com.ark.base.common.BaseException
+import com.ark.base.common.ErrorCode
 import com.ark.base.inventory.InventoryRepository
 import com.ark.base.product.Product
 import com.ark.base.product.ProductRepository
 import com.ark.base.product.findByIdOrThrow
+import com.ark.base.product.option.ProductSku
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -47,6 +50,31 @@ class ProductService(
     ): ProductResponse {
         val product = productRepository.findByIdOrThrow(productId)
         product.removeOptionGroup(groupId)
+        return toResponse(product)
+    }
+
+    @Transactional
+    fun addSku(
+        productId: Long,
+        request: ProductSkuCreateRequest,
+    ): ProductResponse {
+        val product = productRepository.findByIdOrThrow(productId)
+        val allOptions = product.optionGroups.flatMap { it.options }
+        val options =
+            request.optionIds.map { id ->
+                allOptions.find { it.id == id } ?: throw BaseException(ErrorCode.PRODUCT_OPTION_NOT_FOUND)
+            }
+        product.addSku(ProductSku(stock = request.stock, extraPrice = request.extraPrice, options = options.toMutableList()))
+        return toResponse(product)
+    }
+
+    @Transactional
+    fun removeSku(
+        productId: Long,
+        skuId: Long,
+    ): ProductResponse {
+        val product = productRepository.findByIdOrThrow(productId)
+        product.removeSku(skuId)
         return toResponse(product)
     }
 
