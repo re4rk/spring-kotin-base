@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile
 class FileService(
     private val fileClient: FileClient,
     private val fileMetadataRepository: FileMetadataRepository,
-    private val transactionTemplate: TransactionTemplate
+    private val transactionTemplate: TransactionTemplate,
 ) {
     fun upload(request: FileRequest): FileResponse {
         validate(request.file)

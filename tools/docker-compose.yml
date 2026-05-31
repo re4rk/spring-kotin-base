@@ -1,4 +1,45 @@
+# =============================================================================
+# 로컬 개발 인프라
+#
+# 서비스 목록
+#   mysql  - 메인 데이터베이스 (3306)
+#   redis  - RefreshToken / PasswordResetToken 저장소 (6379)
+#   minio  - 파일 오브젝트 스토리지, S3 호환 (9000 / 9001 콘솔)
+#
+# 실행: docker compose up -d
+# =============================================================================
 services:
+
+  # ---------------------------------------------------------------------------
+  # MySQL 8.0
+  #   - 스키마: base / 계정: base/base
+  #   - utf8mb4_unicode_ci: 이모지·다국어 완전 지원
+  #   - Flyway(V1__init.sql)가 앱 기동 시 자동으로 스키마를 생성함
+  # ---------------------------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: base
+      MYSQL_USER: base
+      MYSQL_PASSWORD: base
+    volumes:
+      - mysql-data:/var/lib/mysql
+    # 서버 기본 문자셋을 utf8mb4 로 강제 설정
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "base", "-pbase"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ---------------------------------------------------------------------------
+  # Redis 7
+  #   - RefreshToken (TTL 7일), PasswordResetToken (TTL 1시간) 저장
+  #   - appendonly yes: AOF 영속성 활성화
+  # ---------------------------------------------------------------------------
   redis:
     image: redis:7-alpine
     ports:
@@ -12,6 +53,12 @@ services:
       timeout: 3s
       retries: 5
 
+  # ---------------------------------------------------------------------------
+  # MinIO (S3 호환 오브젝트 스토리지)
+  #   - 9000: S3 API 엔드포인트 (앱에서 사용)
+  #   - 9001: 웹 콘솔 (http://localhost:9001, minioadmin/minioadmin)
+  #   - 업로드된 파일의 실제 바이너리를 저장, 메타데이터는 file_metadata 테이블
+  # ---------------------------------------------------------------------------
   minio:
     image: minio/minio:latest
     ports:
@@ -30,5 +77,6 @@ services:
       retries: 5
 
 volumes:
+  mysql-data:
   redis-data:
   minio-data:
