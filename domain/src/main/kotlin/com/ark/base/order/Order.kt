@@ -16,6 +16,7 @@ import jakarta.persistence.Table
 class Order(
     val userId: Long,
     val productId: Long,
+    val skuId: Long,
     val productName: String,
     val quantity: Int,
     @Enumerated(EnumType.STRING)

@@ -167,33 +167,6 @@ CREATE TABLE product_sku_option
   COMMENT = 'SKU-옵션 매핑';
 
 -- =============================================================================
--- inventory: 상품 재고
---   - product 와 1:1 관계 (product_id FK 없이 ID 참조, 도메인 레이어에서 정합성 관리)
---   - version: Hibernate @Version 낙관적 락 — 동시 재고 차감 충돌 감지
---   - stock <= 0 이 되면 StockSoldOutEvent 발행 → 상품 상태 SOLD_OUT 으로 전이
--- =============================================================================
-CREATE TABLE inventory
-(
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY    COMMENT '재고 PK',
-    product_id BIGINT       NOT NULL                COMMENT '상품 ID (product.id 참조)',
-    stock      INT          NOT NULL                COMMENT '현재 재고 수량',
-    version    BIGINT       NOT NULL DEFAULT 0      COMMENT 'Hibernate 낙관적 락 버전',
-
-    -- audit
-    created_at DATETIME(6)  NOT NULL                COMMENT '생성 일시',
-    created_by VARCHAR(255)                         COMMENT '생성 주체',
-    updated_at DATETIME(6)  NOT NULL                COMMENT '마지막 수정 일시',
-    updated_by VARCHAR(255)                         COMMENT '마지막 수정 주체',
-
-    -- soft delete
-    deleted_at DATETIME(6)                          COMMENT '삭제 일시',
-    deleted_by VARCHAR(255)                         COMMENT '삭제 주체',
-    is_deleted BOOLEAN      NOT NULL DEFAULT FALSE  COMMENT '삭제 여부'
-) DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci
-  COMMENT = '상품 재고 (낙관적 락)';
-
--- =============================================================================
 -- orders: 주문
 --   - 상태 머신: PLACED → CONFIRMED → SHIPPING → DELIVERED
 --                                               ↓
@@ -206,6 +179,7 @@ CREATE TABLE orders
     id           BIGINT AUTO_INCREMENT PRIMARY KEY      COMMENT '주문 PK',
     user_id      BIGINT       NOT NULL                  COMMENT '주문자 ID (users.id 참조)',
     product_id   BIGINT       NOT NULL                  COMMENT '상품 ID (product.id 참조)',
+    sku_id       BIGINT       NOT NULL                  COMMENT 'SKU ID (product_sku.id 참조)',
     product_name VARCHAR(255) NOT NULL                  COMMENT '주문 시점 상품명 스냅샷',
     quantity     INT          NOT NULL                  COMMENT '주문 수량',
     status       VARCHAR(50)  NOT NULL                  COMMENT '상태: PLACED|CONFIRMED|SHIPPING|DELIVERED|CANCELLED',

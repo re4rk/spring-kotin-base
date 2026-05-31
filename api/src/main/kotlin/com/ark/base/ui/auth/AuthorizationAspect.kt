@@ -22,7 +22,6 @@ class AuthorizationAspect(
             AccessType.PRODUCT_OWNER -> accessGuard.requireProductOwner(resolveLong(joinPoint, authorize.param))
             AccessType.ORDER_BUYER -> accessGuard.requireOrderBuyer(resolveLong(joinPoint, authorize.param))
             AccessType.ORDER_SELLER -> accessGuard.requireOrderSeller(resolveLong(joinPoint, authorize.param))
-            AccessType.INVENTORY_OWNER -> accessGuard.requireProductOwnerByInventory(resolveLong(joinPoint, authorize.param))
         }
     }
 

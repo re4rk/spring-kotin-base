@@ -6,5 +6,4 @@ enum class AccessType {
     PRODUCT_OWNER,
     ORDER_BUYER,
     ORDER_SELLER,
-    INVENTORY_OWNER,
 }

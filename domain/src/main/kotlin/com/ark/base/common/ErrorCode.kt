@@ -33,8 +33,6 @@ enum class ErrorCode(
     ORDER_ALREADY_CANCELLED("이미 취소된 주문입니다."),
     ORDER_INVALID_STATUS("현재 상태에서 해당 작업을 수행할 수 없습니다."),
 
-    // Inventory
-    INVENTORY_NOT_FOUND("재고를 찾을 수 없습니다."),
     STOCK_INSUFFICIENT("재고가 부족합니다."),
     STOCK_CONCURRENT_MODIFICATION("재고가 다른 요청에 의해 변경되었습니다. 다시 시도해 주세요."),
 

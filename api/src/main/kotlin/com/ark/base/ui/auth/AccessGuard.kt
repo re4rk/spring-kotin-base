@@ -3,8 +3,6 @@ package com.ark.base.ui.auth
 import com.ark.base.common.BaseException
 import com.ark.base.common.CurrentUserProvider
 import com.ark.base.common.ErrorCode
-import com.ark.base.inventory.InventoryRepository
-import com.ark.base.inventory.findByIdOrThrow
 import com.ark.base.order.Order
 import com.ark.base.order.OrderRepository
 import com.ark.base.order.findByIdOrThrow
@@ -19,7 +17,6 @@ class AccessGuard(
     private val currentUserProvider: CurrentUserProvider,
     private val productRepository: ProductRepository,
     private val orderRepository: OrderRepository,
-    private val inventoryRepository: InventoryRepository,
     private val userRepository: UserRepository,
 ) {
     fun currentUserId(): Long = currentUserProvider.getUserId()
@@ -35,10 +32,6 @@ class AccessGuard(
 
     fun requireProductOwner(productId: Long) {
         requireProductOwner(productRepository.findByIdOrThrow(productId))
-    }
-
-    fun requireProductOwnerByInventory(inventoryId: Long) {
-        requireProductOwner(inventoryRepository.findByIdOrThrow(inventoryId).productId)
     }
 
     fun requireOrderBuyer(orderId: Long) {

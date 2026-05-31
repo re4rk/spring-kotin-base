@@ -36,8 +36,7 @@ class ProductApiTest : ApiIntegrationTest() {
                     """
                     {
                       "name": "Unauthorized",
-                      "price": 1000,
-                      "initialStock": 1
+                      "price": 1000
                     }
                     """.trimIndent()
             }.andExpect {

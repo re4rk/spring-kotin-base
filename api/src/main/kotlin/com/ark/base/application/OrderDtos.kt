@@ -6,6 +6,7 @@ import com.ark.base.product.Product
 
 data class OrderPlaceRequest(
     val productId: Long,
+    val skuId: Long,
     val quantity: Int,
 ) {
     fun toOrder(
@@ -14,6 +15,7 @@ data class OrderPlaceRequest(
     ) = Order(
         userId = userId,
         productId = product.id,
+        skuId = skuId,
         productName = product.name,
         quantity = quantity,
     )
@@ -23,6 +25,7 @@ data class OrderResponse(
     val id: Long,
     val userId: Long,
     val productId: Long,
+    val skuId: Long,
     val productName: String,
     val quantity: Int,
     val status: OrderStatus,
@@ -33,6 +36,7 @@ data class OrderResponse(
                 id = order.id,
                 userId = order.userId,
                 productId = order.productId,
+                skuId = order.skuId,
                 productName = order.productName,
                 quantity = order.quantity,
                 status = order.status,

@@ -24,11 +24,8 @@ class ApiTestClient(
 
     fun loginUserId(token: String): Long = jwtProvider.parseUserId(token)
 
-    fun createPublishedProduct(
-        sellerToken: String,
-        initialStock: Int = 10,
-    ): Long {
-        val productId = createProduct(sellerToken, initialStock = initialStock)
+    fun createPublishedProduct(sellerToken: String): Long {
+        val productId = createProduct(sellerToken)
         publishProduct(sellerToken, productId)
         return productId
     }
@@ -75,10 +72,7 @@ class ApiTestClient(
         return JsonPath.read(result.response.contentAsString, "$.data.accessToken")
     }
 
-    private fun createProduct(
-        token: String,
-        initialStock: Int,
-    ): Long {
+    private fun createProduct(token: String): Long {
         val result =
             mockMvc
                 .post("/products") {
@@ -88,8 +82,7 @@ class ApiTestClient(
                         """
                         {
                           "name": "Test Product",
-                          "price": 10000,
-                          "initialStock": $initialStock
+                          "price": 10000
                         }
                         """.trimIndent()
                 }.andExpect {

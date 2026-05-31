@@ -1,6 +1,7 @@
 package com.ark.base
 
 import com.ark.base.support.ApiIntegrationTest
+import com.jayway.jsonpath.JsonPath
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -10,7 +11,7 @@ import org.springframework.test.web.servlet.post
 class OrderApiTest : ApiIntegrationTest() {
     @Test
     fun `구매자는 주문을 생성할 수 있다`() {
-        val productId = createPublishedProduct()
+        val (productId, skuId) = createPublishedProductWithSku()
 
         mockMvc
             .post("/orders") {
@@ -20,6 +21,7 @@ class OrderApiTest : ApiIntegrationTest() {
                     """
                     {
                       "productId": $productId,
+                      "skuId": $skuId,
                       "quantity": 2
                     }
                     """.trimIndent()
@@ -27,14 +29,15 @@ class OrderApiTest : ApiIntegrationTest() {
                 status { isCreated() }
                 jsonPath("$.data.userId") { value(buyerId) }
                 jsonPath("$.data.productId") { value(productId) }
+                jsonPath("$.data.skuId") { value(skuId) }
                 jsonPath("$.data.status") { value("PLACED") }
             }
     }
 
     @Test
     fun `구매자는 자신의 주문을 취소할 수 있다`() {
-        val productId = createPublishedProduct()
-        val orderId = placeOrder(productId)
+        val (productId, skuId) = createPublishedProductWithSku()
+        val orderId = placeOrder(productId, skuId)
 
         mockMvc
             .patch("/orders/$orderId/cancel") {
@@ -47,8 +50,8 @@ class OrderApiTest : ApiIntegrationTest() {
 
     @Test
     fun `판매자는 주문을 확정할 수 있다`() {
-        val productId = createPublishedProduct()
-        val orderId = placeOrder(productId)
+        val (productId, skuId) = createPublishedProductWithSku()
+        val orderId = placeOrder(productId, skuId)
 
         mockMvc
             .patch("/orders/$orderId/confirm") {
@@ -61,8 +64,8 @@ class OrderApiTest : ApiIntegrationTest() {
 
     @Test
     fun `구매자는 판매자 전용 주문 처리를 할 수 없다`() {
-        val productId = createPublishedProduct()
-        val orderId = placeOrder(productId)
+        val (productId, skuId) = createPublishedProductWithSku()
+        val orderId = placeOrder(productId, skuId)
 
         mockMvc
             .patch("/orders/$orderId/confirm") {
@@ -73,7 +76,11 @@ class OrderApiTest : ApiIntegrationTest() {
             }
     }
 
-    private fun placeOrder(productId: Long): Long {
+    private fun placeOrder(
+        productId: Long,
+        skuId: Long,
+        quantity: Int = 1,
+    ): Long {
         val result =
             mockMvc
                 .post("/orders") {
@@ -83,13 +90,13 @@ class OrderApiTest : ApiIntegrationTest() {
                         """
                         {
                           "productId": $productId,
-                          "quantity": 1
+                          "skuId": $skuId,
+                          "quantity": $quantity
                         }
                         """.trimIndent()
                 }.andExpect {
                     status { isCreated() }
                 }.andReturn()
-        return com.jayway.jsonpath.JsonPath
-            .read(result.response.contentAsString, "$.data.id")
+        return JsonPath.read(result.response.contentAsString, "$.data.id")
     }
 }

@@ -61,6 +61,7 @@ class OrderTest {
         Order(
             userId = 1L,
             productId = 10L,
+            skuId = 100L,
             productName = "상품",
             quantity = 2,
         )

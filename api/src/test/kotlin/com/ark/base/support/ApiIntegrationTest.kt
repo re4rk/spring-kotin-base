@@ -2,7 +2,6 @@ package com.ark.base.support
 
 import com.ark.base.BaseApplication
 import com.ark.base.common.JwtProvider
-import com.ark.base.inventory.InventoryRepository
 import com.jayway.jsonpath.JsonPath
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,9 +25,6 @@ abstract class ApiIntegrationTest : RedisIntegrationTest() {
 
     @Autowired
     protected lateinit var jwtProvider: JwtProvider
-
-    @Autowired
-    protected lateinit var inventoryRepository: InventoryRepository
 
     protected lateinit var sellerToken: String
     protected var sellerId: Long = 0
@@ -105,7 +101,6 @@ abstract class ApiIntegrationTest : RedisIntegrationTest() {
         token: String,
         name: String = "Test Product",
         price: Long = 10_000,
-        initialStock: Int = 10,
     ): Long {
         val result =
             mockMvc
@@ -116,8 +111,7 @@ abstract class ApiIntegrationTest : RedisIntegrationTest() {
                         """
                         {
                           "name": "$name",
-                          "price": $price,
-                          "initialStock": $initialStock
+                          "price": $price
                         }
                         """.trimIndent()
                 }.andExpect {
@@ -148,14 +142,38 @@ abstract class ApiIntegrationTest : RedisIntegrationTest() {
         token: String = sellerToken,
         name: String = "Test Product",
         price: Long = 10_000,
-        initialStock: Int = 10,
     ): Long {
-        val productId = createProduct(token, name, price, initialStock)
+        val productId = createProduct(token, name, price)
         publishProduct(token, productId)
         return productId
     }
 
-    protected fun inventoryIdFor(productId: Long): Long = inventoryRepository.findByProductId(productId)!!.id
+    protected fun createPublishedProductWithSku(
+        token: String = sellerToken,
+        stock: Int = 10,
+    ): Pair<Long, Long> {
+        val productId = createProduct(token)
+        val optionResult =
+            mockMvc
+                .post("/products/$productId/option-groups") {
+                    contentType = MediaType.APPLICATION_JSON
+                    header(HttpHeaders.AUTHORIZATION, bearer(token))
+                    content = """{"name":"기본","options":[{"name":"기본","sortOrder":0}]}"""
+                }.andExpect { status { isCreated() } }
+                .andReturn()
+        val optionId: Int = JsonPath.read(optionResult.response.contentAsString, "$.data.optionGroups[0].options[0].id")
+        val skuResult =
+            mockMvc
+                .post("/products/$productId/skus") {
+                    contentType = MediaType.APPLICATION_JSON
+                    header(HttpHeaders.AUTHORIZATION, bearer(token))
+                    content = """{"optionIds":[$optionId],"stock":$stock,"extraPrice":0}"""
+                }.andExpect { status { isCreated() } }
+                .andReturn()
+        val skuId: Int = JsonPath.read(skuResult.response.contentAsString, "$.data.skus[0].id")
+        publishProduct(token, productId)
+        return productId to skuId.toLong()
+    }
 
     protected fun MvcResult.dataPath(path: String): Any = JsonPath.read(response.contentAsString, "$.data$path")
 }

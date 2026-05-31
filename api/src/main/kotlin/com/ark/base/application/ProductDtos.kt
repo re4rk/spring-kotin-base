@@ -1,6 +1,5 @@
 package com.ark.base.application
 
-import com.ark.base.inventory.Inventory
 import com.ark.base.product.Product
 import com.ark.base.product.ProductQueryFilter
 import com.ark.base.product.ProductStatus
@@ -108,14 +107,11 @@ data class ProductUpdateRequest(
 data class ProductCreateRequest(
     val name: String,
     val price: Long,
-    val initialStock: Int,
     val description: String? = null,
     val category: String? = null,
     val thumbnailUrl: String? = null,
 ) {
     fun toProduct() = Product(name = name, price = price, description = description, category = category, thumbnailUrl = thumbnailUrl)
-
-    fun toInventory(product: Product) = Inventory(productId = product.id, stock = initialStock)
 }
 
 data class ProductResponse(
@@ -131,20 +127,18 @@ data class ProductResponse(
     val skus: List<ProductSkuResponse>,
 ) {
     companion object {
-        fun from(
-            product: Product,
-            stock: Int,
-        ) = ProductResponse(
-            id = product.id,
-            name = product.name,
-            price = product.price,
-            stock = stock,
-            status = product.status,
-            description = product.description,
-            category = product.category,
-            thumbnailUrl = product.thumbnailUrl,
-            optionGroups = product.optionGroups.map { ProductOptionGroupResponse.from(it) },
-            skus = product.skus.map { ProductSkuResponse.from(it) },
-        )
+        fun from(product: Product) =
+            ProductResponse(
+                id = product.id,
+                name = product.name,
+                price = product.price,
+                stock = product.skus.sumOf { it.stock },
+                status = product.status,
+                description = product.description,
+                category = product.category,
+                thumbnailUrl = product.thumbnailUrl,
+                optionGroups = product.optionGroups.map { ProductOptionGroupResponse.from(it) },
+                skus = product.skus.map { ProductSkuResponse.from(it) },
+            )
     }
 }

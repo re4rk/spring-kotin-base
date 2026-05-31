@@ -2,7 +2,6 @@ package com.ark.base.application
 
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
-import com.ark.base.inventory.InventoryRepository
 import com.ark.base.product.Product
 import com.ark.base.product.ProductRepository
 import com.ark.base.product.findByIdOrThrow
@@ -13,24 +12,21 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ProductService(
     private val productRepository: ProductRepository,
-    private val inventoryRepository: InventoryRepository,
 ) {
     @Transactional(readOnly = true)
     fun findAllByFilter(request: ProductQueryFilterRequest): List<ProductResponse> =
-        productRepository.findAllByFilter(request.toQueryFilter()).map { product -> toResponse(product) }
+        productRepository.findAllByFilter(request.toQueryFilter()).map { ProductResponse.from(it) }
 
     @Transactional(readOnly = true)
     fun findById(productId: Long): ProductResponse {
         val product = productRepository.findByIdOrThrow(productId)
-        return toResponse(product)
+        return ProductResponse.from(product)
     }
 
     @Transactional
     fun create(request: ProductCreateRequest): ProductResponse {
         val product = productRepository.save(request.toProduct())
-        val inventory = inventoryRepository.save(request.toInventory(product))
-
-        return ProductResponse.from(product, inventory.stock)
+        return ProductResponse.from(product)
     }
 
     @Transactional
@@ -40,7 +36,8 @@ class ProductService(
     ): ProductResponse {
         val product = productRepository.findByIdOrThrow(productId)
         product.addOptionGroup(request.toOptionGroup())
-        return toResponse(product)
+        productRepository.flush()
+        return ProductResponse.from(product)
     }
 
     @Transactional
@@ -50,7 +47,7 @@ class ProductService(
     ): ProductResponse {
         val product = productRepository.findByIdOrThrow(productId)
         product.removeOptionGroup(groupId)
-        return toResponse(product)
+        return ProductResponse.from(product)
     }
 
     @Transactional
@@ -65,7 +62,8 @@ class ProductService(
                 allOptions.find { it.id == id } ?: throw BaseException(ErrorCode.PRODUCT_OPTION_NOT_FOUND)
             }
         product.addSku(ProductSku(stock = request.stock, extraPrice = request.extraPrice, options = options.toMutableList()))
-        return toResponse(product)
+        productRepository.flush()
+        return ProductResponse.from(product)
     }
 
     @Transactional
@@ -75,7 +73,7 @@ class ProductService(
     ): ProductResponse {
         val product = productRepository.findByIdOrThrow(productId)
         product.removeSku(skuId)
-        return toResponse(product)
+        return ProductResponse.from(product)
     }
 
     @Transactional
@@ -91,7 +89,7 @@ class ProductService(
             category = request.category,
             thumbnailUrl = request.thumbnailUrl,
         )
-        return toResponse(product)
+        return ProductResponse.from(product)
     }
 
     @Transactional
@@ -118,11 +116,6 @@ class ProductService(
     ): ProductResponse {
         val product = productRepository.findByIdOrThrow(productId)
         action(product)
-        return toResponse(product)
-    }
-
-    private fun toResponse(product: Product): ProductResponse {
-        val stock = inventoryRepository.findByProductId(product.id)?.stock ?: 0
-        return ProductResponse.from(product, stock)
+        return ProductResponse.from(product)
     }
 }
