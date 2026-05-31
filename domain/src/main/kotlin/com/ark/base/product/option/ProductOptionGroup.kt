@@ -19,15 +19,17 @@ import jakarta.persistence.OrderBy
 class ProductOptionGroup(
     var name: String,
     var sortOrder: Int = 0,
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    var product: Product? = null,
     @OneToMany(mappedBy = "optionGroup", cascade = [CascadeType.ALL], orphanRemoval = true)
     @OrderBy("sortOrder ASC")
     val options: MutableList<ProductOption> = mutableListOf(),
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseEntity() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    lateinit var product: Product
+        internal set
+
     fun addOption(option: ProductOption) {
         options.add(option)
     }

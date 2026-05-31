@@ -68,7 +68,7 @@ class GlobalExceptionHandler {
             ErrorCode.STOCK_INSUFFICIENT,
             ErrorCode.STOCK_CONCURRENT_MODIFICATION,
             ErrorCode.ORDER_ALREADY_CANCELLED,
-            ErrorCode.PRODUCT_ALREADY_DISCONTINUED,
+            ErrorCode.PRODUCT_OPTION_IN_USE,
             -> HttpStatus.CONFLICT
 
             ErrorCode.USER_LOGIN_FAILED,

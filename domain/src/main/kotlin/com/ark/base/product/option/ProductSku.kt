@@ -17,9 +17,6 @@ import jakarta.persistence.Version
 
 @Entity
 class ProductSku(
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    var product: Product? = null,
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "product_sku_option",
@@ -34,6 +31,11 @@ class ProductSku(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseEntity() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    lateinit var product: Product
+        internal set
+
     fun decreaseStock(quantity: Int) {
         if (stock < quantity) throw BaseException(ErrorCode.STOCK_INSUFFICIENT)
         stock -= quantity

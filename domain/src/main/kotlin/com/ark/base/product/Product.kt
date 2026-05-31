@@ -43,6 +43,10 @@ class Product(
         val group =
             optionGroups.find { it.id == groupId }
                 ?: throw BaseException(ErrorCode.PRODUCT_OPTION_GROUP_NOT_FOUND)
+        val optionIds = group.options.map { it.id }.toSet()
+        if (skus.any { sku -> sku.options.any { it.id in optionIds } }) {
+            throw BaseException(ErrorCode.PRODUCT_OPTION_IN_USE)
+        }
         optionGroups.remove(group)
     }
 
@@ -52,11 +56,10 @@ class Product(
     }
 
     fun removeSku(skuId: Long) {
-        val sku =
-            skus.find { it.id == skuId }
-                ?: throw BaseException(ErrorCode.PRODUCT_SKU_NOT_FOUND)
-        skus.remove(sku)
+        skus.remove(findSkuOrThrow(skuId))
     }
+
+    fun findSkuOrThrow(skuId: Long): ProductSku = skus.find { it.id == skuId } ?: throw BaseException(ErrorCode.PRODUCT_SKU_NOT_FOUND)
 
     fun update(
         name: String,
@@ -102,8 +105,7 @@ class Product(
     }
 
     fun discontinue() {
-        if (status == ProductStatus.DISCONTINUED) throw BaseException(ErrorCode.PRODUCT_ALREADY_DISCONTINUED)
-        status = ProductStatus.DISCONTINUED
+        transitionTo(ProductStatus.DISCONTINUED)
         registerEvent(ProductDiscontinuedEvent(this))
     }
 

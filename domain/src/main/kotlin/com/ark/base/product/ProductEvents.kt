@@ -1,6 +1,6 @@
 package com.ark.base.product
 
-class ProductCreatedEvent(
+sealed class ProductEvent(
     private val product: Product,
 ) {
     val productId get() = product.id
@@ -8,57 +8,31 @@ class ProductCreatedEvent(
     val price get() = product.price
     val status get() = product.status
 }
+
+class ProductCreatedEvent(
+    product: Product,
+) : ProductEvent(product)
 
 class ProductSubmittedEvent(
-    private val product: Product,
-) {
-    val productId get() = product.id
-    val productName get() = product.name
-    val price get() = product.price
-    val status get() = product.status
-}
+    product: Product,
+) : ProductEvent(product)
 
 class ProductApprovedEvent(
-    private val product: Product,
-) {
-    val productId get() = product.id
-    val productName get() = product.name
-    val price get() = product.price
-    val status get() = product.status
-}
+    product: Product,
+) : ProductEvent(product)
 
 class ProductRejectedEvent(
-    private val product: Product,
-) {
-    val productId get() = product.id
-    val productName get() = product.name
-    val price get() = product.price
-    val status get() = product.status
-}
+    product: Product,
+) : ProductEvent(product)
 
 class ProductMarkedSoldOutEvent(
-    private val product: Product,
-) {
-    val productId get() = product.id
-    val productName get() = product.name
-    val price get() = product.price
-    val status get() = product.status
-}
+    product: Product,
+) : ProductEvent(product)
 
 class ProductSaleResumedEvent(
-    private val product: Product,
-) {
-    val productId get() = product.id
-    val productName get() = product.name
-    val price get() = product.price
-    val status get() = product.status
-}
+    product: Product,
+) : ProductEvent(product)
 
 class ProductDiscontinuedEvent(
-    private val product: Product,
-) {
-    val productId get() = product.id
-    val productName get() = product.name
-    val price get() = product.price
-    val status get() = product.status
-}
+    product: Product,
+) : ProductEvent(product)

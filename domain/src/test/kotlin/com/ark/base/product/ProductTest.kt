@@ -36,13 +36,13 @@ class ProductTest {
     }
 
     @Test
-    fun `이미 DISCONTINUED인 상품을 다시 discontinue 하면 PRODUCT_ALREADY_DISCONTINUED 예외를 던진다`() {
+    fun `이미 DISCONTINUED인 상품을 다시 discontinue 하면 PRODUCT_INVALID_STATUS 예외를 던진다`() {
         val product = product()
         product.discontinue()
 
         val exception = assertThrows<BaseException> { product.discontinue() }
 
-        assertEquals(ErrorCode.PRODUCT_ALREADY_DISCONTINUED, exception.errorCode)
+        assertEquals(ErrorCode.PRODUCT_INVALID_STATUS, exception.errorCode)
     }
 
     @Test

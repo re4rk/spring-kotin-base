@@ -6,8 +6,6 @@ import com.ark.base.order.OrderRepository
 import com.ark.base.order.findByIdOrThrow
 import com.ark.base.product.ProductRepository
 import com.ark.base.product.findByIdOrThrow
-import com.ark.base.product.option.ProductSkuRepository
-import com.ark.base.product.option.findByIdOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional
 class OrderService(
     private val orderRepository: OrderRepository,
     private val productRepository: ProductRepository,
-    private val productSkuRepository: ProductSkuRepository,
 ) {
     @Transactional
     fun place(
@@ -23,24 +20,20 @@ class OrderService(
         buyerId: Long,
     ): OrderResponse {
         val product = productRepository.findByIdOrThrow(request.productId)
-        val sku = productSkuRepository.findByIdOrThrow(request.skuId)
-
         if (!product.isOrderable) throw BaseException(ErrorCode.PRODUCT_INVALID_STATUS)
-
+        val sku = product.findSkuOrThrow(request.skuId)
         sku.decreaseStock(request.quantity)
         val order = orderRepository.save(request.toOrder(product, buyerId))
-
         return OrderResponse.from(order)
     }
 
     @Transactional
     fun cancel(orderId: Long): OrderResponse {
         val order = orderRepository.findByIdOrThrow(orderId)
-        val sku = productSkuRepository.findByIdOrThrow(order.skuId)
-
+        val product = productRepository.findByIdOrThrow(order.productId)
+        val sku = product.findSkuOrThrow(order.skuId)
         order.cancel()
         sku.increaseStock(order.quantity)
-
         return OrderResponse.from(order)
     }
 
