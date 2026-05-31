@@ -4,7 +4,7 @@ import com.ark.base.inventory.Inventory
 import com.ark.base.inventory.InventoryRepository
 import com.ark.base.product.Product
 import com.ark.base.product.ProductRepository
-import com.ark.base.product.getById
+import com.ark.base.product.findByIdOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -19,7 +19,7 @@ class ProductService(
 
     @Transactional(readOnly = true)
     fun findById(productId: Long): ProductResponse {
-        val product = productRepository.getById(productId)
+        val product = productRepository.findByIdOrThrow(productId)
         return toResponse(product)
     }
 
@@ -52,7 +52,7 @@ class ProductService(
         productId: Long,
         action: (Product) -> Unit,
     ): ProductResponse {
-        val product = productRepository.getById(productId)
+        val product = productRepository.findByIdOrThrow(productId)
         action(product)
         return toResponse(product)
     }

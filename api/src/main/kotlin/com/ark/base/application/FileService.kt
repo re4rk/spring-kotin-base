@@ -5,6 +5,7 @@ import com.ark.base.common.ErrorCode
 import com.ark.base.file.FileMetadata
 import com.ark.base.file.FileMetadataRepository
 import com.ark.base.file.FileStorage
+import com.ark.base.file.findByIdOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -45,13 +46,13 @@ class FileService(
 
     @Transactional(readOnly = true)
     fun findById(fileId: Long): FileResponse {
-        val metadata = fileMetadataRepository.findActiveById(fileId) ?: throw BaseException(ErrorCode.FILE_NOT_FOUND)
+        val metadata = fileMetadataRepository.findByIdOrThrow(fileId)
         return FileResponse.from(metadata, fileStorage.getUrl(metadata.path))
     }
 
     @Transactional
     fun delete(fileId: Long) {
-        val metadata = fileMetadataRepository.getById(fileId)
+        val metadata = fileMetadataRepository.findByIdOrThrow(fileId)
         metadata.delete()
         fileStorage.delete(metadata.path)
     }

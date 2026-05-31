@@ -10,6 +10,7 @@ import com.ark.base.common.ErrorCode
 import com.ark.base.common.JwtProvider
 import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.UserRepository
+import com.ark.base.user.findByIdOrThrow
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,7 +40,7 @@ class AuthService(
     fun refresh(request: RefreshTokenRequest): TokenResponse {
         when (val result = refreshTokenRepository.consume(request.refreshToken)) {
             is RefreshTokenConsumeResult.Success -> {
-                val user = userRepository.getById(result.userId)
+                val user = userRepository.findByIdOrThrow(result.userId)
                 val refreshToken = refreshTokenRepository.issue(user.id)
                 return TokenResponse(
                     accessToken = jwtProvider.generate(user.id),
@@ -67,7 +68,7 @@ class AuthService(
         val userId =
             passwordResetTokenRepository.findById(request.token).orElse(null)?.userId
                 ?: throw BaseException(ErrorCode.USER_RESET_TOKEN_INVALID)
-        val user = userRepository.getById(userId)
+        val user = userRepository.findByIdOrThrow(userId)
         user.changePassword(request.newPassword, passwordEncoder)
         passwordResetTokenRepository.deleteById(request.token)
     }

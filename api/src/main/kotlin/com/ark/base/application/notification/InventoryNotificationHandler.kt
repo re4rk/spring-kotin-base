@@ -4,6 +4,7 @@ import com.ark.base.inventory.StockSoldOutEvent
 import com.ark.base.notification.EmailSender
 import com.ark.base.notification.KakaoSender
 import com.ark.base.product.ProductRepository
+import com.ark.base.product.findByIdOrThrow
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
@@ -15,7 +16,7 @@ class InventoryNotificationHandler(
 ) {
     @TransactionalEventListener
     fun handle(event: StockSoldOutEvent) {
-        val product = productRepository.getById(event.productId)
+        val product = productRepository.findByIdOrThrow(event.productId)
         val productName = product.name
         emailSender.send(
             to = "admin@example.com",

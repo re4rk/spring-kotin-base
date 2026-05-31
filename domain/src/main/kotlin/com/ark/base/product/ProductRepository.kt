@@ -21,4 +21,4 @@ interface ProductRepository : JpaRepository<Product, Long> {
     ): List<Product>
 }
 
-fun ProductRepository.getById(id: Long): Product = findById(id).orElseThrow { BaseException(ErrorCode.PRODUCT_NOT_FOUND) }
+fun ProductRepository.findByIdOrThrow(id: Long): Product = findById(id).orElseThrow { BaseException(ErrorCode.PRODUCT_NOT_FOUND) }

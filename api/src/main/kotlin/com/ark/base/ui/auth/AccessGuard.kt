@@ -4,13 +4,13 @@ import com.ark.base.common.BaseException
 import com.ark.base.common.CurrentUserProvider
 import com.ark.base.common.ErrorCode
 import com.ark.base.inventory.InventoryRepository
-import com.ark.base.inventory.getById
+import com.ark.base.inventory.findByIdOrThrow
 import com.ark.base.order.Order
 import com.ark.base.order.OrderRepository
-import com.ark.base.order.getById
+import com.ark.base.order.findByIdOrThrow
 import com.ark.base.product.Product
 import com.ark.base.product.ProductRepository
-import com.ark.base.product.getById
+import com.ark.base.product.findByIdOrThrow
 import com.ark.base.user.UserRepository
 import org.springframework.stereotype.Component
 
@@ -34,20 +34,20 @@ class AccessGuard(
     }
 
     fun requireProductOwner(productId: Long) {
-        requireProductOwner(productRepository.getById(productId))
+        requireProductOwner(productRepository.findByIdOrThrow(productId))
     }
 
     fun requireProductOwnerByInventory(inventoryId: Long) {
-        requireProductOwner(inventoryRepository.getById(inventoryId).productId)
+        requireProductOwner(inventoryRepository.findByIdOrThrow(inventoryId).productId)
     }
 
     fun requireOrderBuyer(orderId: Long) {
-        requireOrderBuyer(orderRepository.getById(orderId))
+        requireOrderBuyer(orderRepository.findByIdOrThrow(orderId))
     }
 
     fun requireOrderSeller(orderId: Long) {
-        val order = orderRepository.getById(orderId)
-        requireOrderSeller(order, productRepository.getById(order.productId))
+        val order = orderRepository.findByIdOrThrow(orderId)
+        requireOrderSeller(order, productRepository.findByIdOrThrow(order.productId))
     }
 
     private fun requireProductOwner(product: Product) {

@@ -5,6 +5,7 @@ import com.ark.base.common.ErrorCode
 import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.User
 import com.ark.base.user.UserRepository
+import com.ark.base.user.findByIdOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,7 +22,7 @@ class UserService(
         userId: Long,
         request: ChangePasswordRequest,
     ) {
-        val user = userRepository.getById(userId)
+        val user = userRepository.findByIdOrThrow(userId)
         if (!user.matchesPassword(request.currentPassword, passwordEncoder)) throw BaseException(ErrorCode.USER_LOGIN_FAILED)
         user.changePassword(request.newPassword, passwordEncoder)
     }
@@ -31,7 +32,7 @@ class UserService(
         userId: Long,
         deletedBy: String,
     ) {
-        val user = userRepository.getById(userId)
+        val user = userRepository.findByIdOrThrow(userId)
         user.delete(deletedBy)
     }
 }
