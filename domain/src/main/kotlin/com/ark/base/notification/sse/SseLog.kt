@@ -45,10 +45,3 @@ class SseLog(
         this.errorMessage = errorMessage
     }
 }
-
-enum class SseStatus {
-    PENDING,
-    DELIVERED,
-    MISSED,
-    FAILED,
-}

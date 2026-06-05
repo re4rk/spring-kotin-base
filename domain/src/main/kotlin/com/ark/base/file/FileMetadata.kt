@@ -44,9 +44,3 @@ class FileMetadata(
         isDeleted = true
     }
 }
-
-enum class FileUploadStatus {
-    PENDING,
-    SUCCESS,
-    FAILED,
-}

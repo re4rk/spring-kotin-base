@@ -1,7 +1,5 @@
 package com.ark.base.file
 
-import java.io.InputStream
-
 interface FileClient {
     fun upload(upload: FileUpload): FileMetadata
 
@@ -9,10 +7,3 @@ interface FileClient {
 
     fun getUrl(path: String): String
 }
-
-data class FileUpload(
-    val originalName: String,
-    val contentType: String,
-    val size: Long,
-    val inputStream: InputStream,
-)
