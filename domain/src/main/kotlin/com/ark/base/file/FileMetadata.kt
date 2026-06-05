@@ -28,7 +28,6 @@ class FileMetadata(
 ) : BaseAggregateEntity<FileMetadata>() {
     @Column(columnDefinition = "TEXT")
     var errorMessage: String? = null
-        private set
 
     fun markSuccess() {
         status = FileUploadStatus.SUCCESS

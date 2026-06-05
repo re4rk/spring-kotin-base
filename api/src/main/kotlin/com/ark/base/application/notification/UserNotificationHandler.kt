@@ -1,8 +1,8 @@
 package com.ark.base.application.notification
 
 import com.ark.base.auth.password.reset.PasswordResetRequestedEvent
-import com.ark.base.notification.KakaoSender
 import com.ark.base.notification.email.EmailClient
+import com.ark.base.notification.kakao.KakaoClient
 import com.ark.base.user.UserRegisteredEvent
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
@@ -10,7 +10,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 @Component
 class UserNotificationHandler(
     private val emailClient: EmailClient,
-    private val kakaoSender: KakaoSender,
+    private val kakaoClient: KakaoClient,
 ) {
     @TransactionalEventListener
     fun handle(event: PasswordResetRequestedEvent) {
@@ -28,7 +28,7 @@ class UserNotificationHandler(
             subject = "가입을 환영합니다!",
             body = "${event.name}님, 회원가입이 완료되었습니다.",
         )
-        kakaoSender.send(
+        kakaoClient.send(
             to = event.email,
             message = "${event.name}님, 회원가입이 완료되었습니다.",
         )

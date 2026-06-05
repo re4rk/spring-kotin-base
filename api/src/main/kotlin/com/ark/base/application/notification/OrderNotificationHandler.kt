@@ -1,7 +1,7 @@
 package com.ark.base.application.notification
 
-import com.ark.base.notification.KakaoSender
 import com.ark.base.notification.email.EmailClient
+import com.ark.base.notification.kakao.KakaoClient
 import com.ark.base.order.OrderCancelledEvent
 import com.ark.base.order.OrderConfirmedEvent
 import com.ark.base.order.OrderDeliveredEvent
@@ -13,7 +13,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 @Component
 class OrderNotificationHandler(
     private val emailClient: EmailClient,
-    private val kakaoSender: KakaoSender,
+    private val kakaoClient: KakaoClient,
 ) {
     @TransactionalEventListener
     fun handle(event: OrderPlacedEvent) {
@@ -70,7 +70,7 @@ class OrderNotificationHandler(
             subject = subject,
             body = message,
         )
-        kakaoSender.send(
+        kakaoClient.send(
             to = "user-$userId",
             message = message,
         )

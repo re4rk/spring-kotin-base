@@ -1,7 +1,7 @@
 package com.ark.base.application.notification
 
-import com.ark.base.notification.KakaoSender
 import com.ark.base.notification.email.EmailClient
+import com.ark.base.notification.kakao.KakaoClient
 import com.ark.base.product.ProductApprovedEvent
 import com.ark.base.product.ProductCreatedEvent
 import com.ark.base.product.ProductDiscontinuedEvent
@@ -15,7 +15,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 @Component
 class ProductNotificationHandler(
     private val emailClient: EmailClient,
-    private val kakaoSender: KakaoSender,
+    private val kakaoClient: KakaoClient,
 ) {
     @TransactionalEventListener
     fun handle(event: ProductCreatedEvent) {
@@ -82,7 +82,7 @@ class ProductNotificationHandler(
             subject = subject,
             body = message,
         )
-        kakaoSender.send(
+        kakaoClient.send(
             to = "admin",
             message = message,
         )
