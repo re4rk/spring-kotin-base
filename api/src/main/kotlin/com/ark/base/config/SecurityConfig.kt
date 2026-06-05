@@ -1,6 +1,7 @@
-package com.ark.base.common
+package com.ark.base.config
 
 import com.ark.base.common.ErrorCode
+import com.ark.base.ui.JwtAuthenticationFilter
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

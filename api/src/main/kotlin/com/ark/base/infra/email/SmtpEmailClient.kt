@@ -1,6 +1,6 @@
 package com.ark.base.infra.email
 
-import com.ark.base.common.EmailProperties
+import com.ark.base.config.EmailProperties
 import com.ark.base.notification.email.EmailClient
 import com.ark.base.notification.email.EmailLog
 import com.ark.base.notification.email.EmailLogRepository

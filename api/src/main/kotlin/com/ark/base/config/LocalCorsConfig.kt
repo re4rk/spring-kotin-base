@@ -1,4 +1,4 @@
-package com.ark.base.common
+package com.ark.base.config
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile

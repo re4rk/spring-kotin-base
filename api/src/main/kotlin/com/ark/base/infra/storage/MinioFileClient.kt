@@ -1,6 +1,6 @@
 package com.ark.base.infra.storage
 
-import com.ark.base.common.MinioProperties
+import com.ark.base.config.MinioProperties
 import com.ark.base.file.FileClient
 import com.ark.base.file.FileMetadata
 import com.ark.base.file.FileMetadataRepository

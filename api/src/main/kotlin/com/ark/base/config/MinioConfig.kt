@@ -1,18 +1,9 @@
-package com.ark.base.common
+package com.ark.base.config
 
 import io.minio.MinioClient
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-
-@ConfigurationProperties(prefix = "minio")
-data class MinioProperties(
-    val endpoint: String = "http://localhost:9000",
-    val accessKey: String = "minioadmin",
-    val secretKey: String = "minioadmin",
-    val bucket: String = "files",
-)
 
 @Configuration
 @EnableConfigurationProperties(MinioProperties::class)

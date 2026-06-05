@@ -1,6 +1,6 @@
 package com.ark.base.infra.storage
 
-import com.ark.base.common.MinioProperties
+import com.ark.base.config.MinioProperties
 import io.minio.MinioClient
 import io.minio.PutObjectArgs
 import io.minio.RemoveObjectArgs
