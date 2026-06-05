@@ -27,6 +27,8 @@ management:
       enabled: false
     fcm:
       enabled: false
+    slack:
+      enabled: false
     group:
       readiness:
         include: readinessState, db, redis

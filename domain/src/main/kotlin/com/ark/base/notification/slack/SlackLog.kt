@@ -1,4 +1,4 @@
-package com.ark.base.notification.kakao
+package com.ark.base.notification.slack
 
 import com.ark.base.common.BaseEntity
 import jakarta.persistence.Column
@@ -12,15 +12,15 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "kakao_log")
-class KakaoLog(
+@Table(name = "slack_log")
+class SlackLog(
     @Column(nullable = false)
-    val recipient: String,
+    val channel: String,
     @Column(nullable = false, columnDefinition = "TEXT")
     val message: String,
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    var status: KakaoStatus = KakaoStatus.PENDING,
+    var status: SlackStatus = SlackStatus.PENDING,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseEntity() {
@@ -32,13 +32,13 @@ class KakaoLog(
     var sentAt: LocalDateTime? = null
 
     fun markSuccess(messageId: String?) {
-        status = KakaoStatus.SUCCESS
+        status = SlackStatus.SUCCESS
         this.messageId = messageId
         sentAt = LocalDateTime.now()
     }
 
     fun markFailed(errorMessage: String) {
-        status = KakaoStatus.FAILED
+        status = SlackStatus.FAILED
         this.errorMessage = errorMessage
     }
 }
