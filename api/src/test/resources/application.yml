@@ -7,6 +7,9 @@ spring:
       ddl-auto: create-drop
   flyway:
     enabled: false
+  mail:
+    host: localhost
+    port: 1025
 
 jwt:
   secret: test-secret-key-minimum-256-bits-long-for-hmac
@@ -19,6 +22,10 @@ management:
       show-components: always
   health:
     minio:
+      enabled: false
+    smtp:
+      enabled: false
+    fcm:
       enabled: false
     group:
       readiness:
