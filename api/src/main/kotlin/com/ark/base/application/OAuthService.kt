@@ -12,6 +12,7 @@ import com.ark.base.common.JwtProvider
 import com.ark.base.config.OAuthProperties
 import com.ark.base.infra.oauth.GoogleOAuthHttpClient
 import com.ark.base.infra.oauth.KakaoOAuthHttpClient
+import com.ark.base.infra.oauth.NaverOAuthHttpClient
 import com.ark.base.infra.oauth.OAuthUserInfo
 import com.ark.base.user.User
 import com.ark.base.user.UserRepository
@@ -30,6 +31,7 @@ class OAuthService(
     private val jwtProvider: JwtProvider,
     private val googleOAuthHttpClient: GoogleOAuthHttpClient,
     private val kakaoOAuthHttpClient: KakaoOAuthHttpClient,
+    private val naverOAuthHttpClient: NaverOAuthHttpClient,
     private val oauthProperties: OAuthProperties,
 ) {
     fun getAuthorizationUrl(
@@ -63,6 +65,7 @@ class OAuthService(
             when (oauthProvider) {
                 OAuthProvider.GOOGLE -> googleOAuthHttpClient.getUserInfo(request.code, request.redirectUri)
                 OAuthProvider.KAKAO -> kakaoOAuthHttpClient.getUserInfo(request.code, request.redirectUri)
+                OAuthProvider.NAVER -> naverOAuthHttpClient.getUserInfo(request.code, request.redirectUri, request.state)
             }
 
         val user = findOrCreateUser(userInfo)
@@ -114,6 +117,16 @@ class OAuthService(
                 UriComponentsBuilder
                     .fromUriString("https://kauth.kakao.com/oauth/authorize")
                     .queryParam("client_id", oauthProperties.kakao.clientId)
+                    .queryParam("redirect_uri", redirectUri)
+                    .queryParam("response_type", "code")
+                    .queryParam("state", state)
+                    .build()
+                    .toUriString()
+
+            OAuthProvider.NAVER ->
+                UriComponentsBuilder
+                    .fromUriString("https://nid.naver.com/oauth2.0/authorize")
+                    .queryParam("client_id", oauthProperties.naver.clientId)
                     .queryParam("redirect_uri", redirectUri)
                     .queryParam("response_type", "code")
                     .queryParam("state", state)

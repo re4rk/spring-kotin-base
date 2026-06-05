@@ -84,6 +84,10 @@ oauth:
     client-id: ${KAKAO_CLIENT_ID:}
     client-secret: ${KAKAO_CLIENT_SECRET:}
     redirect-uri: ${KAKAO_REDIRECT_URI:http://localhost:3000/auth/oauth/kakao/callback}
+  naver:
+    client-id: ${NAVER_CLIENT_ID:}
+    client-secret: ${NAVER_CLIENT_SECRET:}
+    redirect-uri: ${NAVER_REDIRECT_URI:http://localhost:3000/auth/oauth/naver/callback}
 
 # ---------------------------------------------------------------------------
 # MinIO (S3 호환 오브젝트 스토리지)
