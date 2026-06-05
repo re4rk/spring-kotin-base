@@ -1,7 +1,7 @@
 package com.ark.base.application.notification
 
-import com.ark.base.notification.EmailSender
 import com.ark.base.notification.KakaoSender
+import com.ark.base.notification.email.EmailClient
 import com.ark.base.order.OrderCancelledEvent
 import com.ark.base.order.OrderConfirmedEvent
 import com.ark.base.order.OrderDeliveredEvent
@@ -12,7 +12,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
 class OrderNotificationHandler(
-    private val emailSender: EmailSender,
+    private val emailClient: EmailClient,
     private val kakaoSender: KakaoSender,
 ) {
     @TransactionalEventListener
@@ -65,7 +65,7 @@ class OrderNotificationHandler(
         subject: String,
         message: String,
     ) {
-        emailSender.send(
+        emailClient.send(
             to = "user-$userId@example.com",
             subject = subject,
             body = message,

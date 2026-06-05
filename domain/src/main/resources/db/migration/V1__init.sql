@@ -229,3 +229,43 @@ CREATE TABLE file_metadata
 ) DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci
   COMMENT = '업로드 파일 메타데이터 (실제 파일은 MinIO)';
+
+-- =============================================================================
+-- email_log: 이메일 발송 기록
+--   - receiver_email: 수신자 이메일 주소
+--   - sender_email: 발신자 이메일 주소
+--   - subject: 이메일 제목
+--   - template_id: 사용된 이메일 템플릿 식별자 (예: WELCOME_EMAIL)
+--   - template_params: 템플릿에 치환될 변수 데이터 (JSON 형식)
+--   - status: 발송 상태 (PENDING, SUCCESS, FAILED, BOUNCED)
+--   - error_message: 발송 실패 시 원인 기록
+--   - message_id: 외부 API(SES, SendGrid 등) 제공 고유 식별자
+--   - sent_at: 실제 외부 API 발송 처리 일시
+-- =============================================================================
+CREATE TABLE email_log (
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY                   COMMENT '고유 식별자',
+    receiver_email VARCHAR(255) NOT NULL                               COMMENT '수신자 이메일',
+    sender_email   VARCHAR(255) NOT NULL                               COMMENT '발신자 이메일',
+    subject        VARCHAR(255) NOT NULL                               COMMENT '이메일 제목',
+    template_id     VARCHAR(100) NULL                                  COMMENT '사용된 이메일 템플릿 식별자',
+    template_params JSON         NULL                                  COMMENT '템플릿에 치환될 변수 데이터',
+    status          VARCHAR(30)  NOT NULL DEFAULT 'PENDING'            COMMENT '상태 (PENDING, SUCCESS, FAILED, BOUNCED)',
+    error_message   TEXT         NULL                                  COMMENT '발송 실패 시 원인 기록',
+    message_id      VARCHAR(255) NULL                                  COMMENT '외부 API(SES, SendGrid 등) 제공 고유 식별자',
+    sent_at         DATETIME     NULL                                  COMMENT '실제 외부 API 발송 처리 일시',
+
+    -- audit
+    created_at    DATETIME(6)  NOT NULL                                COMMENT '업로드 일시',
+    created_by    VARCHAR(255)                                         COMMENT '업로드 주체',
+    updated_at    DATETIME(6)  NOT NULL                                COMMENT '마지막 수정 일시',
+    updated_by    VARCHAR(255)                                         COMMENT '마지막 수정 주체',
+
+    -- soft delete
+    deleted_at    DATETIME(6)                                          COMMENT '삭제 일시 (MinIO 파일도 함께 삭제됨)',
+    deleted_by    VARCHAR(255)                                         COMMENT '삭제 주체',
+    is_deleted    BOOLEAN      NOT NULL DEFAULT FALSE                  COMMENT '삭제 여부'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='이메일 발송 기록 테이블';
+
+CREATE INDEX idx_email_log_receiver   ON email_log (receiver_email);
+CREATE INDEX idx_email_log_created_at ON email_log (created_at);
+CREATE INDEX idx_email_log_status     ON email_log (status);

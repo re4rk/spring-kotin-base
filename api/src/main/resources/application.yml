@@ -40,6 +40,23 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+  # ---------------------------------------------------------------------------
+  # 이메일 (SMTP)
+  #   로컬 개발: Mailpit (smtp 1025, 웹 UI 8025)
+  #   운영 환경: 환경변수로 오버라이드 (MAIL_HOST / MAIL_PORT / MAIL_USERNAME / MAIL_PASSWORD)
+  # ---------------------------------------------------------------------------
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:false}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:false}
+
 # ---------------------------------------------------------------------------
 # JWT 설정
 #   secret: 운영 환경에서는 반드시 환경변수(JWT_SECRET)로 주입
@@ -49,6 +66,9 @@ spring:
 jwt:
   secret: ${JWT_SECRET:local-dev-secret-key-minimum-256-bits-long}
   expiration-ms: 3600000
+
+email:
+  from: ${EMAIL_FROM:noreply@base.local}
 
 # ---------------------------------------------------------------------------
 # MinIO (S3 호환 오브젝트 스토리지)
@@ -81,8 +101,10 @@ management:
   health:
     minio:
       enabled: true
+    smtp:
+      enabled: true
     group:
       readiness:
-        include: readinessState, db, redis, minioFileClient
+        include: readinessState, db, redis, minioFileClient, smtpEmailClient
       liveness:
         include: livenessState
