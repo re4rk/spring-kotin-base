@@ -1,4 +1,4 @@
-package com.ark.base.infra
+package com.ark.base.infra.email
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.health.contributor.Health

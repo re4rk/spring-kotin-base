@@ -1,4 +1,4 @@
-package com.ark.base.infra
+package com.ark.base.infra.email
 
 import com.ark.base.common.EmailProperties
 import com.ark.base.notification.email.EmailClient

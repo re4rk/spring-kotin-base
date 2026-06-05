@@ -1,4 +1,4 @@
-package com.ark.base.infra
+package com.ark.base.infra.storage
 
 import com.ark.base.common.MinioProperties
 import com.ark.base.file.FileClient
@@ -11,6 +11,7 @@ import io.minio.MinioClient
 import io.minio.PutObjectArgs
 import io.minio.RemoveObjectArgs
 import io.minio.http.Method
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -20,6 +21,8 @@ class MinioFileClient(
     private val minioClient: MinioClient,
     private val minioProperties: MinioProperties,
 ) : FileClient {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     init {
         ensureBucketExists()
     }
@@ -28,6 +31,7 @@ class MinioFileClient(
         val extension = upload.originalName.substringAfterLast('.', "")
         val storedName = if (extension.isNotEmpty()) "${UUID.randomUUID()}.$extension" else "${UUID.randomUUID()}"
 
+        log.info("Uploading file originalName={} storedName={} size={}", upload.originalName, storedName, upload.size)
         minioClient.putObject(
             PutObjectArgs
                 .builder()
@@ -37,6 +41,7 @@ class MinioFileClient(
                 .contentType(upload.contentType)
                 .build(),
         )
+        log.info("Uploaded file storedName={} bucket={}", storedName, minioProperties.bucket)
 
         return StoredFile(
             storedName = storedName,
@@ -47,6 +52,7 @@ class MinioFileClient(
     }
 
     override fun delete(path: String) {
+        log.info("Deleting file path={} bucket={}", path, minioProperties.bucket)
         minioClient.removeObject(
             RemoveObjectArgs
                 .builder()
@@ -54,6 +60,7 @@ class MinioFileClient(
                 .`object`(path)
                 .build(),
         )
+        log.info("Deleted file path={}", path)
     }
 
     override fun getUrl(path: String): String =
@@ -70,7 +77,9 @@ class MinioFileClient(
     private fun ensureBucketExists() {
         val exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(minioProperties.bucket).build())
         if (!exists) {
+            log.info("Bucket not found, creating bucket={}", minioProperties.bucket)
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(minioProperties.bucket).build())
+            log.info("Bucket created bucket={}", minioProperties.bucket)
         }
     }
 }

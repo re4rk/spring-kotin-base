@@ -1,4 +1,4 @@
-package com.ark.base.infra
+package com.ark.base.infra.storage
 
 import com.ark.base.common.MinioProperties
 import com.ark.base.file.FileUpload

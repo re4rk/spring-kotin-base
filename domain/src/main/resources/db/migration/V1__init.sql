@@ -269,3 +269,41 @@ CREATE TABLE email_log (
 CREATE INDEX idx_email_log_receiver   ON email_log (receiver_email);
 CREATE INDEX idx_email_log_created_at ON email_log (created_at);
 CREATE INDEX idx_email_log_status     ON email_log (status);
+
+-- =============================================================================
+-- push_log: 푸시 알림 발송 기록
+--   - recipient: 수신 대상 (디바이스 토큰 또는 사용자 ID)
+--   - title / body: 푸시 제목·본문
+--   - status: 발송 상태 (PENDING, SUCCESS, FAILED)
+--   - message_id: 외부 API(FCM 등) 제공 고유 식별자
+--   - sent_at: 실제 외부 API 발송 처리 일시
+-- =============================================================================
+CREATE TABLE push_log
+(
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY      COMMENT '고유 식별자',
+    recipient     VARCHAR(255) NOT NULL                  COMMENT '수신 대상 (디바이스 토큰 또는 사용자 ID)',
+    title         VARCHAR(255) NOT NULL                  COMMENT '푸시 제목',
+    body          TEXT         NOT NULL                  COMMENT '푸시 본문',
+
+    status        VARCHAR(30)  NOT NULL DEFAULT 'PENDING' COMMENT '상태 (PENDING, SUCCESS, FAILED)',
+    error_message TEXT                                   COMMENT '발송 실패 시 원인 기록',
+    message_id    VARCHAR(255)                           COMMENT '외부 API(FCM 등) 제공 고유 식별자',
+    sent_at       DATETIME(6)                            COMMENT '실제 외부 API 발송 처리 일시',
+
+    -- audit
+    created_at    DATETIME(6)  NOT NULL                  COMMENT '생성 일시',
+    created_by    VARCHAR(255)                           COMMENT '생성 주체',
+    updated_at    DATETIME(6)  NOT NULL                  COMMENT '마지막 수정 일시',
+    updated_by    VARCHAR(255)                           COMMENT '마지막 수정 주체',
+
+    -- soft delete
+    deleted_at    DATETIME(6)                            COMMENT '삭제 일시',
+    deleted_by    VARCHAR(255)                           COMMENT '삭제 주체',
+    is_deleted    BOOLEAN      NOT NULL DEFAULT FALSE    COMMENT '삭제 여부'
+) DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = '푸시 알림 발송 기록';
+
+CREATE INDEX idx_push_log_recipient  ON push_log (recipient);
+CREATE INDEX idx_push_log_created_at ON push_log (created_at);
+CREATE INDEX idx_push_log_status     ON push_log (status);

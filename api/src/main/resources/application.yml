@@ -103,8 +103,10 @@ management:
       enabled: true
     smtp:
       enabled: true
+    fcm:
+      enabled: true
     group:
       readiness:
-        include: readinessState, db, redis, minioFileClient, smtpEmailClient
+        include: readinessState, db, redis, minioFileClient, smtpEmailClient, fcmPushClient
       liveness:
         include: livenessState
