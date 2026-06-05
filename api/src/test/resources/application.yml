@@ -29,6 +29,8 @@ management:
       enabled: false
     slack:
       enabled: false
+    sms:
+      enabled: false
     group:
       readiness:
         include: readinessState, db, redis
