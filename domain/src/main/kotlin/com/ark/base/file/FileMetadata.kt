@@ -1,7 +1,10 @@
 package com.ark.base.file
 
 import com.ark.base.common.BaseAggregateEntity
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -17,12 +20,34 @@ class FileMetadata(
     val size: Long,
     val bucket: String,
     val path: String,
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    var status: FileUploadStatus = FileUploadStatus.PENDING,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseAggregateEntity<FileMetadata>() {
+    @Column(columnDefinition = "TEXT")
+    var errorMessage: String? = null
+        private set
+
+    fun markSuccess() {
+        status = FileUploadStatus.SUCCESS
+    }
+
+    fun markFailed(errorMessage: String) {
+        status = FileUploadStatus.FAILED
+        this.errorMessage = errorMessage
+    }
+
     fun delete(by: String? = null) {
         deletedAt = LocalDateTime.now()
         deletedBy = by
         isDeleted = true
     }
+}
+
+enum class FileUploadStatus {
+    PENDING,
+    SUCCESS,
+    FAILED,
 }

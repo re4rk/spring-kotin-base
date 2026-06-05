@@ -215,6 +215,8 @@ CREATE TABLE file_metadata
     size          BIGINT       NOT NULL                 COMMENT '파일 크기 (bytes)',
     bucket        VARCHAR(255) NOT NULL                 COMMENT 'MinIO 버킷명',
     path          VARCHAR(255) NOT NULL                 COMMENT 'MinIO 오브젝트 경로',
+    status        VARCHAR(20)  NOT NULL DEFAULT 'PENDING' COMMENT '업로드 상태 (PENDING, SUCCESS, FAILED)',
+    error_message TEXT                                  COMMENT '업로드 실패 시 원인',
 
     -- audit
     created_at    DATETIME(6)  NOT NULL                 COMMENT '업로드 일시',

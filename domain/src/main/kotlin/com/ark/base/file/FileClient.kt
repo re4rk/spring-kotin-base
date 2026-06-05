@@ -3,7 +3,7 @@ package com.ark.base.file
 import java.io.InputStream
 
 interface FileClient {
-    fun upload(upload: FileUpload): StoredFile
+    fun upload(upload: FileUpload): FileMetadata
 
     fun delete(path: String)
 
@@ -15,11 +15,4 @@ data class FileUpload(
     val contentType: String,
     val size: Long,
     val inputStream: InputStream,
-)
-
-data class StoredFile(
-    val storedName: String,
-    val bucket: String,
-    val path: String,
-    val url: String,
 )

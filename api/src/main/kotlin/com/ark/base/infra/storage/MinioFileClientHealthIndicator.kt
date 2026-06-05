@@ -1,7 +1,9 @@
 package com.ark.base.infra.storage
 
 import com.ark.base.common.MinioProperties
-import com.ark.base.file.FileUpload
+import io.minio.MinioClient
+import io.minio.PutObjectArgs
+import io.minio.RemoveObjectArgs
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.health.contributor.Health
 import org.springframework.boot.health.contributor.HealthIndicator
@@ -15,7 +17,7 @@ import java.io.ByteArrayInputStream
     matchIfMissing = true,
 )
 class MinioFileClientHealthIndicator(
-    private val minioFileClient: MinioFileClient,
+    private val minioClient: MinioClient,
     private val minioProperties: MinioProperties,
 ) : HealthIndicator {
     override fun health(): Health =
@@ -34,20 +36,27 @@ class MinioFileClientHealthIndicator(
         }
 
     private fun probeUploadAndDelete(): String {
-        val stored = minioFileClient.upload(fileUpload)
-        minioFileClient.delete(stored.path)
-        return stored.path
+        minioClient.putObject(
+            PutObjectArgs
+                .builder()
+                .bucket(minioProperties.bucket)
+                .`object`(HEALTH_CHECK_FILE_NAME)
+                .stream(ByteArrayInputStream(HEALTH_CHECK_PAYLOAD), HEALTH_CHECK_PAYLOAD.size.toLong(), -1)
+                .contentType("text/plain")
+                .build(),
+        )
+        minioClient.removeObject(
+            RemoveObjectArgs
+                .builder()
+                .bucket(minioProperties.bucket)
+                .`object`(HEALTH_CHECK_FILE_NAME)
+                .build(),
+        )
+        return HEALTH_CHECK_FILE_NAME
     }
 
     companion object {
         private const val HEALTH_CHECK_FILE_NAME = "_healthcheck/probe.txt"
         private val HEALTH_CHECK_PAYLOAD = "ok".toByteArray()
-        private val fileUpload =
-            FileUpload(
-                originalName = HEALTH_CHECK_FILE_NAME,
-                contentType = "text/plain",
-                size = HEALTH_CHECK_PAYLOAD.size.toLong(),
-                inputStream = ByteArrayInputStream(HEALTH_CHECK_PAYLOAD),
-            )
     }
 }

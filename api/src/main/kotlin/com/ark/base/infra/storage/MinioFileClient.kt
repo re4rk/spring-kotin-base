@@ -2,8 +2,9 @@ package com.ark.base.infra.storage
 
 import com.ark.base.common.MinioProperties
 import com.ark.base.file.FileClient
+import com.ark.base.file.FileMetadata
+import com.ark.base.file.FileMetadataRepository
 import com.ark.base.file.FileUpload
-import com.ark.base.file.StoredFile
 import io.minio.BucketExistsArgs
 import io.minio.GetPresignedObjectUrlArgs
 import io.minio.MakeBucketArgs
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeUnit
 class MinioFileClient(
     private val minioClient: MinioClient,
     private val minioProperties: MinioProperties,
+    private val fileMetadataRepository: FileMetadataRepository,
 ) : FileClient {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -27,28 +29,44 @@ class MinioFileClient(
         ensureBucketExists()
     }
 
-    override fun upload(upload: FileUpload): StoredFile {
+    override fun upload(upload: FileUpload): FileMetadata {
         val extension = upload.originalName.substringAfterLast('.', "")
         val storedName = if (extension.isNotEmpty()) "${UUID.randomUUID()}.$extension" else "${UUID.randomUUID()}"
 
-        log.info("Uploading file originalName={} storedName={} size={}", upload.originalName, storedName, upload.size)
-        minioClient.putObject(
-            PutObjectArgs
-                .builder()
-                .bucket(minioProperties.bucket)
-                .`object`(storedName)
-                .stream(upload.inputStream, upload.size, -1)
-                .contentType(upload.contentType)
-                .build(),
-        )
-        log.info("Uploaded file storedName={} bucket={}", storedName, minioProperties.bucket)
+        val metadata =
+            fileMetadataRepository.save(
+                FileMetadata(
+                    originalName = upload.originalName,
+                    storedName = storedName,
+                    mimeType = upload.contentType,
+                    size = upload.size,
+                    bucket = minioProperties.bucket,
+                    path = storedName,
+                ),
+            )
 
-        return StoredFile(
-            storedName = storedName,
-            bucket = minioProperties.bucket,
-            path = storedName,
-            url = getUrl(storedName),
-        )
+        log.info("Uploading file originalName={} storedName={} size={}", upload.originalName, storedName, upload.size)
+        try {
+            minioClient.putObject(
+                PutObjectArgs
+                    .builder()
+                    .bucket(minioProperties.bucket)
+                    .`object`(storedName)
+                    .stream(upload.inputStream, upload.size, -1)
+                    .contentType(upload.contentType)
+                    .build(),
+            )
+            metadata.markSuccess()
+            log.info("Uploaded file storedName={} bucket={}", storedName, minioProperties.bucket)
+        } catch (e: Exception) {
+            metadata.markFailed(e.message ?: e.javaClass.simpleName)
+            log.error("Failed to upload file storedName={} error={}", storedName, e.message, e)
+            throw e
+        } finally {
+            fileMetadataRepository.save(metadata)
+        }
+
+        return metadata
     }
 
     override fun delete(path: String) {
