@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSE Test Client</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 24px; }
+    .row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    input, select, button { padding: 8px; font-size: 14px; }
+    #log {
+      white-space: pre-wrap;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      height: 360px;
+      overflow: auto;
+      background: #fafafa;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+    }
+    .muted { color: #666; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h2>SSE 테스트</h2>
+
+  <div class="row">
+    <label>URL</label>
+    <input id="url" style="width:420px" value="http://localhost:8080/sse/connect" />
+  </div>
+
+  <div class="row">
+    <label>연결 방식</label>
+    <select id="mode">
+      <option value="eventsource">EventSource (쿠키 인증)</option>
+      <option value="fetch">Fetch Stream (Bearer 토큰 헤더)</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <label>Bearer Token</label>
+    <input id="token" style="width:420px" placeholder="fetch 모드에서만 사용" />
+  </div>
+
+  <div class="row">
+    <button id="connectBtn">Connect</button>
+    <button id="disconnectBtn">Disconnect</button>
+    <button id="clearBtn">Clear Log</button>
+  </div>
+
+  <div class="muted">
+    - 서버가 쿠키 인증이면 EventSource 사용<br/>
+    - Authorization 헤더 필요하면 Fetch 모드 사용
+  </div>
+
+  <hr />
+  <div id="log"></div>
+
+  <script>
+    let es = null;
+    let fetchAbort = null;
+
+    const $ = (id) => document.getElementById(id);
+    const logEl = $("log");
+
+    function log(msg) {
+      const ts = new Date().toISOString();
+      logEl.textContent += `[${ts}] ${msg}\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function disconnect() {
+      if (es) {
+        es.close();
+        es = null;
+        log("EventSource disconnected");
+      }
+      if (fetchAbort) {
+        fetchAbort.abort();
+        fetchAbort = null;
+        log("Fetch stream aborted");
+      }
+    }
+
+    async function connectByFetch(url, token) {
+      fetchAbort = new AbortController();
+
+      const headers = {};
+      if (token && token.trim()) headers["Authorization"] = `Bearer ${token.trim()}`;
+
+      log(`Fetch connecting: ${url}`);
+      const res = await fetch(url, {
+        method: "GET",
+        headers,
+        signal: fetchAbort.signal,
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        log(`HTTP ${res.status} ${res.statusText}`);
+        return;
+      }
+      if (!res.body) {
+        log("No response body");
+        return;
+      }
+
+      log("Fetch connected");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+          log("Fetch stream closed by server");
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+
+        let idx;
+        while ((idx = buffer.indexOf("\n\n")) >= 0) {
+          const rawEvent = buffer.slice(0, idx);
+          buffer = buffer.slice(idx + 2);
+
+          const lines = rawEvent.split("\n");
+          let eventName = "message";
+          const dataLines = [];
+
+          for (const line of lines) {
+            if (line.startsWith("event:")) eventName = line.slice(6).trim();
+            if (line.startsWith("data:")) dataLines.push(line.slice(5).trim());
+          }
+
+          if (dataLines.length > 0) {
+            log(`[${eventName}] ${dataLines.join("\n")}`);
+          }
+        }
+      }
+    }
+
+    function connectByEventSource(url) {
+      log(`EventSource connecting: ${url}`);
+      es = new EventSource(url, { withCredentials: true });
+
+      es.onopen = () => log("EventSource connected");
+      es.onmessage = (e) => log(`[message] ${e.data}`);
+      es.onerror = () => log("EventSource error (or disconnected)");
+
+      // 서버에서 event: connect 로 보낼 경우 수신
+      es.addEventListener("connect", (e) => log(`[connect] ${e.data}`));
+    }
+
+    $("connectBtn").addEventListener("click", async () => {
+      disconnect();
+
+      const url = $("url").value.trim();
+      const mode = $("mode").value;
+      const token = $("token").value;
+
+      if (!url) {
+        log("URL을 입력하세요.");
+        return;
+      }
+
+      try {
+        if (mode === "eventsource") {
+          connectByEventSource(url);
+        } else {
+          await connectByFetch(url, token);
+        }
+      } catch (e) {
+        log(`Connect failed: ${e?.message || e}`);
+      }
+    });
+
+    $("disconnectBtn").addEventListener("click", disconnect);
+    $("clearBtn").addEventListener("click", () => { logEl.textContent = ""; });
+  </script>
+</body>
+</html>
+

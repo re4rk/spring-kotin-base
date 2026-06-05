@@ -463,3 +463,39 @@ CREATE TABLE user_oauth_account
     COMMENT = '소셜 로그인 계정 연동';
 
 CREATE INDEX idx_user_oauth_user_id ON user_oauth_account (user_id);
+
+-- =============================================================================
+-- V3: SSE (Server-Sent Events) 발송 기록
+--   - user_id: 수신 대상 사용자 ID
+--   - event_type: 이벤트 유형 (예: ORDER_SHIPPED, PRODUCT_APPROVED)
+--   - data: 전송 데이터 (JSON 문자열)
+--   - status: PENDING → DELIVERED (연결됨) / MISSED (연결 없음) / FAILED
+-- =============================================================================
+CREATE TABLE sse_log
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY      COMMENT '고유 식별자',
+    user_id    BIGINT       NOT NULL                  COMMENT '수신 대상 사용자 ID',
+    event_type VARCHAR(100) NOT NULL                  COMMENT '이벤트 유형',
+    data       TEXT         NOT NULL                  COMMENT '전송 데이터',
+
+    status        VARCHAR(30)  NOT NULL DEFAULT 'PENDING' COMMENT '상태 (PENDING, DELIVERED, MISSED, FAILED)',
+    error_message TEXT                                   COMMENT '전송 실패 시 원인 기록',
+    sent_at       DATETIME(6)                            COMMENT '실제 전송 처리 일시',
+
+    -- audit
+    created_at    DATETIME(6)  NOT NULL                  COMMENT '생성 일시',
+    created_by    VARCHAR(255)                           COMMENT '생성 주체',
+    updated_at    DATETIME(6)  NOT NULL                  COMMENT '마지막 수정 일시',
+    updated_by    VARCHAR(255)                           COMMENT '마지막 수정 주체',
+
+    -- soft delete
+    deleted_at    DATETIME(6)                            COMMENT '삭제 일시',
+    deleted_by    VARCHAR(255)                           COMMENT '삭제 주체',
+    is_deleted    BOOLEAN      NOT NULL DEFAULT FALSE    COMMENT '삭제 여부'
+) DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+    COMMENT = 'SSE 이벤트 발송 기록';
+
+CREATE INDEX idx_sse_log_user_id    ON sse_log (user_id);
+CREATE INDEX idx_sse_log_created_at ON sse_log (created_at);
+CREATE INDEX idx_sse_log_status     ON sse_log (status);
