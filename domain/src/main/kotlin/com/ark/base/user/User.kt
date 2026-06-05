@@ -17,12 +17,12 @@ import java.time.LocalDateTime
 class User(
     val email: String,
     val name: String,
-    password: String,
-    passwordEncoder: PasswordEncoder,
+    password: String? = null,
+    passwordEncoder: PasswordEncoder? = null,
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseAggregateEntity<User>() {
-    var passwordHash: String = passwordEncoder.encode(password)
+    var passwordHash: String? = if (password != null && passwordEncoder != null) passwordEncoder.encode(password) else null
 
     init {
         validateEmail(email)
@@ -36,10 +36,12 @@ class User(
         isDeleted = true
     }
 
+    fun hasPassword(): Boolean = passwordHash != null
+
     fun matchesPassword(
         rawPassword: String,
         passwordEncoder: PasswordEncoder,
-    ): Boolean = passwordEncoder.matches(rawPassword, passwordHash)
+    ): Boolean = passwordHash?.let { passwordEncoder.matches(rawPassword, it) } ?: false
 
     fun changePassword(
         newPassword: String,

@@ -420,3 +420,46 @@ CREATE TABLE sms_log
 CREATE INDEX idx_sms_log_recipient   ON sms_log (recipient);
 CREATE INDEX idx_sms_log_created_at  ON sms_log (created_at);
 CREATE INDEX idx_sms_log_status      ON sms_log (status);
+
+-- =============================================================================
+-- V2: OAuth 소셜 로그인 지원
+--   - users.password_hash: NOT NULL → NULL (OAuth 전용 계정 허용)
+--   - user_oauth_account: 소셜 계정 연동 테이블 추가
+-- =============================================================================
+
+-- OAuth 전용 계정을 위해 password_hash nullable 허용
+ALTER TABLE users
+    MODIFY COLUMN password_hash VARCHAR(255) NULL COMMENT 'BCrypt 해시 비밀번호 (OAuth 전용 계정은 NULL)';
+
+-- =============================================================================
+-- user_oauth_account: 소셜 로그인 계정 연동
+--   - provider: OAuth 공급자 (GOOGLE, KAKAO)
+--   - provider_user_id: 공급자에서 발급한 고유 사용자 식별자
+--   - provider_email: 공급자에서 제공한 이메일 (users.email과 다를 수 있음)
+--   - (provider, provider_user_id) 조합은 전 세계적으로 유일
+-- =============================================================================
+CREATE TABLE user_oauth_account
+(
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY      COMMENT '고유 식별자',
+    user_id          BIGINT       NOT NULL                  COMMENT '연동된 사용자 ID (users.id 참조)',
+    provider         VARCHAR(20)  NOT NULL                  COMMENT 'OAuth 공급자 (GOOGLE, KAKAO)',
+    provider_user_id VARCHAR(255) NOT NULL                  COMMENT '공급자 발급 사용자 ID',
+    provider_email   VARCHAR(255)                           COMMENT '공급자 제공 이메일',
+
+    -- audit
+    created_at       DATETIME(6)  NOT NULL                  COMMENT '연동 일시',
+    created_by       VARCHAR(255)                           COMMENT '생성 주체',
+    updated_at       DATETIME(6)  NOT NULL                  COMMENT '마지막 수정 일시',
+    updated_by       VARCHAR(255)                           COMMENT '마지막 수정 주체',
+
+    -- soft delete
+    deleted_at       DATETIME(6)                            COMMENT '삭제 일시',
+    deleted_by       VARCHAR(255)                           COMMENT '삭제 주체',
+    is_deleted       BOOLEAN      NOT NULL DEFAULT FALSE    COMMENT '삭제 여부',
+
+    CONSTRAINT uq_provider_account UNIQUE (provider, provider_user_id)
+) DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+    COMMENT = '소셜 로그인 계정 연동';
+
+CREATE INDEX idx_user_oauth_user_id ON user_oauth_account (user_id);

@@ -42,4 +42,3 @@ class SmsLog(
         this.errorMessage = errorMessage
     }
 }
-

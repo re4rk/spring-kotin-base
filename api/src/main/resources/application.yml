@@ -71,6 +71,21 @@ email:
   from: ${EMAIL_FROM:noreply@base.local}
 
 # ---------------------------------------------------------------------------
+# OAuth2 소셜 로그인
+#   Google: https://accounts.google.com/o/oauth2/v2/auth
+#   Kakao:  https://kauth.kakao.com/oauth/authorize
+# ---------------------------------------------------------------------------
+oauth:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:}
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
+    redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:3000/auth/oauth/google/callback}
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID:}
+    client-secret: ${KAKAO_CLIENT_SECRET:}
+    redirect-uri: ${KAKAO_REDIRECT_URI:http://localhost:3000/auth/oauth/kakao/callback}
+
+# ---------------------------------------------------------------------------
 # MinIO (S3 호환 오브젝트 스토리지)
 #   파일 업로드 흐름: FileController → MinioFileClient → MinIO
 #   메타데이터(original_name, stored_name 등)는 file_metadata 테이블에 저장

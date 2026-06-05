@@ -41,4 +41,10 @@ enum class ErrorCode(
     FILE_INVALID_TYPE("지원하지 않는 파일 형식입니다. 이미지 파일만 업로드 가능합니다."),
     FILE_EMPTY("파일이 비어있습니다."),
     FILE_UPLOAD_FAILED("파일 업로드에 실패했습니다."),
+
+    // OAuth
+    OAUTH_INVALID_STATE("유효하지 않거나 만료된 OAuth state입니다."),
+    OAUTH_PROVIDER_ERROR("OAuth 공급자로부터 오류 응답을 받았습니다."),
+    OAUTH_EMAIL_REQUIRED("OAuth 공급자로부터 이메일 정보를 가져올 수 없습니다."),
+    OAUTH_UNSUPPORTED_PROVIDER("지원하지 않는 OAuth 공급자입니다."),
 }

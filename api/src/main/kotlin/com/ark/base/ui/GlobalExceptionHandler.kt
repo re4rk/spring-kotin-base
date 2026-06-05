@@ -83,5 +83,12 @@ class GlobalExceptionHandler {
             -> HttpStatus.BAD_REQUEST
 
             ErrorCode.FILE_UPLOAD_FAILED -> HttpStatus.INTERNAL_SERVER_ERROR
+
+            ErrorCode.OAUTH_INVALID_STATE,
+            ErrorCode.OAUTH_EMAIL_REQUIRED,
+            ErrorCode.OAUTH_UNSUPPORTED_PROVIDER,
+            -> HttpStatus.BAD_REQUEST
+
+            ErrorCode.OAUTH_PROVIDER_ERROR -> HttpStatus.BAD_GATEWAY
         }
 }
