@@ -38,43 +38,53 @@ class ProductAdminController(
         return "admin/products"
     }
 
+    @GetMapping("/{id}")
+    fun detail(
+        @PathVariable id: Long,
+        model: Model,
+    ): String {
+        model.addAttribute("product", productService.findById(id))
+        return "admin/product-detail"
+    }
+
     @PostMapping("/{id}/approve")
     fun approve(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes,
-    ) = transition(redirectAttributes) { productService.approve(id) }
+    ) = transition(id, redirectAttributes) { productService.approve(id) }
 
     @PostMapping("/{id}/reject")
     fun reject(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes,
-    ) = transition(redirectAttributes) { productService.reject(id) }
+    ) = transition(id, redirectAttributes) { productService.reject(id) }
 
     @PostMapping("/{id}/sold-out")
     fun soldOut(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes,
-    ) = transition(redirectAttributes) { productService.markSoldOut(id) }
+    ) = transition(id, redirectAttributes) { productService.markSoldOut(id) }
 
     @PostMapping("/{id}/resume-sale")
     fun resumeSale(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes,
-    ) = transition(redirectAttributes) { productService.resumeSale(id) }
+    ) = transition(id, redirectAttributes) { productService.resumeSale(id) }
 
     @PostMapping("/{id}/discontinue")
     fun discontinue(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes,
-    ) = transition(redirectAttributes) { productService.discontinue(id) }
+    ) = transition(id, redirectAttributes) { productService.discontinue(id) }
 
     private fun transition(
+        id: Long,
         redirectAttributes: RedirectAttributes,
         action: () -> Unit,
     ): String {
         runCatching(action)
             .onSuccess { redirectAttributes.addFlashAttribute("success", "상태가 변경됐습니다.") }
             .onFailure { redirectAttributes.addFlashAttribute("error", it.message ?: "오류가 발생했습니다.") }
-        return "redirect:/admin/products"
+        return "redirect:/admin/products/$id"
     }
 }

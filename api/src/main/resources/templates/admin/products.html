@@ -65,12 +65,14 @@
                     <th>카테고리</th>
                     <th>상태</th>
                     <th>등록일</th>
+                    <th></th>
                     <th>액션</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="product : ${products.content}">
                     <td class="text-muted" th:text="${product.id}"></td>
+                    <td><a th:href="@{/admin/products/{id}(id=${product.id})}" class="btn btn-outline-primary btn-sm">상세</a></td>
                     <td th:text="${product.name}"></td>
                     <td th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}"></td>
                     <td th:text="${product.category ?: '-'}"></td>
