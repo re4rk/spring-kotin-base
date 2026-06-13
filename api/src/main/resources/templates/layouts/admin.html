@@ -10,7 +10,7 @@
     <style>
         body { background-color: #f8f9fa; }
         .sidebar { min-height: 100vh; background-color: #212529; width: 220px; flex-shrink: 0; }
-        .sidebar a { color: #adb5bd; text-decoration: none; display: block; padding: 0.5rem 1rem; }
+        .sidebar a { color: #adb5bd; text-decoration: none; display: block; padding: 0.5rem 1rem; border-radius: 4px; }
         .sidebar a:hover, .sidebar a.active { color: #fff; background-color: #343a40; }
     </style>
     <th:block layout:fragment="head-extra"></th:block>
@@ -28,10 +28,18 @@
     </div>
 
     <div class="flex-grow-1 p-4">
-        <layout:fragment name="content">
-            <!-- 각 페이지 내용이 여기에 들어옵니다 -->
-        </layout:fragment>
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <layout:fragment name="content"></layout:fragment>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

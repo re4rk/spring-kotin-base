@@ -2,10 +2,13 @@ package com.ark.base.application
 
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
+import com.ark.base.order.Order
 import com.ark.base.order.OrderRepository
 import com.ark.base.order.findByIdOrThrow
 import com.ark.base.product.ProductRepository
 import com.ark.base.product.findByIdOrThrow
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,6 +17,9 @@ class OrderService(
     private val orderRepository: OrderRepository,
     private val productRepository: ProductRepository,
 ) {
+    @Transactional(readOnly = true)
+    fun listOrders(pageable: Pageable): Page<Order> = orderRepository.findAll(pageable)
+
     @Transactional
     fun place(
         request: OrderPlaceRequest,

@@ -6,6 +6,8 @@ import com.ark.base.product.Product
 import com.ark.base.product.ProductRepository
 import com.ark.base.product.findByIdOrThrow
 import com.ark.base.product.option.ProductSku
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -13,6 +15,12 @@ import org.springframework.transaction.annotation.Transactional
 class ProductService(
     private val productRepository: ProductRepository,
 ) {
+    @Transactional(readOnly = true)
+    fun listProducts(
+        filter: ProductQueryFilterRequest,
+        pageable: Pageable,
+    ): Page<Product> = productRepository.findAllByFilter(filter.toQueryFilter(), pageable)
+
     @Transactional(readOnly = true)
     fun findAllByFilter(request: ProductQueryFilterRequest): List<ProductResponse> =
         productRepository.findAllByFilter(request.toQueryFilter()).map { ProductResponse.from(it) }

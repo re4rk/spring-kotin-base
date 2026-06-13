@@ -4,7 +4,13 @@
 <nav th:fragment="sidebar(activeMenu)">
     <a th:href="@{/admin/users}"
        th:classappend="${activeMenu == 'users'} ? 'active'"
-       class="rounded mb-1">유저 관리</a>
+       class="mb-1">유저 관리</a>
+    <a th:href="@{/admin/products}"
+       th:classappend="${activeMenu == 'products'} ? 'active'"
+       class="mb-1">상품 관리</a>
+    <a th:href="@{/admin/orders}"
+       th:classappend="${activeMenu == 'orders'} ? 'active'"
+       class="mb-1">주문 관리</a>
 </nav>
 </body>
 </html>
