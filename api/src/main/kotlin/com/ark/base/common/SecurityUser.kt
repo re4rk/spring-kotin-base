@@ -1,12 +1,15 @@
 package com.ark.base.common
 
+import com.ark.base.user.UserRole
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 class SecurityUser(
     val userId: Long,
+    val role: UserRole = UserRole.USER,
 ) : UserDetails {
-    override fun getAuthorities(): Collection<GrantedAuthority> = emptyList()
+    override fun getAuthorities(): Collection<GrantedAuthority> = listOf(SimpleGrantedAuthority("ROLE_${role.name}"))
 
     override fun getPassword(): String = ""
 

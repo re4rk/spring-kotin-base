@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="sidebar(activeMenu)">
+    <a th:href="@{/admin/users}"
+       th:classappend="${activeMenu == 'users'} ? 'active'"
+       class="rounded mb-1">유저 관리</a>
+</nav>
+</body>
+</html>

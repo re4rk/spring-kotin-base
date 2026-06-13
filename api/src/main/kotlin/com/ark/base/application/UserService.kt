@@ -6,6 +6,8 @@ import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.User
 import com.ark.base.user.UserRepository
 import com.ark.base.user.findByIdOrThrow
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,6 +18,9 @@ class UserService(
 ) {
     @Transactional(readOnly = true)
     fun findByEmail(email: String): User? = userRepository.findByEmail(email)
+
+    @Transactional(readOnly = true)
+    fun listUsers(pageable: Pageable): Page<User> = userRepository.findAll(pageable)
 
     @Transactional
     fun changePassword(

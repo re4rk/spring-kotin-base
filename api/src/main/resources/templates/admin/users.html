@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin}"
+      th:with="activeMenu='users'">
+<head>
+    <title>유저 목록</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="mb-0">유저 목록</h5>
+        <small class="text-muted">총 <span th:text="${users.totalElements}"></span>명</small>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>이메일</th>
+                    <th>이름</th>
+                    <th>역할</th>
+                    <th>가입일</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users.content}">
+                    <td class="text-muted" th:text="${user.id}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.name}"></td>
+                    <td>
+                        <span th:if="${user.role.name() == 'ADMIN'}"
+                              class="badge" style="background-color:#dc3545">ADMIN</span>
+                        <span th:unless="${user.role.name() == 'ADMIN'}"
+                              class="badge bg-secondary">USER</span>
+                    </td>
+                    <td class="text-muted" th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                </tr>
+                <tr th:if="${users.content.empty}">
+                    <td colspan="5" class="text-center text-muted py-4">유저가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav th:if="${users.totalPages > 1}" class="mt-3">
+        <ul class="pagination pagination-sm justify-content-center">
+            <li class="page-item" th:classappend="${users.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/users(page=${users.number - 1})}">이전</a>
+            </li>
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(0, users.totalPages - 1)}"
+                th:classappend="${i == users.number} ? 'active'">
+                <a class="page-link" th:href="@{/admin/users(page=${i})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${users.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/users(page=${users.number + 1})}">다음</a>
+            </li>
+        </ul>
+    </nav>
+</th:block>
+</body>
+</html>

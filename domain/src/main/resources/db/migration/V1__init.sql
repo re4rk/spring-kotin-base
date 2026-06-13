@@ -27,6 +27,7 @@ CREATE TABLE users
     email         VARCHAR(255) NOT NULL                 COMMENT '로그인 이메일 (형식 검증: ^[A-Za-z0-9+_.-]+@...)',
     name          VARCHAR(100) NOT NULL                 COMMENT '표시 이름 (공백 불가, max 100)',
     password_hash VARCHAR(255) NOT NULL                 COMMENT 'BCrypt 해시 비밀번호',
+    role          VARCHAR(20)  NOT NULL DEFAULT 'USER'  COMMENT '사용자 권한 (ADMIN / USER)',
 
     -- audit
     created_at    DATETIME(6)  NOT NULL                 COMMENT '생성 일시',

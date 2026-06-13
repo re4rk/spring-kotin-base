@@ -9,6 +9,7 @@ import com.ark.base.product.option.ProductSku
 import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.User
 import com.ark.base.user.UserRepository
+import com.ark.base.user.UserRole
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
@@ -36,11 +37,15 @@ class LocalDataInitializer(
             log.info("[Seed] 유저 데이터 이미 존재 — skip")
             return
         }
-        val users = listOf(
-            User(email = "admin@test.com", name = "관리자", password = "password123!", passwordEncoder = passwordEncoder),
-            User(email = "user1@test.com", name = "테스트유저1", password = "password123!", passwordEncoder = passwordEncoder),
-            User(email = "user2@test.com", name = "테스트유저2", password = "password123!", passwordEncoder = passwordEncoder),
-        )
+        val admin =
+            User(email = "admin@test.com", name = "관리자", password = "password123!", passwordEncoder = passwordEncoder)
+                .also { it.role = UserRole.ADMIN }
+        val users =
+            listOf(
+                admin,
+                User(email = "user1@test.com", name = "테스트유저1", password = "password123!", passwordEncoder = passwordEncoder),
+                User(email = "user2@test.com", name = "테스트유저2", password = "password123!", passwordEncoder = passwordEncoder),
+            )
         userRepository.saveAll(users)
         log.info("[Seed] 유저 {}명 생성 완료", users.size)
     }
@@ -56,13 +61,14 @@ class LocalDataInitializer(
     }
 
     private fun buildTshirt(): Product {
-        val product = Product(
-            name = "베이직 티셔츠",
-            price = 29_000,
-            description = "사계절 입기 좋은 베이직 티셔츠",
-            category = "상의",
-            status = ProductStatus.ON_SALE,
-        )
+        val product =
+            Product(
+                name = "베이직 티셔츠",
+                price = 29_000,
+                description = "사계절 입기 좋은 베이직 티셔츠",
+                category = "상의",
+                status = ProductStatus.ON_SALE,
+            )
 
         val colorGroup = ProductOptionGroup(name = "색상", sortOrder = 0)
         val white = ProductOption(optionGroup = colorGroup, name = "화이트", sortOrder = 0)
@@ -92,13 +98,14 @@ class LocalDataInitializer(
     }
 
     private fun buildJeans(): Product {
-        val product = Product(
-            name = "슬림핏 청바지",
-            price = 79_000,
-            description = "편안한 슬림핏 청바지",
-            category = "하의",
-            status = ProductStatus.ON_SALE,
-        )
+        val product =
+            Product(
+                name = "슬림핏 청바지",
+                price = 79_000,
+                description = "편안한 슬림핏 청바지",
+                category = "하의",
+                status = ProductStatus.ON_SALE,
+            )
 
         val sizeGroup = ProductOptionGroup(name = "사이즈", sortOrder = 0)
         val size28 = ProductOption(optionGroup = sizeGroup, name = "28", sortOrder = 0)

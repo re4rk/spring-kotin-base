@@ -5,11 +5,15 @@ import com.ark.base.ui.JwtAuthenticationFilter
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
@@ -19,6 +23,36 @@ class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
 ) {
     @Bean
+    fun springPasswordEncoder(): org.springframework.security.crypto.password.PasswordEncoder = BCryptPasswordEncoder()
+
+    @Bean
+    @Order(1)
+    fun adminSecurityFilterChain(
+        http: HttpSecurity,
+        adminUserDetailsService: UserDetailsService,
+    ): SecurityFilterChain {
+        val authProvider = DaoAuthenticationProvider(adminUserDetailsService)
+        authProvider.setPasswordEncoder(springPasswordEncoder())
+
+        return http
+            .securityMatcher("/admin/**")
+            .authenticationProvider(authProvider)
+            .authorizeHttpRequests {
+                it.requestMatchers("/admin/login").permitAll()
+                it.requestMatchers("/admin/**").hasRole("ADMIN")
+            }.formLogin {
+                it.loginPage("/admin/login")
+                it.loginProcessingUrl("/admin/login")
+                it.defaultSuccessUrl("/admin/users", true)
+                it.failureUrl("/admin/login?error=true")
+            }.logout {
+                it.logoutUrl("/admin/logout")
+                it.logoutSuccessUrl("/admin/login?logout=true")
+            }.build()
+    }
+
+    @Bean
+    @Order(2)
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
         http
             .cors { }

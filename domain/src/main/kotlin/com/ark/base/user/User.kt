@@ -3,7 +3,10 @@ package com.ark.base.user
 import com.ark.base.common.BaseAggregateEntity
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -23,6 +26,10 @@ class User(
     val id: Long = 0,
 ) : BaseAggregateEntity<User>() {
     var passwordHash: String? = if (password != null && passwordEncoder != null) passwordEncoder.encode(password) else null
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    var role: UserRole = UserRole.USER
 
     init {
         validateEmail(email)
