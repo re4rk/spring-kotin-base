@@ -1,9 +1,11 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import styled from '@emotion/styled'
 import { keyframes } from '@emotion/react'
 import type { ReactNode } from 'react'
 import { colors, radii, shadows, spacing, typography } from '../tokens/index.ts'
+import { ToastContext } from './ToastContext.ts'
+import type { ToastOptions, ToastFn } from './ToastContext.ts'
 
 type ToastVariant = 'default' | 'success' | 'warning' | 'danger'
 
@@ -13,24 +15,6 @@ interface ToastItem {
   variant: ToastVariant
   duration: number
 }
-
-interface ToastOptions {
-  variant?: ToastVariant
-  duration?: number
-}
-
-interface ToastFn {
-  (message: string, options?: ToastOptions): void
-  success: (message: string, options?: Omit<ToastOptions, 'variant'>) => void
-  warning: (message: string, options?: Omit<ToastOptions, 'variant'>) => void
-  danger: (message: string, options?: Omit<ToastOptions, 'variant'>) => void
-}
-
-interface ToastContextValue {
-  toast: ToastFn
-}
-
-const ToastContext = createContext<ToastContextValue | null>(null)
 
 let counter = 0
 
@@ -95,7 +79,6 @@ const DismissButton = styled.button<{ variant: ToastVariant }>(({ variant }) => 
   flexShrink: 0,
   borderRadius: radii.sm,
   '&:hover': { opacity: 1 },
-  // suppress unused warning
   ...(variant ? {} : {}),
 }))
 
@@ -134,14 +117,14 @@ export function ToastProvider({ children }: ToastProviderProps) {
     }])
   }, [])
 
-  const toast = useCallback(Object.assign(
+  const toast = useMemo((): ToastFn => Object.assign(
     (message: string, options?: ToastOptions) => add(message, options),
     {
       success: (message: string, options?: Omit<ToastOptions, 'variant'>) => add(message, { ...options, variant: 'success' }),
       warning: (message: string, options?: Omit<ToastOptions, 'variant'>) => add(message, { ...options, variant: 'warning' }),
       danger: (message: string, options?: Omit<ToastOptions, 'variant'>) => add(message, { ...options, variant: 'danger' }),
     }
-  ), [add]) as ToastFn
+  ) as ToastFn, [add])
 
   return (
     <ToastContext.Provider value={{ toast }}>
@@ -156,10 +139,4 @@ export function ToastProvider({ children }: ToastProviderProps) {
       )}
     </ToastContext.Provider>
   )
-}
-
-export function useToast(): ToastFn {
-  const ctx = useContext(ToastContext)
-  if (!ctx) throw new Error('useToast must be used within <ToastProvider>')
-  return ctx.toast
 }

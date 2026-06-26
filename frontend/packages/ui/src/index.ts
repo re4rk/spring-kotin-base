@@ -49,8 +49,10 @@ export type { RadioProps, RadioGroupProps } from './components/Radio.tsx'
 export { Modal } from './components/Modal.tsx'
 export type { ModalProps } from './components/Modal.tsx'
 
-export { ToastProvider, useToast } from './components/Toast.tsx'
+export { ToastProvider } from './components/Toast.tsx'
 export type { ToastProviderProps } from './components/Toast.tsx'
+
+export { useToast } from './components/useToast.ts'
 
 export { Tabs, TabList, Tab, TabPanel } from './components/Tabs.tsx'
 export type { TabsProps, TabListProps, TabProps, TabPanelProps } from './components/Tabs.tsx'
