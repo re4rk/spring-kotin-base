@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent, ChangeEvent } from 'react'
 import styled from '@emotion/styled'
 import { Stack, Card, Text, Input, Button, Alert, colors, typography, radii, spacing } from '@base/ui'
+import { useAuthStore } from '../store'
 
 const LoginCard = styled(Card)({
   width: '100%',
@@ -51,6 +52,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const login = useAuthStore((s) => s.login)
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -64,7 +66,8 @@ export function LoginPage() {
     setLoading(true)
     setTimeout(() => {
       setLoading(false)
-      setError('이메일 또는 비밀번호가 올바르지 않습니다.')
+      // TODO: 실제 API 연동 후 교체
+      login({ id: '1', email, name: email.split('@')[0] }, 'mock-token')
     }, 1500)
   }
 
