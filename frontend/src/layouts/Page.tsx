@@ -4,7 +4,7 @@ import { colors, spacing } from '@base/ui'
 
 export const Page = styled('div')<HTMLAttributes<HTMLDivElement>>({
   minHeight: '100vh',
-  background: colors.gray[50],
+  background: colors.gray[100],
   padding: `${spacing[10]} ${spacing[6]}`,
   textAlign: 'left',
   fontFamily: 'inherit',

@@ -13,9 +13,9 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const sizeMap = {
-  sm: { padding: `${spacing[1]} ${spacing[3]}`, fontSize: typography.fontSize.sm, height: '32px' },
-  md: { padding: `${spacing[2]} ${spacing[3]}`, fontSize: typography.fontSize.sm, height: '40px' },
-  lg: { padding: `${spacing[3]} ${spacing[4]}`, fontSize: typography.fontSize.base, height: '48px' },
+  sm: { padding: `0 ${spacing[3]}`, fontSize: typography.fontSize.sm, height: '36px' },
+  md: { padding: `0 ${spacing[4]}`, fontSize: typography.fontSize.sm, height: '44px' },
+  lg: { padding: `0 ${spacing[4]}`, fontSize: typography.fontSize.base, height: '52px' },
 }
 
 const Wrapper = styled('div', {
@@ -29,7 +29,7 @@ const Wrapper = styled('div', {
 
 const Label = styled.label({
   fontSize: typography.fontSize.sm,
-  fontWeight: typography.fontWeight.medium,
+  fontWeight: typography.fontWeight.semibold,
   color: colors.gray[700],
   fontFamily: typography.fontFamily.sans,
 })
@@ -40,24 +40,25 @@ const StyledInput = styled('input', {
   shouldForwardProp: (prop) => !CUSTOM_PROPS.has(prop as string),
 })<{ inputSize: InputSize; hasError: boolean }>(({ inputSize, hasError }) => ({
   fontFamily: typography.fontFamily.sans,
-  borderRadius: radii.md,
-  border: `1px solid ${hasError ? colors.red[500] : colors.gray[300]}`,
+  fontWeight: typography.fontWeight.medium,
+  borderRadius: radii.lg,
+  border: `1.5px solid ${hasError ? colors.red[500] : 'transparent'}`,
   outline: 'none',
   width: '100%',
   color: colors.gray[900],
-  background: '#fff',
+  background: hasError ? colors.red[50] : colors.gray[100],
   boxSizing: 'border-box' as const,
-  transition: 'border-color 150ms, box-shadow 150ms',
-  '&::placeholder': { color: colors.gray[400] },
+  transition: 'background 120ms, border-color 120ms, box-shadow 120ms',
+  '&::placeholder': { color: colors.gray[400], fontWeight: typography.fontWeight.normal },
   '&:focus': {
+    background: '#fff',
     borderColor: hasError ? colors.red[500] : colors.primary[500],
     boxShadow: hasError
       ? `0 0 0 3px ${colors.red[100]}`
       : `0 0 0 3px ${colors.primary[100]}`,
   },
   '&:disabled': {
-    background: colors.gray[50],
-    color: colors.gray[400],
+    opacity: 0.5,
     cursor: 'not-allowed',
   },
   ...sizeMap[inputSize],

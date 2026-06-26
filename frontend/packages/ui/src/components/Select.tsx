@@ -13,12 +13,13 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   children?: ReactNode
 }
 
-const ARROW_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%239CA3AF' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`
+// stroke color matches new gray[400] = #B0B8C1
+const ARROW_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23B0B8C1' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`
 
 const sizeMap = {
-  sm: { padding: `${spacing[1]} ${spacing[8]} ${spacing[1]} ${spacing[3]}`, fontSize: typography.fontSize.sm, height: '32px' },
-  md: { padding: `${spacing[2]} ${spacing[8]} ${spacing[2]} ${spacing[3]}`, fontSize: typography.fontSize.sm, height: '40px' },
-  lg: { padding: `${spacing[3]} ${spacing[10]} ${spacing[3]} ${spacing[4]}`, fontSize: typography.fontSize.base, height: '48px' },
+  sm: { padding: `0 ${spacing[8]} 0 ${spacing[3]}`, fontSize: typography.fontSize.sm, height: '36px' },
+  md: { padding: `0 ${spacing[8]} 0 ${spacing[4]}`, fontSize: typography.fontSize.sm, height: '44px' },
+  lg: { padding: `0 ${spacing[10]} 0 ${spacing[4]}`, fontSize: typography.fontSize.base, height: '52px' },
 }
 
 const Wrapper = styled('div', {
@@ -32,7 +33,7 @@ const Wrapper = styled('div', {
 
 const Label = styled.label({
   fontSize: typography.fontSize.sm,
-  fontWeight: typography.fontWeight.medium,
+  fontWeight: typography.fontWeight.semibold,
   color: colors.gray[700],
   fontFamily: typography.fontFamily.sans,
 })
@@ -43,23 +44,24 @@ const StyledSelect = styled('select', {
   shouldForwardProp: (prop) => !CUSTOM_PROPS.has(prop as string),
 })<{ selectSize: SelectSize; hasError: boolean }>(({ selectSize, hasError }) => ({
   fontFamily: typography.fontFamily.sans,
-  borderRadius: radii.md,
-  border: `1px solid ${hasError ? colors.red[500] : colors.gray[300]}`,
+  fontWeight: typography.fontWeight.medium,
+  borderRadius: radii.lg,
+  border: `1.5px solid ${hasError ? colors.red[500] : 'transparent'}`,
   outline: 'none',
   width: '100%',
   color: colors.gray[900],
-  background: `#fff ${ARROW_SVG} no-repeat right ${spacing[3]} center`,
+  background: `${hasError ? colors.red[50] : colors.gray[100]} ${ARROW_SVG} no-repeat right ${spacing[3]} center`,
   appearance: 'none',
   cursor: 'pointer',
   boxSizing: 'border-box' as const,
-  transition: 'border-color 150ms, box-shadow 150ms',
+  transition: 'background 120ms, border-color 120ms, box-shadow 120ms',
   '&:focus': {
+    background: `#fff ${ARROW_SVG} no-repeat right ${spacing[3]} center`,
     borderColor: hasError ? colors.red[500] : colors.primary[500],
     boxShadow: hasError ? `0 0 0 3px ${colors.red[100]}` : `0 0 0 3px ${colors.primary[100]}`,
   },
   '&:disabled': {
-    background: colors.gray[50],
-    color: colors.gray[400],
+    opacity: 0.5,
     cursor: 'not-allowed',
   },
   ...sizeMap[selectSize],

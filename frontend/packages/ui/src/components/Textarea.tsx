@@ -15,7 +15,7 @@ export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
 
 const sizeMap = {
   sm: { padding: `${spacing[2]} ${spacing[3]}`, fontSize: typography.fontSize.sm },
-  md: { padding: `${spacing[2]} ${spacing[3]}`, fontSize: typography.fontSize.sm },
+  md: { padding: `${spacing[3]} ${spacing[4]}`, fontSize: typography.fontSize.sm },
   lg: { padding: `${spacing[3]} ${spacing[4]}`, fontSize: typography.fontSize.base },
 }
 
@@ -42,27 +42,28 @@ const StyledTextarea = styled('textarea', {
 })<{ inputSize: TextareaSize; hasError: boolean; resize: string }>(
   ({ inputSize, hasError, resize }) => ({
     fontFamily: typography.fontFamily.sans,
-    borderRadius: radii.md,
-    border: `1px solid ${hasError ? colors.red[500] : colors.gray[300]}`,
+    fontWeight: typography.fontWeight.medium,
+    borderRadius: radii.lg,
+    border: `1.5px solid ${hasError ? colors.red[500] : 'transparent'}`,
     outline: 'none',
     width: '100%',
     color: colors.gray[900],
-    background: '#fff',
+    background: hasError ? colors.red[50] : colors.gray[100],
     boxSizing: 'border-box' as const,
-    transition: 'border-color 150ms, box-shadow 150ms',
+    transition: 'background 120ms, border-color 120ms, box-shadow 120ms',
     resize: resize as 'none' | 'vertical' | 'horizontal' | 'both',
     minHeight: '80px',
     lineHeight: typography.lineHeight.normal,
-    '&::placeholder': { color: colors.gray[400] },
+    '&::placeholder': { color: colors.gray[400], fontWeight: typography.fontWeight.normal },
     '&:focus': {
+      background: '#fff',
       borderColor: hasError ? colors.red[500] : colors.primary[500],
       boxShadow: hasError
         ? `0 0 0 3px ${colors.red[100]}`
         : `0 0 0 3px ${colors.primary[100]}`,
     },
     '&:disabled': {
-      background: colors.gray[50],
-      color: colors.gray[400],
+      opacity: 0.5,
       cursor: 'not-allowed',
       resize: 'none',
     },

@@ -20,25 +20,25 @@ const StyledButton = styled('button', {
 })<{ variant: ButtonVariant; size: ButtonSize; fullWidth: boolean }>(
   ({ variant, size, fullWidth }) => {
     const sizeMap = {
-      sm: { padding: `${spacing[1]} ${spacing[3]}`, fontSize: typography.fontSize.sm, height: '32px' },
-      md: { padding: `${spacing[2]} ${spacing[4]}`, fontSize: typography.fontSize.sm, height: '40px' },
-      lg: { padding: `${spacing[3]} ${spacing[6]}`, fontSize: typography.fontSize.base, height: '48px' },
+      sm: { padding: `0 ${spacing[4]}`, fontSize: typography.fontSize.sm, height: '36px' },
+      md: { padding: `0 ${spacing[5]}`, fontSize: typography.fontSize.sm, height: '44px' },
+      lg: { padding: `0 ${spacing[6]}`, fontSize: typography.fontSize.base, height: '52px' },
     }
 
     const variantMap = {
       primary: {
-        background: colors.primary[600],
+        background: colors.primary[500],
         color: '#fff',
         border: 'none',
-        '&:hover:not(:disabled)': { background: colors.primary[700] },
-        '&:active:not(:disabled)': { background: colors.primary[800] },
+        '&:hover:not(:disabled)': { background: colors.primary[600] },
+        '&:active:not(:disabled)': { background: colors.primary[700] },
       },
       secondary: {
-        background: '#fff',
-        color: colors.gray[700],
-        border: `1px solid ${colors.gray[300]}`,
-        '&:hover:not(:disabled)': { background: colors.gray[50] },
-        '&:active:not(:disabled)': { background: colors.gray[100] },
+        background: colors.gray[100],
+        color: colors.gray[800],
+        border: 'none',
+        '&:hover:not(:disabled)': { background: colors.gray[200] },
+        '&:active:not(:disabled)': { background: colors.gray[200] },
       },
       ghost: {
         background: 'transparent',
@@ -48,10 +48,10 @@ const StyledButton = styled('button', {
         '&:active:not(:disabled)': { background: colors.gray[200] },
       },
       danger: {
-        background: colors.red[600],
+        background: colors.red[500],
         color: '#fff',
         border: 'none',
-        '&:hover:not(:disabled)': { background: colors.red[700] },
+        '&:hover:not(:disabled)': { background: colors.red[600] },
         '&:active:not(:disabled)': { background: colors.red[700] },
       },
     }
@@ -62,15 +62,16 @@ const StyledButton = styled('button', {
       justifyContent: 'center',
       gap: spacing[2],
       fontFamily: typography.fontFamily.sans,
-      fontWeight: typography.fontWeight.medium,
-      borderRadius: radii.md,
+      fontWeight: typography.fontWeight.semibold,
+      letterSpacing: '-0.01em',
+      borderRadius: radii.lg,
       cursor: 'pointer',
-      transition: 'background 150ms, color 150ms, border-color 150ms',
+      transition: 'background 120ms',
       outline: 'none',
       width: fullWidth ? '100%' : undefined,
       whiteSpace: 'nowrap' as const,
       boxSizing: 'border-box' as const,
-      '&:disabled': { opacity: 0.5, cursor: 'not-allowed' },
+      '&:disabled': { opacity: 0.4, cursor: 'not-allowed' },
       '&:focus-visible': {
         outline: `2px solid ${colors.primary[500]}`,
         outlineOffset: '2px',
