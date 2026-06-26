@@ -1,9 +1,9 @@
 import styled from '@emotion/styled'
-import type { CSSProperties, ReactNode, ElementType } from 'react'
+import type { CSSProperties, ElementType, HTMLAttributes } from 'react'
 import { spacing } from '../tokens/index.ts'
 import type { SpacingKey } from '../tokens/index.ts'
 
-export interface StackProps {
+export interface StackProps extends HTMLAttributes<HTMLDivElement> {
   direction?: 'row' | 'column'
   gap?: SpacingKey
   align?: CSSProperties['alignItems']
@@ -12,17 +12,23 @@ export interface StackProps {
   fullWidth?: boolean
   fullHeight?: boolean
   as?: ElementType
-  className?: string
-  children?: ReactNode
+}
+
+type StyledStackProps = {
+  direction?: 'row' | 'column'
+  gap?: SpacingKey
+  align?: CSSProperties['alignItems']
+  justify?: CSSProperties['justifyContent']
+  wrap?: boolean
+  fullWidth?: boolean
+  fullHeight?: boolean
 }
 
 const CUSTOM_PROPS = new Set(['direction', 'gap', 'align', 'justify', 'wrap', 'fullWidth', 'fullHeight'])
 
-type StyledProps = Omit<StackProps, 'as' | 'children' | 'className'>
-
 const StyledStack = styled('div', {
   shouldForwardProp: (prop) => !CUSTOM_PROPS.has(prop as string),
-})<StyledProps>(({ direction = 'column', gap = 4, align, justify, wrap, fullWidth, fullHeight }) => ({
+})<StyledStackProps>(({ direction = 'column', gap = 4, align, justify, wrap, fullWidth, fullHeight }) => ({
   display: 'flex',
   flexDirection: direction,
   gap: spacing[gap],
@@ -33,9 +39,30 @@ const StyledStack = styled('div', {
   height: fullHeight ? '100%' : undefined,
 }))
 
-export function Stack({ as, children, ...props }: StackProps) {
+export function Stack({
+  as,
+  children,
+  direction,
+  gap,
+  align,
+  justify,
+  wrap,
+  fullWidth,
+  fullHeight,
+  ...htmlProps
+}: StackProps) {
   return (
-    <StyledStack as={as} {...props}>
+    <StyledStack
+      as={as}
+      direction={direction}
+      gap={gap}
+      align={align}
+      justify={justify}
+      wrap={wrap}
+      fullWidth={fullWidth}
+      fullHeight={fullHeight}
+      {...htmlProps}
+    >
       {children}
     </StyledStack>
   )
