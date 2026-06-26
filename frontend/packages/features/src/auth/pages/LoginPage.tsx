@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FormEvent, ChangeEvent } from 'react'
 import styled from '@emotion/styled'
 import { Stack, Card, Text, Input, Button, Alert, colors, typography, radii, spacing } from '@base/ui'
-import { useAuthStore } from '../store'
+import { useLoginMutation } from '../mutations'
 
 const LoginCard = styled(Card)({
   width: '100%',
@@ -50,25 +50,11 @@ const RegisterLink = styled.span({
 export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const login = useAuthStore((s) => s.login)
+  const { mutate: login, isPending, error } = useLoginMutation()
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-    if (!email || !password) {
-      setError('이메일과 비밀번호를 입력해주세요.')
-      return
-    }
-
-    setError('')
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      // TODO: 실제 API 연동 후 교체
-      login({ id: '1', email, name: email.split('@')[0] }, 'mock-token')
-    }, 1500)
+    login({ email, password })
   }
 
   return (
@@ -87,7 +73,7 @@ export function LoginPage() {
         </Stack>
 
         {/* Error */}
-        {error && <Alert variant="danger">{error}</Alert>}
+        {error && <Alert variant="danger">{error.message}</Alert>}
 
         {/* Form */}
         <Form onSubmit={handleSubmit}>
@@ -114,7 +100,7 @@ export function LoginPage() {
               <ForgotLink>비밀번호를 잊으셨나요?</ForgotLink>
             </Stack>
           </Stack>
-          <Button type="submit" fullWidth loading={loading}>
+          <Button type="submit" fullWidth loading={isPending}>
             로그인
           </Button>
         </Form>

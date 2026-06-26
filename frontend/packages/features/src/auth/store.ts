@@ -1,23 +1,19 @@
 import { create } from 'zustand'
-
-interface User {
-  id: string
-  email: string
-  name: string
-}
+import type { TokenResponse } from '@base/api'
 
 interface AuthState {
-  user: User | null
-  token: string | null
+  accessToken: string | null
+  refreshToken: string | null
   isAuthenticated: boolean
-  login: (user: User, token: string) => void
+  login: (tokens: TokenResponse) => void
   logout: () => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  token: null,
+  accessToken: null,
+  refreshToken: null,
   isAuthenticated: false,
-  login: (user, token) => set({ user, token, isAuthenticated: true }),
-  logout: () => set({ user: null, token: null, isAuthenticated: false }),
+  login: ({ accessToken, refreshToken }) =>
+    set({ accessToken, refreshToken, isAuthenticated: true }),
+  logout: () => set({ accessToken: null, refreshToken: null, isAuthenticated: false }),
 }))
