@@ -1,3 +1,3 @@
-import { DocsRouter } from '@base/features'
+import { AppRouter } from '@base/features'
 
-export default DocsRouter
+export default AppRouter
