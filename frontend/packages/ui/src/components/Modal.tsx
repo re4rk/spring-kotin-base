@@ -1,40 +1,34 @@
-import { useEffect } from 'react'
+import { useEffect, createContext, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import styled from '@emotion/styled'
 import { keyframes } from '@emotion/react'
-import type { ReactNode, MouseEvent } from 'react'
+import type { ReactNode } from 'react'
 import { colors, radii, shadows, spacing, typography } from '../tokens/index.ts'
 
 type ModalSize = 'sm' | 'md' | 'lg' | 'xl'
 
-export interface ModalProps {
-  open: boolean
+interface ModalContextValue {
   onClose: () => void
-  title?: string
-  children?: ReactNode
-  footer?: ReactNode
-  size?: ModalSize
-  closeOnBackdrop?: boolean
 }
 
-const fadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
-`
+const ModalContext = createContext<ModalContextValue | null>(null)
 
+function useModalContext() {
+  const ctx = useContext(ModalContext)
+  if (!ctx) throw new Error('Modal compound components must be used within <Modal>')
+  return ctx
+}
+
+const fadeIn = keyframes`from { opacity: 0 } to { opacity: 1 }`
 const slideUp = keyframes`
-  from { opacity: 0; transform: translateY(8px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 8px)) scale(0.98); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 `
 
-const Backdrop = styled.div({
+const BackdropEl = styled.div({
   position: 'fixed',
   inset: 0,
   background: 'rgba(0, 0, 0, 0.45)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: spacing[4],
   zIndex: 1000,
   animation: `${fadeIn} 150ms ease`,
 })
@@ -46,21 +40,26 @@ const sizeMap: Record<ModalSize, string> = {
   xl: '900px',
 }
 
-const Dialog = styled('div', {
+const DialogEl = styled('div', {
   shouldForwardProp: (prop) => prop !== 'size',
 })<{ size: ModalSize }>(({ size }) => ({
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
   background: '#fff',
   borderRadius: radii['2xl'],
   boxShadow: shadows.xl,
-  width: '100%',
+  width: `calc(100% - ${spacing[8]})`,
   maxWidth: sizeMap[size],
   maxHeight: 'calc(100svh - 48px)',
   display: 'flex',
   flexDirection: 'column' as const,
+  zIndex: 1001,
   animation: `${slideUp} 180ms ease`,
 }))
 
-const Header = styled.div({
+const HeaderEl = styled.div({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -69,7 +68,7 @@ const Header = styled.div({
   flexShrink: 0,
 })
 
-const Title = styled.p({
+const TitleEl = styled.p({
   margin: 0,
   fontSize: typography.fontSize.lg,
   fontWeight: typography.fontWeight.semibold,
@@ -93,19 +92,18 @@ const CloseButton = styled.button({
   flexShrink: 0,
   transition: 'background 150ms, color 150ms',
   '&:hover': { background: colors.gray[100], color: colors.gray[700] },
-  '&:focus-visible': {
-    outline: `2px solid ${colors.primary[500]}`,
-    outlineOffset: '2px',
-  },
+  '&:focus-visible': { outline: `2px solid ${colors.primary[500]}`, outlineOffset: '2px' },
 })
 
-const Body = styled.div({
-  padding: `${spacing[5]} ${spacing[6]}`,
+const BodyEl = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'noPadding',
+})<{ noPadding?: boolean }>(({ noPadding }) => ({
+  padding: noPadding ? 0 : `${spacing[5]} ${spacing[6]}`,
   overflowY: 'auto',
   flex: 1,
-})
+}))
 
-const Footer = styled.div({
+const FooterEl = styled.div({
   display: 'flex',
   justifyContent: 'flex-end',
   gap: spacing[3],
@@ -114,15 +112,13 @@ const Footer = styled.div({
   flexShrink: 0,
 })
 
-export function Modal({
-  open,
-  onClose,
-  title,
-  children,
-  footer,
-  size = 'md',
-  closeOnBackdrop = true,
-}: ModalProps) {
+export interface ModalProps {
+  open: boolean
+  onClose: () => void
+  children?: ReactNode
+}
+
+function ModalRoot({ open, onClose, children }: ModalProps) {
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -132,22 +128,54 @@ export function Modal({
 
   if (!open) return null
 
-  const handleBackdropClick = closeOnBackdrop ? onClose : undefined
-  const stopPropagation = (e: MouseEvent) => e.stopPropagation()
-
   return createPortal(
-    <Backdrop onClick={handleBackdropClick}>
-      <Dialog size={size} role="dialog" aria-modal aria-labelledby={title ? 'modal-title' : undefined} onClick={stopPropagation}>
-        {title !== undefined && (
-          <Header>
-            <Title id="modal-title">{title}</Title>
-            <CloseButton onClick={onClose} aria-label="닫기">✕</CloseButton>
-          </Header>
-        )}
-        <Body>{children}</Body>
-        {footer && <Footer>{footer}</Footer>}
-      </Dialog>
-    </Backdrop>,
+    <ModalContext.Provider value={{ onClose }}>
+      {children}
+    </ModalContext.Provider>,
     document.body,
   )
 }
+
+function ModalBackdrop() {
+  const { onClose } = useModalContext()
+  return <BackdropEl onClick={onClose} />
+}
+
+function ModalDialog({ size = 'md', children }: { size?: ModalSize; children?: ReactNode }) {
+  return (
+    <DialogEl size={size} role="dialog" aria-modal>
+      {children}
+    </DialogEl>
+  )
+}
+
+function ModalHeader({ children }: { children?: ReactNode }) {
+  const { onClose } = useModalContext()
+  return (
+    <HeaderEl>
+      {children}
+      <CloseButton onClick={onClose} aria-label="닫기">✕</CloseButton>
+    </HeaderEl>
+  )
+}
+
+function ModalTitle({ children }: { children?: ReactNode }) {
+  return <TitleEl>{children}</TitleEl>
+}
+
+function ModalBody({ noPadding, children }: { noPadding?: boolean; children?: ReactNode }) {
+  return <BodyEl noPadding={noPadding}>{children}</BodyEl>
+}
+
+function ModalFooter({ children }: { children?: ReactNode }) {
+  return <FooterEl>{children}</FooterEl>
+}
+
+export const Modal = Object.assign(ModalRoot, {
+  Backdrop: ModalBackdrop,
+  Dialog: ModalDialog,
+  Header: ModalHeader,
+  Title: ModalTitle,
+  Body: ModalBody,
+  Footer: ModalFooter,
+})

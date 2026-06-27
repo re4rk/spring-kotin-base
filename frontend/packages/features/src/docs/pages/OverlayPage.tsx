@@ -58,40 +58,57 @@ export function OverlayPage() {
       <ToastSection />
 
       {/* Modals */}
-      <Modal open={smOpen} onClose={() => setSmOpen(false)} title="알림" size="sm">
-        <Text variant="body1">작은 사이즈 모달입니다.</Text>
+      <Modal open={smOpen} onClose={() => setSmOpen(false)}>
+        <Modal.Backdrop />
+        <Modal.Dialog size="sm">
+          <Modal.Header><Modal.Title>알림</Modal.Title></Modal.Header>
+          <Modal.Body>
+            <Text variant="body1">작은 사이즈 모달입니다.</Text>
+          </Modal.Body>
+        </Modal.Dialog>
       </Modal>
 
-      <Modal open={basicOpen} onClose={() => setBasicOpen(false)} title="공지사항">
-        <Stack gap={3}>
-          <Text variant="body1">기본 사이즈 모달입니다.</Text>
-          <Alert variant="info">새로운 기능이 추가되었습니다.</Alert>
-        </Stack>
+      <Modal open={basicOpen} onClose={() => setBasicOpen(false)}>
+        <Modal.Backdrop />
+        <Modal.Dialog>
+          <Modal.Header><Modal.Title>공지사항</Modal.Title></Modal.Header>
+          <Modal.Body>
+            <Stack gap={3}>
+              <Text variant="body1">기본 사이즈 모달입니다.</Text>
+              <Alert variant="info">새로운 기능이 추가되었습니다.</Alert>
+            </Stack>
+          </Modal.Body>
+        </Modal.Dialog>
       </Modal>
 
-      <Modal open={lgOpen} onClose={() => setLgOpen(false)} title="상세 내용" size="lg">
-        <Stack gap={3}>
-          <Text variant="body1">큰 사이즈 모달입니다.</Text>
-          <Text variant="body2" color={colors.gray[500]}>더 많은 내용을 표시할 때 사용합니다.</Text>
-        </Stack>
+      <Modal open={lgOpen} onClose={() => setLgOpen(false)}>
+        <Modal.Backdrop />
+        <Modal.Dialog size="lg">
+          <Modal.Header><Modal.Title>상세 내용</Modal.Title></Modal.Header>
+          <Modal.Body>
+            <Stack gap={3}>
+              <Text variant="body1">큰 사이즈 모달입니다.</Text>
+              <Text variant="body2" color={colors.gray[500]}>더 많은 내용을 표시할 때 사용합니다.</Text>
+            </Stack>
+          </Modal.Body>
+        </Modal.Dialog>
       </Modal>
 
-      <Modal
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        title="주문 확인"
-        size="sm"
-        footer={
-          <>
+      <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <Modal.Backdrop />
+        <Modal.Dialog size="sm">
+          <Modal.Header><Modal.Title>주문 확인</Modal.Title></Modal.Header>
+          <Modal.Body>
+            <Stack gap={3}>
+              <Text variant="body1">선택한 상품을 주문하시겠습니까?</Text>
+              <Alert variant="warning">결제 후 취소는 24시간 이내에만 가능합니다.</Alert>
+            </Stack>
+          </Modal.Body>
+          <Modal.Footer>
             <Button variant="ghost" onClick={() => setConfirmOpen(false)}>취소</Button>
             <Button onClick={() => setConfirmOpen(false)}>확인</Button>
-          </>
-        }
-      >
-        <Stack gap={3}>
-          <Text variant="body1">선택한 상품을 주문하시겠습니까?</Text>
-          <Alert variant="warning">결제 후 취소는 24시간 이내에만 가능합니다.</Alert>
-        </Stack>
+          </Modal.Footer>
+        </Modal.Dialog>
       </Modal>
     </Stack>
   )
