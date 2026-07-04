@@ -16,36 +16,32 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
 
-      - name: Tempo overrides.yaml content
+      - name: Tempo service ports
         run: |
-          echo "===== TEMPO OVERRIDES.YAML ====="
-          kubectl exec -n monitoring statefulset/tempo -- cat /conf/overrides.yaml 2>/dev/null || echo "(not found)"
-          echo ""
-          echo "===== ALL TEMPO CONFIGMAPS ====="
-          kubectl get configmap -n monitoring | grep -i tempo
+          echo "===== TEMPO SERVICE ====="
+          kubectl get svc tempo -n monitoring -o yaml | grep -A30 "ports:"
 
-      - name: Tempo ingestion check (push/receive logs, last 100 lines)
+      - name: Alloy full logs (last 60 lines, no filter)
         run: |
-          echo "===== TEMPO FULL LOGS (last 100 lines) ====="
-          kubectl logs statefulset/tempo -n monitoring --tail=100
+          echo "===== ALLOY FULL LOGS ====="
+          kubectl logs -n monitoring -l app.kubernetes.io/name=alloy --tail=60
 
-      - name: Test Tempo OTLP endpoint from cluster
+      - name: Alloy -> Tempo gRPC connectivity
         run: |
-          echo "===== TEMPO OTLP HTTP CONNECTIVITY ====="
-          kubectl run tempo-test --rm -i --restart=Never --image=curlimages/curl:latest -n base \
-            -- curl -s -o /dev/null -w "%{http_code}" \
-            -X POST http://tempo.monitoring.svc.cluster.local:4318/v1/traces \
-            -H "Content-Type: application/json" -d '{}' 2>/dev/null || echo "connectivity test failed"
+          echo "===== ALLOY -> TEMPO gRPC ====="
+          kubectl exec -n monitoring deployment/alloy -- \
+            wget -q -O- --timeout=3 http://tempo.monitoring.svc.cluster.local:3200/status 2>&1 || echo "wget failed"
+          kubectl exec -n monitoring deployment/alloy -- \
+            nc -zv tempo.monitoring.svc.cluster.local 4317 2>&1 || echo "nc 4317 failed"
 
-      - name: Test Faro/Alloy endpoint from cluster
+      - name: Faro ingress status
         run: |
-          echo "===== ALLOY FARO CONNECTIVITY ====="
-          kubectl run alloy-test --rm -i --restart=Never --image=curlimages/curl:latest -n base \
-            -- curl -s -o /dev/null -w "%{http_code}" \
-            -X POST http://alloy.monitoring.svc.cluster.local:12347/collect \
-            -H "Content-Type: application/json" -d '{}' 2>/dev/null || echo "connectivity test failed"
+          echo "===== FARO INGRESS ====="
+          kubectl get ingress faro-ingress -n base -o yaml | grep -A20 "rules:\|status:\|backend:"
+          echo "---"
+          kubectl get svc alloy-faro -n base -o yaml | grep -A10 "spec:"
 
-      - name: Backend env (OTel config)
+      - name: Backend span resource attributes
         run: |
-          echo "===== BACKEND OTEL ENV ====="
-          kubectl exec -n base deployment/backend -- env | grep -iE "otel|management|tracing" 2>/dev/null || echo "(exec failed)"
+          echo "===== BACKEND ENV (full OTel) ====="
+          kubectl exec -n base deployment/backend -- env | grep -iE "otel|spring|management" | sort

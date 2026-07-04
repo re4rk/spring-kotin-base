@@ -15,6 +15,7 @@ data:
   MAIL_SMTP_STARTTLS: "true"
   TZ: "Asia/Seoul"
   OTEL_SERVICE_NAME: "base-backend"
+  SPRING_APPLICATION_NAME: "base-backend"
   OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "http://tempo.monitoring.svc.cluster.local:4318/v1/traces"
   MANAGEMENT_OTLP_TRACING_ENDPOINT: "http://tempo.monitoring.svc.cluster.local:4318/v1/traces"
   MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
