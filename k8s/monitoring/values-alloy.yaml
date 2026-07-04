@@ -1,7 +1,13 @@
-# Grafana Alloy — Faro receiver
+# Grafana Alloy — Faro receiver + Kubernetes log collector
 controller:
   type: deployment
   replicas: 1
+
+rbac:
+  create: true
+
+serviceAccount:
+  create: true
 
 alloy:
   extraPorts:
