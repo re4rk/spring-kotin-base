@@ -1,6 +1,13 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { productApi } from '@base/api'
 
 export function useCreateProductMutation() {
-  return useMutation({ mutationFn: productApi.create })
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: productApi.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+    },
+  })
 }

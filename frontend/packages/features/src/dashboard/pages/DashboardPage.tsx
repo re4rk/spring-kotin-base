@@ -21,10 +21,15 @@ export function DashboardPage() {
           <Stack gap={1}>
             <Text variant="h4">상품</Text>
             <Text variant="body2" color={colors.gray[500]}>
-              새 상품을 등록할 수 있습니다.
+              상품 목록을 조회하고 새 상품을 등록할 수 있습니다.
             </Text>
           </Stack>
-          <Button onClick={() => navigate('/products/new')}>상품 등록</Button>
+          <Stack direction="row" gap={3} style={{ flexWrap: 'wrap' }}>
+            <Button onClick={() => navigate('/products')}>상품 목록</Button>
+            <Button variant="secondary" onClick={() => navigate('/products/new')}>
+              상품 등록
+            </Button>
+          </Stack>
         </Stack>
       </Card>
 

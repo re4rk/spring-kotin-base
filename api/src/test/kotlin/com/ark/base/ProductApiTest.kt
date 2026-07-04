@@ -21,9 +21,9 @@ class ProductApiTest : ApiIntegrationTest() {
                 param("name", uniqueName)
             }.andExpect {
                 status { isOk() }
-                jsonPath("$.data") { isArray() }
-                jsonPath("$.data.length()") { value(1) }
-                jsonPath("$.data[0].id") { value(productId) }
+                jsonPath("$.data.content") { isArray() }
+                jsonPath("$.data.content.length()") { value(1) }
+                jsonPath("$.data.content[0].id") { value(productId) }
             }
     }
 

@@ -13,6 +13,24 @@ export interface ProductCreateRequest {
   thumbnailUrl?: string
 }
 
+export interface ProductListParams {
+  page?: number
+  size?: number
+  status?: ProductStatus
+  name?: string
+  minPrice?: number
+  maxPrice?: number
+  category?: string
+}
+
+export interface ProductPageResponse {
+  content: ProductResponse[]
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
+}
+
 export interface ProductResponse {
   id: number
   name: string

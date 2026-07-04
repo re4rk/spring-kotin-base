@@ -9,6 +9,10 @@ import com.ark.base.application.ProductSkuCreateRequest
 import com.ark.base.application.ProductUpdateRequest
 import com.ark.base.ui.auth.AccessType
 import com.ark.base.ui.auth.Authorize
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -29,7 +33,9 @@ class ProductController(
     @GetMapping
     fun findAll(
         @ModelAttribute request: ProductQueryFilterRequest,
-    ): List<ProductResponse> = productService.findAllByFilter(request)
+        @PageableDefault(size = 20, sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
+    ): Page<ProductResponse> =
+        productService.listProducts(request, pageable).map { ProductResponse.from(it) }
 
     @GetMapping("/{productId}")
     fun findById(

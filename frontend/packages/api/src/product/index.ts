@@ -1,2 +1,8 @@
 export { productApi } from './api'
-export type { ProductCreateRequest, ProductResponse, ProductStatus } from './types'
+export type {
+  ProductCreateRequest,
+  ProductListParams,
+  ProductPageResponse,
+  ProductResponse,
+  ProductStatus,
+} from './types'

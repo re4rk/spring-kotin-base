@@ -14,4 +14,4 @@ export type {
   UserResponse,
   PageResponse,
 } from './auth'
-export type { ProductCreateRequest, ProductResponse, ProductStatus } from './product'
+export type { ProductCreateRequest, ProductListParams, ProductPageResponse, ProductResponse, ProductStatus } from './product'
