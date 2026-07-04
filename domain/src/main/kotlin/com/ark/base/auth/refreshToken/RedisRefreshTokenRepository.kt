@@ -17,6 +17,7 @@ class RedisRefreshTokenRepository(
                 userId.toString(),
                 UUID.randomUUID().toString(),
                 TTL_SECONDS.toString(),
+                GRAVEYARD_TTL_SECONDS.toString(),
             ) ?: error("Failed to issue refresh token for userId=$userId")
         return RefreshToken(token = token, userId = userId)
     }
@@ -31,6 +32,7 @@ class RedisRefreshTokenRepository(
             )
         return when {
             result == null -> RefreshTokenConsumeResult.Invalid
+            result == EXPIRED_MARKER -> RefreshTokenConsumeResult.Expired
             result.startsWith(REUSED_PREFIX) ->
                 RefreshTokenConsumeResult.Reused(userId = result.removePrefix(REUSED_PREFIX).toLong())
             else -> RefreshTokenConsumeResult.Success(userId = result.toLong())
@@ -47,9 +49,12 @@ class RedisRefreshTokenRepository(
 
     companion object {
         private const val TTL_SECONDS = 604_800L
+        private const val GRAVEYARD_TTL_SECONDS = TTL_SECONDS + 86_400L
         private const val REUSED_PREFIX = "REUSED:"
+        private const val EXPIRED_MARKER = "EXPIRED"
         private const val KEYSPACE = "refresh-token"
         private const val USED_KEYSPACE = "refresh-token-used"
+        private const val GRAVEYARD_KEYSPACE = "refresh-token-graveyard"
         private const val ENTITY_CLASS = "com.ark.base.auth.refresh_token.RefreshToken"
         private const val USED_ENTITY_CLASS = "com.ark.base.auth.refresh_token.UsedRefreshToken"
 
@@ -61,11 +66,13 @@ class RedisRefreshTokenRepository(
                     local userId = ARGV[1]
                     local newToken = ARGV[2]
                     local ttl = tonumber(ARGV[3])
+                    local graveyardTtl = tonumber(ARGV[4])
                     local userIndexKey = '$KEYSPACE:userId:' .. userId
                     local oldTokens = redis.call('SMEMBERS', userIndexKey)
                     for _, oldToken in ipairs(oldTokens) do
                       redis.call('DEL', '$KEYSPACE:' .. oldToken)
                       redis.call('DEL', '$USED_KEYSPACE:' .. oldToken)
+                      redis.call('DEL', '$GRAVEYARD_KEYSPACE:' .. oldToken)
                     end
                     redis.call('DEL', userIndexKey)
                     local entityKey = '$KEYSPACE:' .. newToken
@@ -80,6 +87,7 @@ class RedisRefreshTokenRepository(
                       '$ENTITY_CLASS'
                     )
                     redis.call('EXPIRE', entityKey, ttl)
+                    redis.call('SET', '$GRAVEYARD_KEYSPACE:' .. newToken, userId, 'EX', graveyardTtl)
                     redis.call('SADD', userIndexKey, newToken)
                     redis.call('EXPIRE', userIndexKey, ttl)
                     return newToken
@@ -99,6 +107,7 @@ class RedisRefreshTokenRepository(
                     local userId = redis.call('HGET', entityKey, 'userId')
                     if userId then
                       redis.call('DEL', entityKey)
+                      redis.call('DEL', '$GRAVEYARD_KEYSPACE:' .. token)
                       redis.call('SREM', '$KEYSPACE:userId:' .. userId, token)
                       redis.call(
                         'HSET',
@@ -117,6 +126,9 @@ class RedisRefreshTokenRepository(
                     if reusedUserId then
                       return '$REUSED_PREFIX' .. reusedUserId
                     end
+                    if redis.call('EXISTS', '$GRAVEYARD_KEYSPACE:' .. token) == 1 then
+                      return '$EXPIRED_MARKER'
+                    end
                     return nil
                     """.trimIndent(),
                 )
@@ -133,6 +145,7 @@ class RedisRefreshTokenRepository(
                     for _, token in ipairs(tokens) do
                       redis.call('DEL', '$KEYSPACE:' .. token)
                       redis.call('DEL', '$USED_KEYSPACE:' .. token)
+                      redis.call('DEL', '$GRAVEYARD_KEYSPACE:' .. token)
                     end
                     redis.call('DEL', userIndexKey)
                     if #tokens > 0 then

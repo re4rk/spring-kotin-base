@@ -52,6 +52,7 @@ class AuthService(
                 throw BaseException(ErrorCode.USER_REFRESH_TOKEN_REUSED)
             }
             RefreshTokenConsumeResult.Invalid -> throw BaseException(ErrorCode.USER_REFRESH_TOKEN_INVALID)
+            RefreshTokenConsumeResult.Expired -> throw BaseException(ErrorCode.REFRESH_TOKEN_EXPIRED)
         }
     }
 

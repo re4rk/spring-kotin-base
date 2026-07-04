@@ -3,6 +3,8 @@ package com.ark.base.support
 import com.ark.base.BaseApplication
 import com.ark.base.common.JwtProvider
 import com.jayway.jsonpath.JsonPath
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -15,6 +17,7 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
 import org.springframework.transaction.annotation.Transactional
+import java.util.Date
 
 @SpringBootTest(classes = [BaseApplication::class])
 @AutoConfigureMockMvc
@@ -96,6 +99,15 @@ abstract class ApiIntegrationTest : RedisIntegrationTest() {
     }
 
     protected fun bearer(token: String): String = "Bearer $token"
+
+    protected fun expiredAccessToken(userId: Long): String =
+        Jwts
+            .builder()
+            .subject(userId.toString())
+            .issuedAt(Date(System.currentTimeMillis() - 7_200_000))
+            .expiration(Date(System.currentTimeMillis() - 3_600_000))
+            .signWith(Keys.hmacShaKeyFor("test-secret-key-minimum-256-bits-long-for-hmac".toByteArray()))
+            .compact()
 
     protected fun createProduct(
         token: String,

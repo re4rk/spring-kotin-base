@@ -73,6 +73,8 @@ class GlobalExceptionHandler {
 
             ErrorCode.USER_LOGIN_FAILED,
             ErrorCode.UNAUTHORIZED,
+            ErrorCode.ACCESS_TOKEN_EXPIRED,
+            ErrorCode.REFRESH_TOKEN_EXPIRED,
             -> HttpStatus.UNAUTHORIZED
 
             ErrorCode.ACCESS_DENIED -> HttpStatus.FORBIDDEN

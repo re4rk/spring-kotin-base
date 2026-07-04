@@ -50,8 +50,14 @@ export async function request<T>(
     headers: { ...headers, ...init.headers },
   })
 
-  // 401 이고 인증 경로가 아닌 경우 → refresh 시도
+  // 만료된 액세스 토큰 → refresh 시도
   if (res.status === 401 && !path.startsWith('/auth/')) {
+    const body = await res.json().catch(() => ({}))
+    const error = (body as { data?: { code?: string; message?: string }; code?: string; message?: string }).data ?? body
+    if (error.code !== 'ACCESS_TOKEN_EXPIRED') {
+      throw new Error(error.message ?? `${res.status} ${res.statusText}`)
+    }
+
     if (!isRefreshing) {
       isRefreshing = true
       const newToken = await tryRefreshToken().catch(() => null)

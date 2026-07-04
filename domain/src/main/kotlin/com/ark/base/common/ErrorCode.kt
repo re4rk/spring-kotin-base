@@ -8,6 +8,8 @@ enum class ErrorCode(
     INVALID_INPUT("잘못된 입력입니다."),
     ACCESS_DENIED("접근 권한이 없습니다."),
     UNAUTHORIZED("인증이 필요합니다."),
+    ACCESS_TOKEN_EXPIRED("액세스 토큰이 만료되었습니다."),
+    REFRESH_TOKEN_EXPIRED("리프레시 토큰이 만료되었습니다."),
 
     // User
     USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
@@ -17,7 +19,7 @@ enum class ErrorCode(
     USER_DUPLICATE_EMAIL("이미 등록된 이메일입니다."),
     USER_LOGIN_FAILED("이메일 또는 비밀번호가 올바르지 않습니다."),
     USER_RESET_TOKEN_INVALID("유효하지 않거나 만료된 토큰입니다."),
-    USER_REFRESH_TOKEN_INVALID("유효하지 않거나 만료된 리프레시 토큰입니다."),
+    USER_REFRESH_TOKEN_INVALID("유효하지 않은 리프레시 토큰입니다."),
     USER_REFRESH_TOKEN_REUSED("리프레시 토큰이 재사용되어 모든 세션이 무효화되었습니다."),
 
     // Product

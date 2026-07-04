@@ -4,10 +4,16 @@ import com.ark.base.support.ApiIntegrationTest
 import com.jayway.jsonpath.JsonPath
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.post
 
 class AuthApiTest : ApiIntegrationTest() {
+    @Autowired
+    private lateinit var redisTemplate: StringRedisTemplate
+
     @Test
     fun `회원가입에 성공한다`() {
         mockMvc
@@ -141,6 +147,17 @@ class AuthApiTest : ApiIntegrationTest() {
     }
 
     @Test
+    fun `만료된 리프레시 토큰으로 refresh하면 REFRESH_TOKEN_EXPIRED를 반환한다`() {
+        val refreshToken = loginRefreshToken("seller@test.com")
+        redisTemplate.delete("refresh-token:$refreshToken")
+
+        refreshWithToken(refreshToken).andExpect {
+            status { isUnauthorized() }
+            jsonPath("$.code") { value("REFRESH_TOKEN_EXPIRED") }
+        }
+    }
+
+    @Test
     fun `유효하지 않은 리프레시 토큰이면 400을 반환한다`() {
         mockMvc
             .post("/auth/refresh") {
@@ -154,6 +171,27 @@ class AuthApiTest : ApiIntegrationTest() {
             }.andExpect {
                 status { isBadRequest() }
                 jsonPath("$.code") { value("USER_REFRESH_TOKEN_INVALID") }
+            }
+    }
+
+    @Test
+    fun `만료된 액세스 토큰으로 요청하면 ACCESS_TOKEN_EXPIRED를 반환한다`() {
+        val expiredToken = expiredAccessToken(sellerId)
+
+        mockMvc
+            .post("/products") {
+                contentType = MediaType.APPLICATION_JSON
+                header(HttpHeaders.AUTHORIZATION, bearer(expiredToken))
+                content =
+                    """
+                    {
+                      "name": "Expired Token Product",
+                      "price": 1000
+                    }
+                    """.trimIndent()
+            }.andExpect {
+                status { isUnauthorized() }
+                jsonPath("$.code") { value("ACCESS_TOKEN_EXPIRED") }
             }
     }
 

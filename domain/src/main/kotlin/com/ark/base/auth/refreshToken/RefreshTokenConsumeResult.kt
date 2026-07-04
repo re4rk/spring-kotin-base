@@ -10,4 +10,6 @@ sealed interface RefreshTokenConsumeResult {
     ) : RefreshTokenConsumeResult
 
     data object Invalid : RefreshTokenConsumeResult
+
+    data object Expired : RefreshTokenConsumeResult
 }
