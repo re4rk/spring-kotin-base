@@ -34,6 +34,10 @@ export interface PasswordResetConfirmRequest {
   newPassword: string
 }
 
+export interface PasswordPublicKeyResponse {
+  publicKey: string
+}
+
 export interface PageResponse<T> {
   content: T[]
   totalElements: number

@@ -9,6 +9,7 @@ import com.ark.base.auth.refreshToken.RefreshTokenRepository
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
 import com.ark.base.common.JwtProvider
+import com.ark.base.common.PasswordTransportResolver
 import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.UserRepository
 import com.ark.base.user.UserRole
@@ -26,12 +27,15 @@ class AuthService(
     private val refreshTokenRepository: RefreshTokenRepository,
     private val jwtProvider: JwtProvider,
     private val eventPublisher: ApplicationEventPublisher,
+    private val passwordTransportResolver: PasswordTransportResolver,
 ) {
     @Transactional
     fun login(request: LoginRequest): TokenResponse {
         val user = userRepository.findByEmail(request.email) ?: throw BaseException(ErrorCode.USER_LOGIN_FAILED)
 
-        if (!user.matchesPassword(request.password, passwordEncoder)) throw BaseException(ErrorCode.USER_LOGIN_FAILED)
+        if (!user.matchesPassword(passwordTransportResolver.resolve(request.password), passwordEncoder)) {
+            throw BaseException(ErrorCode.USER_LOGIN_FAILED)
+        }
 
         val accessToken = jwtProvider.generate(user.id)
         val refreshToken = refreshTokenRepository.issue(user.id)
@@ -69,7 +73,7 @@ class AuthService(
         val userId = passwordResetTokenRepository.findByIdOrThrow(request.token).userId
         val user = userRepository.findByIdOrThrow(userId)
 
-        user.changePassword(request.newPassword, passwordEncoder)
+        user.changePassword(passwordTransportResolver.resolve(request.newPassword), passwordEncoder)
 
         passwordResetTokenRepository.deleteById(request.token)
     }
@@ -77,7 +81,10 @@ class AuthService(
     @Transactional
     fun register(request: RegisterRequest): UserResponse {
         if (userRepository.findByEmail(request.email) != null) throw BaseException(ErrorCode.USER_DUPLICATE_EMAIL)
-        val user = request.toUser(passwordEncoder)
+        val user =
+            request
+                .copy(password = passwordTransportResolver.resolve(request.password))
+                .toUser(passwordEncoder)
         if (userRepository.count() == 0L) user.role = UserRole.ADMIN
         return UserResponse.from(userRepository.save(user))
     }

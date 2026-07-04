@@ -2,6 +2,7 @@ package com.ark.base.application
 
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
+import com.ark.base.common.PasswordTransportResolver
 import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.User
 import com.ark.base.user.UserRepository
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
+    private val passwordTransportResolver: PasswordTransportResolver,
 ) {
     @Transactional(readOnly = true)
     fun findByEmail(email: String): User? = userRepository.findByEmail(email)
@@ -32,10 +34,10 @@ class UserService(
     ) {
         val user = userRepository.findByIdOrThrow(userId)
 
-        if (!user.matchesPassword(request.currentPassword, passwordEncoder)) {
+        if (!user.matchesPassword(passwordTransportResolver.resolve(request.currentPassword), passwordEncoder)) {
             throw BaseException(ErrorCode.USER_LOGIN_FAILED)
         }
-        user.changePassword(request.newPassword, passwordEncoder)
+        user.changePassword(passwordTransportResolver.resolve(request.newPassword), passwordEncoder)
     }
 
     @Transactional

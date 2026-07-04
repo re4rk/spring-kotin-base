@@ -1,8 +1,7 @@
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
-import { configureClient } from '@base/api'
+import { configureClient, clearPasswordPublicKeyCache } from '@base/api'
 import { authRoutes } from './auth/index.ts'
 import { AuthBootstrap } from './auth/AuthBootstrap.tsx'
-import { docsRoutes } from './docs/index.ts'
 import { dashboardRoutes } from './dashboard/index.ts'
 import { adminRoutes } from './admin/index.ts'
 import { useAuthStore } from './auth/store.ts'
@@ -14,6 +13,7 @@ configureClient({
   onTokensRefreshed: (tokens) => useAuthStore.getState().setTokens(tokens),
   onLogout: (message) => {
     useAuthStore.getState().logout()
+    clearPasswordPublicKeyCache()
     if (message) {
       useAuthStore.setState({ sessionExpiredMessage: message })
     }
@@ -25,7 +25,7 @@ const router = createBrowserRouter([
   ...authRoutes,
   ...dashboardRoutes,
   ...adminRoutes,
-  ...docsRoutes,
+  { path: '/design-system/*', element: <Navigate to="/admin/design-system" replace /> },
 ])
 
 export function AppRouter() {

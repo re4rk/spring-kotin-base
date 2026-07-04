@@ -2,13 +2,16 @@ package com.ark.base.ui
 
 import com.ark.base.application.AuthService
 import com.ark.base.application.LoginRequest
+import com.ark.base.application.PasswordPublicKeyResponse
 import com.ark.base.application.PasswordResetConfirmRequest
 import com.ark.base.application.PasswordResetRequest
 import com.ark.base.application.RefreshTokenRequest
 import com.ark.base.application.RegisterRequest
 import com.ark.base.application.TokenResponse
 import com.ark.base.application.UserResponse
+import com.ark.base.common.PasswordTransportCrypto
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -19,7 +22,12 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/auth")
 class AuthController(
     private val authService: AuthService,
+    private val passwordTransportCrypto: PasswordTransportCrypto,
 ) {
+    @GetMapping("/crypto/public-key")
+    fun publicKey(): PasswordPublicKeyResponse =
+        PasswordPublicKeyResponse(publicKey = passwordTransportCrypto.publicKeySpkiBase64())
+
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     fun register(
