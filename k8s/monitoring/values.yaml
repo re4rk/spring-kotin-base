@@ -51,6 +51,8 @@ grafana:
     passwordKey: admin-password
   ingress:
     enabled: false
+  plugins:
+    - grafana-app-observability
   additionalDataSources:
     - name: Loki
       type: loki
@@ -67,10 +69,18 @@ grafana:
         tracesToLogs:
           enabled: true
           datasourceUid: loki
+          filterByTraceID: true
+          filterBySpanID: false
+        tracesToMetrics:
+          datasourceUid: prometheus
         serviceMap:
           datasourceUid: prometheus
         nodeGraph:
           enabled: true
+        search:
+          hide: false
+        lokiSearch:
+          datasourceUid: loki
   resources:
     requests:
       memory: 128Mi
