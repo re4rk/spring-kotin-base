@@ -88,6 +88,9 @@ kubectl delete ingressroute faro-collector -n base --ignore-not-found
 echo "==> Grafana Ingress 적용"
 kubectl apply -f "${ROOT_DIR}/grafana-ingress.yaml"
 
+echo "==> Grafana Frontend Dashboard 적용"
+kubectl apply -f "${ROOT_DIR}/grafana-dashboard-frontend.yaml"
+
 HELM_ARGS=(
   upgrade --install "${RELEASE}" "${CHART}"
   --namespace "${NAMESPACE}"

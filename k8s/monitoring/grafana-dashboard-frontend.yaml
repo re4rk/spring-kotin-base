@@ -1,0 +1,200 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-frontend
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  frontend.json: |
+    {
+      "title": "Frontend",
+      "uid": "frontend-observability",
+      "schemaVersion": 38,
+      "version": 1,
+      "refresh": "30s",
+      "time": { "from": "now-1h", "to": "now" },
+      "timezone": "browser",
+      "tags": ["frontend"],
+      "panels": [
+        {
+          "id": 1,
+          "type": "stat",
+          "title": "Frontend Errors (1h)",
+          "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": { "reduceOptions": { "calcs": ["sum"] }, "colorMode": "background", "graphMode": "none" },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": { "mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 1}, {"color": "red", "value": 10}] },
+              "color": { "mode": "thresholds" }
+            }
+          },
+          "targets": [{
+            "datasource": { "type": "loki", "uid": "loki" },
+            "expr": "sum(count_over_time({app=\"base-frontend\"} | json | level =~ \"error|Error\" [$__range]))",
+            "legendFormat": "Errors"
+          }]
+        },
+        {
+          "id": 2,
+          "type": "stat",
+          "title": "Frontend Log Lines (1h)",
+          "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": { "reduceOptions": { "calcs": ["sum"] }, "colorMode": "value", "graphMode": "none" },
+          "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "blue" } } },
+          "targets": [{
+            "datasource": { "type": "loki", "uid": "loki" },
+            "expr": "sum(count_over_time({app=\"base-frontend\"}[$__range]))",
+            "legendFormat": "Logs"
+          }]
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "Backend Errors (1h)",
+          "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": { "reduceOptions": { "calcs": ["sum"] }, "colorMode": "background", "graphMode": "none" },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": { "mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 1}, {"color": "red", "value": 10}] },
+              "color": { "mode": "thresholds" }
+            }
+          },
+          "targets": [{
+            "datasource": { "type": "loki", "uid": "loki" },
+            "expr": "sum(count_over_time({namespace=\"base\", app=\"backend\"} |~ \"(?i)error|exception\" [$__range]))",
+            "legendFormat": "Backend Errors"
+          }]
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Backend Log Lines (1h)",
+          "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": { "reduceOptions": { "calcs": ["sum"] }, "colorMode": "value", "graphMode": "none" },
+          "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "blue" } } },
+          "targets": [{
+            "datasource": { "type": "loki", "uid": "loki" },
+            "expr": "sum(count_over_time({namespace=\"base\", app=\"backend\"}[$__range]))",
+            "legendFormat": "Logs"
+          }]
+        },
+        {
+          "id": 5,
+          "type": "timeseries",
+          "title": "Log Rate by Level",
+          "gridPos": { "x": 0, "y": 4, "w": 24, "h": 7 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "fieldConfig": { "defaults": { "unit": "short", "custom": { "lineWidth": 2 } } },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "loki" },
+              "expr": "sum(rate({app=\"base-frontend\"} | json | level = \"error\" [$__interval]))",
+              "legendFormat": "frontend error"
+            },
+            {
+              "datasource": { "type": "loki", "uid": "loki" },
+              "expr": "sum(rate({namespace=\"base\", app=\"backend\"} |~ \"(?i)error|exception\" [$__interval]))",
+              "legendFormat": "backend error"
+            },
+            {
+              "datasource": { "type": "loki", "uid": "loki" },
+              "expr": "sum(rate({namespace=\"base\", app=\"backend\"}[$__interval]))",
+              "legendFormat": "backend total"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "type": "row",
+          "title": "Frontend Logs (Faro)",
+          "gridPos": { "x": 0, "y": 11, "w": 24, "h": 1 },
+          "collapsed": false
+        },
+        {
+          "id": 7,
+          "type": "logs",
+          "title": "Frontend Errors & Exceptions",
+          "gridPos": { "x": 0, "y": 12, "w": 24, "h": 8 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showTime": true, "wrapLogMessage": false },
+          "targets": [{
+            "datasource": { "type": "loki", "uid": "loki" },
+            "expr": "{app=\"base-frontend\"} | json | level =~ \"error|Error\" or kind = \"exception\"",
+            "legendFormat": ""
+          }]
+        },
+        {
+          "id": 8,
+          "type": "logs",
+          "title": "All Frontend Logs",
+          "gridPos": { "x": 0, "y": 20, "w": 24, "h": 8 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showTime": true, "wrapLogMessage": false },
+          "targets": [{
+            "datasource": { "type": "loki", "uid": "loki" },
+            "expr": "{app=\"base-frontend\"}",
+            "legendFormat": ""
+          }]
+        },
+        {
+          "id": 9,
+          "type": "row",
+          "title": "Backend Logs",
+          "gridPos": { "x": 0, "y": 28, "w": 24, "h": 1 },
+          "collapsed": false
+        },
+        {
+          "id": 10,
+          "type": "logs",
+          "title": "Backend Errors",
+          "gridPos": { "x": 0, "y": 29, "w": 24, "h": 8 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showTime": true, "wrapLogMessage": true },
+          "targets": [{
+            "datasource": { "type": "loki", "uid": "loki" },
+            "expr": "{namespace=\"base\", app=\"backend\"} |~ \"(?i)error|exception|warn\"",
+            "legendFormat": ""
+          }]
+        },
+        {
+          "id": 11,
+          "type": "logs",
+          "title": "All Backend Logs",
+          "gridPos": { "x": 0, "y": 37, "w": 24, "h": 8 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showTime": true, "wrapLogMessage": false },
+          "targets": [{
+            "datasource": { "type": "loki", "uid": "loki" },
+            "expr": "{namespace=\"base\", app=\"backend\"}",
+            "legendFormat": ""
+          }]
+        },
+        {
+          "id": 12,
+          "type": "row",
+          "title": "Traces",
+          "gridPos": { "x": 0, "y": 45, "w": 24, "h": 1 },
+          "collapsed": false
+        },
+        {
+          "id": 13,
+          "type": "traces",
+          "title": "Recent Backend Traces",
+          "gridPos": { "x": 0, "y": 46, "w": 24, "h": 10 },
+          "datasource": { "type": "tempo", "uid": "tempo" },
+          "targets": [{
+            "datasource": { "type": "tempo", "uid": "tempo" },
+            "queryType": "traceqlSearch",
+            "filters": [
+              { "id": "service-name", "operator": "=", "scope": "resource", "tag": "service.name", "value": ["base-backend"], "valueType": "string" }
+            ],
+            "limit": 20
+          }]
+        }
+      ]
+    }
