@@ -16,26 +16,42 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
 
-      - name: Tempo configmap
+      - name: Tempo configmap (overrides + metrics_generator)
         run: |
           echo "===== TEMPO CONFIGMAP ====="
-          kubectl get configmap tempo -n monitoring -o jsonpath='{.data.tempo\.yaml}' 2>/dev/null \
-            || kubectl get configmap -n monitoring -l app.kubernetes.io/name=tempo -o yaml | head -200
+          kubectl get configmap tempo -n monitoring -o jsonpath='{.data.tempo\.yaml}'
 
-      - name: Tempo pod logs
+      - name: Tempo pod status & age
         run: |
-          echo "===== TEMPO POD LOGS (last 50 lines) ====="
-          kubectl logs statefulset/tempo -n monitoring --tail=50 2>/dev/null \
-            || kubectl logs -n monitoring -l app.kubernetes.io/name=tempo --tail=50
-
-      - name: Tempo pod status
-        run: |
-          echo "===== TEMPO POD STATUS ====="
+          echo "===== TEMPO POD ====="
           kubectl get pods -n monitoring -l app.kubernetes.io/name=tempo -o wide
-          kubectl describe pod -n monitoring -l app.kubernetes.io/name=tempo | tail -40
 
-      - name: Prometheus remote write receiver
+      - name: Tempo pod logs (errors + trace ingestion)
         run: |
-          echo "===== PROMETHEUS FLAGS ====="
-          kubectl get prometheus -n monitoring -o jsonpath='{.items[0].spec.enableRemoteWriteReceiver}' 2>/dev/null || true
-          kubectl get pods -n monitoring -l app.kubernetes.io/name=prometheus --no-headers
+          echo "===== TEMPO LOGS ====="
+          kubectl logs statefulset/tempo -n monitoring --tail=80 \
+            | grep -E "error|warn|metrics.gen|ring|ingester|push|otlp|receiver" || echo "(no matching lines)"
+
+      - name: Alloy pod status
+        run: |
+          echo "===== ALLOY POD ====="
+          kubectl get pods -n monitoring -l app.kubernetes.io/name=alloy -o wide
+
+      - name: Alloy logs (Faro + trace forwarding)
+        run: |
+          echo "===== ALLOY LOGS ====="
+          kubectl logs -n monitoring -l app.kubernetes.io/name=alloy --tail=80 \
+            | grep -E "error|warn|faro|tempo|otlp|trace|push|failed" || echo "(no matching lines)"
+
+      - name: Backend pod logs (OTel trace export)
+        run: |
+          echo "===== BACKEND OTEL LOGS ====="
+          kubectl logs -n base -l app=backend --tail=50 \
+            | grep -iE "otel|trace|otlp|export|tempo" || echo "(no matching lines)"
+
+      - name: All pods summary
+        run: |
+          echo "===== ALL PODS ====="
+          kubectl get pods -n monitoring
+          echo "---"
+          kubectl get pods -n base
