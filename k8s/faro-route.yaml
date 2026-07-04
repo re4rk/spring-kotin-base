@@ -1,0 +1,33 @@
+# Faro collector — ark-base.site/faro/* → Alloy (monitoring)
+# 별도 DNS(faro.ark-base.site) 없이 동일 도메인 사용
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-faro-prefix
+  namespace: base
+spec:
+  stripPrefix:
+    prefixes:
+      - /faro
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: faro-collector
+  namespace: base
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`ark-base.site`) && PathPrefix(`/faro`)
+      kind: Rule
+      middlewares:
+        - name: strip-faro-prefix
+          namespace: base
+      services:
+        - name: alloy
+          namespace: monitoring
+          port: 12347
+  tls:
+    secretName: ark-base-site-tls

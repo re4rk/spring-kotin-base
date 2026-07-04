@@ -68,8 +68,10 @@ helm upgrade --install alloy grafana/alloy \
   -f "${ROOT_DIR}/values-alloy.yaml" \
   --wait --timeout 10m
 
-echo "==> Faro / Grafana Ingress 적용"
-kubectl apply -f "${ROOT_DIR}/faro-ingress.yaml"
+echo "==> Faro route 적용 (ark-base.site/faro → Alloy)"
+kubectl apply -f "${ROOT_DIR}/../faro-route.yaml"
+
+echo "==> Grafana Ingress 적용"
 kubectl apply -f "${ROOT_DIR}/grafana-ingress.yaml"
 
 HELM_ARGS=(
@@ -92,11 +94,10 @@ echo ""
 echo "설치 완료."
 echo ""
 echo "Grafana:  https://grafana.ark-base.site  (admin / \$GRAFANA_ADMIN_PASSWORD)"
-echo "Faro:     https://faro.ark-base.site/collect"
+echo "Faro:     https://ark-base.site/faro/collect"
 echo ""
 echo "DNS (ark-base.site와 동일 IP):"
 echo "  grafana.ark-base.site"
-echo "  faro.ark-base.site"
 echo ""
 echo "Grafana Explore:"
 echo "  Loki  → {app=\"base-frontend\"} 또는 service_name"
