@@ -2,6 +2,7 @@ package com.ark.base.config
 
 import com.ark.base.common.ErrorCode
 import com.ark.base.ui.JwtAuthenticationFilter
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,9 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.security.web.util.matcher.AndRequestMatcher
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher
+import org.springframework.security.web.util.matcher.RequestMatcher
 
 @Configuration
 @EnableWebSecurity
@@ -37,13 +36,12 @@ class SecurityConfig(
         val authProvider = DaoAuthenticationProvider(adminUserDetailsService)
         authProvider.setPasswordEncoder(springPasswordEncoder())
 
+        val adminWebMatcher = RequestMatcher { req: HttpServletRequest ->
+            req.requestURI.startsWith("/admin") && !req.requestURI.startsWith("/admin/api")
+        }
+
         return http
-            .securityMatcher(
-                AndRequestMatcher(
-                    AntPathRequestMatcher("/admin/**"),
-                    NegatedRequestMatcher(AntPathRequestMatcher("/admin/api/**")),
-                ),
-            )
+            .securityMatcher(adminWebMatcher)
             .authenticationProvider(authProvider)
             .authorizeHttpRequests {
                 it.requestMatchers("/admin/login").permitAll()

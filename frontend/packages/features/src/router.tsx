@@ -10,7 +10,7 @@ import { useAuthStore } from './auth/store.ts'
 configureClient({
   getAccessToken: () => useAuthStore.getState().accessToken,
   getRefreshToken: () => useAuthStore.getState().refreshToken,
-  onTokensRefreshed: (tokens) => useAuthStore.getState().login(tokens as TokenResponse),
+  onTokensRefreshed: (tokens) => useAuthStore.getState().login(tokens as unknown as TokenResponse),
   onLogout: () => useAuthStore.getState().logout(),
 })
 

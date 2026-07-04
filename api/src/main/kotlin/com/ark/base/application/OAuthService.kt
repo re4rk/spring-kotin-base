@@ -71,7 +71,7 @@ class OAuthService(
         val user = findOrCreateUser(userInfo)
         val accessToken = jwtProvider.generate(user.id)
         val refreshToken = refreshTokenRepository.issue(user.id)
-        return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token)
+        return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token, user = UserResponse.from(user))
     }
 
     private fun findOrCreateUser(userInfo: OAuthUserInfo): User {
