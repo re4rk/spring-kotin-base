@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { authApi } from '@base/api'
+import { authApi, isSessionExpiredError } from '@base/api'
 import { useAuthStore } from './store'
 
 export function useLoginMutation() {
@@ -21,6 +21,12 @@ export function useRefreshMutation() {
   return useMutation({
     mutationFn: authApi.refresh,
     onSuccess: (tokens) => login(tokens),
+    onError: (error) => {
+      if (!isSessionExpiredError(error)) return
+
+      useAuthStore.getState().logout()
+      useAuthStore.setState({ sessionExpiredMessage: error.message })
+    },
   })
 }
 

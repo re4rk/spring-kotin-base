@@ -1,10 +1,12 @@
+import { ApiError, ErrorCode, parseApiError } from './errors'
+
 const BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
 
 interface AuthProvider {
   getAccessToken(): string | null
   getRefreshToken(): string | null
   onTokensRefreshed(tokens: { accessToken: string; refreshToken: string; [key: string]: unknown }): void
-  onLogout(): void
+  onLogout(message?: string): void
 }
 
 let authProvider: AuthProvider | null = null
@@ -16,9 +18,14 @@ export function configureClient(provider: AuthProvider) {
 let isRefreshing = false
 let refreshQueue: Array<(token: string | null) => void> = []
 
+const SESSION_EXPIRED_MESSAGE = '세션이 만료됐습니다. 다시 로그인해주세요.'
+
 async function tryRefreshToken(): Promise<string | null> {
   const refreshToken = authProvider?.getRefreshToken()
-  if (!refreshToken) return null
+  if (!refreshToken) {
+    authProvider?.onLogout(SESSION_EXPIRED_MESSAGE)
+    return null
+  }
 
   const res = await fetch(`${BASE_URL}/auth/refresh`, {
     method: 'POST',
@@ -27,7 +34,8 @@ async function tryRefreshToken(): Promise<string | null> {
   })
 
   if (!res.ok) {
-    authProvider?.onLogout()
+    const apiError = parseApiError(await res.json().catch(() => ({})), res.status)
+    authProvider?.onLogout(apiError.message)
     return null
   }
 
@@ -50,12 +58,11 @@ export async function request<T>(
     headers: { ...headers, ...init.headers },
   })
 
-  // 만료된 액세스 토큰 → refresh 시도
   if (res.status === 401 && !path.startsWith('/auth/')) {
-    const body = await res.json().catch(() => ({}))
-    const error = (body as { data?: { code?: string; message?: string }; code?: string; message?: string }).data ?? body
-    if (error.code !== 'ACCESS_TOKEN_EXPIRED') {
-      throw new Error(error.message ?? `${res.status} ${res.statusText}`)
+    const apiError = parseApiError(await res.json().catch(() => ({})), res.status)
+
+    if (apiError.code !== ErrorCode.ACCESS_TOKEN_EXPIRED) {
+      throw apiError
     }
 
     if (!isRefreshing) {
@@ -65,15 +72,14 @@ export async function request<T>(
       refreshQueue.forEach((cb) => cb(newToken))
       refreshQueue = []
 
-      if (!newToken) throw new Error('세션이 만료됐습니다. 다시 로그인해주세요.')
+      if (!newToken) throw new ApiError(SESSION_EXPIRED_MESSAGE, ErrorCode.REFRESH_TOKEN_EXPIRED, 401)
       return request<T>(path, init, newToken)
     }
 
-    // 이미 refresh 중이면 대기열에 추가
     return new Promise((resolve, reject) => {
       refreshQueue.push(async (newToken) => {
         if (!newToken) {
-          reject(new Error('세션이 만료됐습니다. 다시 로그인해주세요.'))
+          reject(new ApiError(SESSION_EXPIRED_MESSAGE, ErrorCode.REFRESH_TOKEN_EXPIRED, 401))
           return
         }
         try {
@@ -86,8 +92,7 @@ export async function request<T>(
   }
 
   if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
-    throw new Error((body.data ?? body).message ?? `${res.status} ${res.statusText}`)
+    throw parseApiError(await res.json().catch(() => ({})), res.status)
   }
 
   if (res.status === 204) return undefined as T

@@ -11,7 +11,12 @@ configureClient({
   getAccessToken: () => useAuthStore.getState().accessToken,
   getRefreshToken: () => useAuthStore.getState().refreshToken,
   onTokensRefreshed: (tokens) => useAuthStore.getState().login(tokens as unknown as TokenResponse),
-  onLogout: () => useAuthStore.getState().logout(),
+  onLogout: (message) => {
+    useAuthStore.getState().logout()
+    if (message) {
+      useAuthStore.setState({ sessionExpiredMessage: message })
+    }
+  },
 })
 
 const router = createBrowserRouter([

@@ -3,7 +3,9 @@ import type { FormEvent, ChangeEvent } from 'react'
 import styled from '@emotion/styled'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Stack, Card, Text, Input, Button, Alert, colors, typography, radii, spacing } from '@base/ui'
+import { useEffect } from 'react'
 import { useLoginMutation } from '../mutations'
+import { useAuthStore } from '../store'
 
 const LoginCard = styled(Card)({
   width: '100%',
@@ -55,7 +57,13 @@ export function LoginPage() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const sessionExpiredMessage = useAuthStore((s) => s.sessionExpiredMessage)
+  const clearSessionExpiredMessage = useAuthStore((s) => s.clearSessionExpiredMessage)
   const { mutate: login, isPending, error } = useLoginMutation()
+
+  useEffect(() => {
+    return () => clearSessionExpiredMessage()
+  }, [clearSessionExpiredMessage])
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -79,6 +87,7 @@ export function LoginPage() {
 
         {/* Success / Error */}
         {registered && <Alert variant="success">회원가입이 완료됐습니다. 로그인해주세요.</Alert>}
+        {sessionExpiredMessage && <Alert variant="warning">{sessionExpiredMessage}</Alert>}
         {error && <Alert variant="danger">{error.message}</Alert>}
 
         {/* Form */}

@@ -7,8 +7,10 @@ interface AuthState {
   refreshToken: string | null
   user: UserResponse | null
   isAuthenticated: boolean
+  sessionExpiredMessage: string | null
   login: (tokens: TokenResponse) => void
   logout: () => void
+  clearSessionExpiredMessage: () => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -18,10 +20,24 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       user: null,
       isAuthenticated: false,
+      sessionExpiredMessage: null,
       login: ({ accessToken, refreshToken, user }) =>
-        set({ accessToken, refreshToken, user, isAuthenticated: true }),
+        set({
+          accessToken,
+          refreshToken,
+          user,
+          isAuthenticated: true,
+          sessionExpiredMessage: null,
+        }),
       logout: () =>
-        set({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false }),
+        set({
+          accessToken: null,
+          refreshToken: null,
+          user: null,
+          isAuthenticated: false,
+          sessionExpiredMessage: null,
+        }),
+      clearSessionExpiredMessage: () => set({ sessionExpiredMessage: null }),
     }),
     { name: 'auth' },
   ),
