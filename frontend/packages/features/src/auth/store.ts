@@ -8,7 +8,8 @@ interface AuthState {
   user: UserResponse | null
   isAuthenticated: boolean
   sessionExpiredMessage: string | null
-  login: (tokens: TokenResponse) => void
+  setTokens: (tokens: TokenResponse) => void
+  setUser: (user: UserResponse) => void
   logout: () => void
   clearSessionExpiredMessage: () => void
 }
@@ -21,14 +22,14 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       sessionExpiredMessage: null,
-      login: ({ accessToken, refreshToken, user }) =>
+      setTokens: ({ accessToken, refreshToken }) =>
         set({
           accessToken,
           refreshToken,
-          user,
           isAuthenticated: true,
           sessionExpiredMessage: null,
         }),
+      setUser: (user) => set({ user }),
       logout: () =>
         set({
           accessToken: null,

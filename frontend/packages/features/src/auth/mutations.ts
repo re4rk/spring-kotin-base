@@ -3,11 +3,19 @@ import { authApi, isSessionExpiredError } from '@base/api'
 import { useAuthStore } from './store'
 
 export function useLoginMutation() {
-  const login = useAuthStore((s) => s.login)
+  const setTokens = useAuthStore((s) => s.setTokens)
+  const setUser = useAuthStore((s) => s.setUser)
 
   return useMutation({
-    mutationFn: authApi.login,
-    onSuccess: (tokens) => login(tokens),
+    mutationFn: async (data: Parameters<typeof authApi.login>[0]) => {
+      const tokens = await authApi.login(data)
+      const user = await authApi.me(tokens.accessToken)
+      return { tokens, user }
+    },
+    onSuccess: ({ tokens, user }) => {
+      setTokens(tokens)
+      setUser(user)
+    },
   })
 }
 
@@ -16,11 +24,11 @@ export function useRegisterMutation() {
 }
 
 export function useRefreshMutation() {
-  const login = useAuthStore((s) => s.login)
+  const setTokens = useAuthStore((s) => s.setTokens)
 
   return useMutation({
     mutationFn: authApi.refresh,
-    onSuccess: (tokens) => login(tokens),
+    onSuccess: (tokens) => setTokens(tokens),
     onError: (error) => {
       if (!isSessionExpiredError(error)) return
 

@@ -19,6 +19,9 @@ export const authApi = {
   refresh: (data: RefreshTokenRequest) =>
     request<TokenResponse>('/auth/refresh', { method: 'POST', body: JSON.stringify(data) }),
 
+  me: (token?: string | null) =>
+    request<UserResponse>('/users/me', { method: 'GET' }, token),
+
   requestPasswordReset: (data: PasswordResetRequest) =>
     request<void>('/auth/passwords/reset/init', { method: 'POST', body: JSON.stringify(data) }),
 

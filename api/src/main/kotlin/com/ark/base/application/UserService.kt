@@ -20,6 +20,9 @@ class UserService(
     fun findByEmail(email: String): User? = userRepository.findByEmail(email)
 
     @Transactional(readOnly = true)
+    fun getById(userId: Long): User = userRepository.findByIdOrThrow(userId)
+
+    @Transactional(readOnly = true)
     fun listUsers(pageable: Pageable): Page<User> = userRepository.findAll(pageable)
 
     @Transactional

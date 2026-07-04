@@ -8,7 +8,6 @@ data class LoginRequest(
 data class TokenResponse(
     val accessToken: String,
     val refreshToken: String,
-    val user: UserResponse,
 )
 
 data class RefreshTokenRequest(

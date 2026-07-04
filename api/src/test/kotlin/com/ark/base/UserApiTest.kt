@@ -10,6 +10,18 @@ import org.springframework.test.web.servlet.patch
 
 class UserApiTest : ApiIntegrationTest() {
     @Test
+    fun `인증된 사용자는 본인 정보를 조회할 수 있다`() {
+        mockMvc
+            .get("/users/me") {
+                header(HttpHeaders.AUTHORIZATION, bearer(sellerToken))
+            }.andExpect {
+                status { isOk() }
+                jsonPath("$.data.email") { value("seller@test.com") }
+                jsonPath("$.data.name") { value("Seller") }
+            }
+    }
+
+    @Test
     fun `본인 이메일로 사용자 정보를 조회할 수 있다`() {
         mockMvc
             .get("/users") {

@@ -35,7 +35,7 @@ class AuthService(
 
         val accessToken = jwtProvider.generate(user.id)
         val refreshToken = refreshTokenRepository.issue(user.id)
-        return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token, user = UserResponse.from(user))
+        return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token)
     }
 
     @Transactional
@@ -45,7 +45,7 @@ class AuthService(
                 val user = userRepository.findByIdOrThrow(result.userId)
                 val accessToken = jwtProvider.generate(user.id)
                 val refreshToken = refreshTokenRepository.issue(user.id)
-                return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token, user = UserResponse.from(user))
+                return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token)
             }
             is RefreshTokenConsumeResult.Reused -> {
                 refreshTokenRepository.revokeAll(result.userId)

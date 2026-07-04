@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
-import { configureClient, type TokenResponse } from '@base/api'
+import { configureClient } from '@base/api'
 import { authRoutes } from './auth/index.ts'
+import { AuthBootstrap } from './auth/AuthBootstrap.tsx'
 import { docsRoutes } from './docs/index.ts'
 import { dashboardRoutes } from './dashboard/index.ts'
 import { adminRoutes } from './admin/index.ts'
@@ -10,7 +11,7 @@ import { useAuthStore } from './auth/store.ts'
 configureClient({
   getAccessToken: () => useAuthStore.getState().accessToken,
   getRefreshToken: () => useAuthStore.getState().refreshToken,
-  onTokensRefreshed: (tokens) => useAuthStore.getState().login(tokens as unknown as TokenResponse),
+  onTokensRefreshed: (tokens) => useAuthStore.getState().setTokens(tokens),
   onLogout: (message) => {
     useAuthStore.getState().logout()
     if (message) {
@@ -28,5 +29,9 @@ const router = createBrowserRouter([
 ])
 
 export function AppRouter() {
-  return <RouterProvider router={router} />
+  return (
+    <AuthBootstrap>
+      <RouterProvider router={router} />
+    </AuthBootstrap>
+  )
 }

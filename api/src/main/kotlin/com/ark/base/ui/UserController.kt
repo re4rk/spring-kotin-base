@@ -23,6 +23,11 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val userService: UserService,
 ) {
+    @GetMapping("/me")
+    fun me(
+        @InjectCurrentUser currentUser: CurrentUser,
+    ): UserResponse = UserResponse.from(userService.getById(currentUser.requireUserId()))
+
     @Authorize(AccessType.SELF_BY_EMAIL, param = "email")
     @GetMapping
     fun findByEmail(
