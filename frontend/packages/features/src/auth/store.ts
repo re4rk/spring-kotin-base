@@ -1,10 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { TokenResponse } from '@base/api'
+import type { TokenResponse, UserResponse } from '@base/api'
 
 interface AuthState {
   accessToken: string | null
   refreshToken: string | null
+  user: UserResponse | null
   isAuthenticated: boolean
   login: (tokens: TokenResponse) => void
   logout: () => void
@@ -15,11 +16,12 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       accessToken: null,
       refreshToken: null,
+      user: null,
       isAuthenticated: false,
-      login: ({ accessToken, refreshToken }) =>
-        set({ accessToken, refreshToken, isAuthenticated: true }),
+      login: ({ accessToken, refreshToken, user }) =>
+        set({ accessToken, refreshToken, user, isAuthenticated: true }),
       logout: () =>
-        set({ accessToken: null, refreshToken: null, isAuthenticated: false }),
+        set({ accessToken: null, refreshToken: null, user: null, isAuthenticated: false }),
     }),
     { name: 'auth' },
   ),

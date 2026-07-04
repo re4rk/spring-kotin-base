@@ -9,9 +9,17 @@ export interface RegisterRequest {
   password: string
 }
 
+export interface UserResponse {
+  id: number
+  email: string
+  name: string
+  roles: ('ADMIN' | 'USER')[]
+}
+
 export interface TokenResponse {
   accessToken: string
   refreshToken: string
+  user: UserResponse
 }
 
 export interface RefreshTokenRequest {
@@ -27,8 +35,10 @@ export interface PasswordResetConfirmRequest {
   newPassword: string
 }
 
-export interface UserResponse {
-  id: number
-  email: string
-  name: string
+export interface PageResponse<T> {
+  content: T[]
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
 }

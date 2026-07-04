@@ -73,6 +73,7 @@ export function DashboardPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const logout = useAuthStore((s) => s.logout)
+  const user = useAuthStore((s) => s.user)
 
   const isDesignSystem = location.pathname.startsWith('/design-system')
 
@@ -95,6 +96,9 @@ export function DashboardPage() {
             <Tab active={isDesignSystem} onClick={() => navigate('/design-system')}>
               디자인시스템
             </Tab>
+            {user?.roles.includes('ADMIN') && (
+              <Tab onClick={() => navigate('/admin/users')}>유저 관리</Tab>
+            )}
           </TabBar>
         </HeaderLeft>
         <Button variant="ghost" size="sm" onClick={handleLogout}>

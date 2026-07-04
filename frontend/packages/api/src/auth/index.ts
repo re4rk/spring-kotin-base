@@ -7,4 +7,5 @@ export type {
   PasswordResetRequest,
   PasswordResetConfirmRequest,
   UserResponse,
+  PageResponse,
 } from './types'

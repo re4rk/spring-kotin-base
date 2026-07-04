@@ -11,6 +11,7 @@ import com.ark.base.common.ErrorCode
 import com.ark.base.common.JwtProvider
 import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.UserRepository
+import com.ark.base.user.UserRole
 import com.ark.base.user.findByIdOrThrow
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -34,7 +35,7 @@ class AuthService(
 
         val accessToken = jwtProvider.generate(user.id)
         val refreshToken = refreshTokenRepository.issue(user.id)
-        return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token)
+        return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token, user = UserResponse.from(user))
     }
 
     @Transactional
@@ -44,7 +45,7 @@ class AuthService(
                 val user = userRepository.findByIdOrThrow(result.userId)
                 val accessToken = jwtProvider.generate(user.id)
                 val refreshToken = refreshTokenRepository.issue(user.id)
-                return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token)
+                return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token, user = UserResponse.from(user))
             }
             is RefreshTokenConsumeResult.Reused -> {
                 refreshTokenRepository.revokeAll(result.userId)
@@ -75,7 +76,8 @@ class AuthService(
     @Transactional
     fun register(request: RegisterRequest): UserResponse {
         if (userRepository.findByEmail(request.email) != null) throw BaseException(ErrorCode.USER_DUPLICATE_EMAIL)
-        val user = userRepository.save(request.toUser(passwordEncoder))
-        return UserResponse.from(user)
+        val user = request.toUser(passwordEncoder)
+        if (userRepository.count() == 0L) user.role = UserRole.ADMIN
+        return UserResponse.from(userRepository.save(user))
     }
 }
