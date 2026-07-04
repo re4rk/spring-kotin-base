@@ -59,7 +59,7 @@ export function LoginPage() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    login({ email, password })
+    login({ email, password }, { onSuccess: () => navigate('/dashboard') })
   }
 
   return (

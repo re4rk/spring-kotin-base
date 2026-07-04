@@ -1,4 +1,5 @@
 export { authApi } from './auth'
+export { configureClient } from './client'
 export type {
   LoginRequest,
   RegisterRequest,
