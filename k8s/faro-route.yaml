@@ -22,6 +22,7 @@ spec:
   routes:
     - match: Host(`ark-base.site`) && PathPrefix(`/faro`)
       kind: Rule
+      priority: 100
       middlewares:
         - name: strip-faro-prefix
           namespace: base

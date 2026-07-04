@@ -1,13 +1,10 @@
-import { initializeFaro, getWebInstrumentations } from '@grafana/faro-web-sdk'
+import { initializeFaro, getWebInstrumentations, LogLevel } from '@grafana/faro-web-sdk'
 import { TracingInstrumentation } from '@grafana/faro-web-tracing'
 
 const FARO_URL = import.meta.env.VITE_FARO_URL ?? '/faro/collect'
 
 export function initFaro() {
   if (typeof window === 'undefined') return
-  if (window.location.hostname === 'localhost' && !import.meta.env.VITE_FARO_URL) {
-    return
-  }
 
   initializeFaro({
     url: FARO_URL,
@@ -19,17 +16,9 @@ export function initFaro() {
     instrumentations: [
       ...getWebInstrumentations({
         captureConsole: true,
-        captureConsoleDisabledLevels: ['log', 'debug', 'info', 'trace'],
+        captureConsoleDisabledLevels: [LogLevel.LOG, LogLevel.DEBUG, LogLevel.INFO, LogLevel.TRACE],
       }),
-      new TracingInstrumentation({
-        instrumentationOptions: {
-          propagateTraceHeaderCorsUrls: [
-            /^https?:\/\/ark-base\.site\/api(\/|$)/,
-            /^https?:\/\/localhost:3000\/api(\/|$)/,
-            /^\/api(\/|$)/,
-          ],
-        },
-      }),
+      new TracingInstrumentation(),
     ],
   })
 }
