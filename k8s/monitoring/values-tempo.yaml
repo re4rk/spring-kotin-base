@@ -1,0 +1,28 @@
+# Tempo monolithic (소형 클러스터)
+tempo:
+  reportingEnabled: false
+  retention: 168h
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces
+
+persistence:
+  enabled: true
+  size: 10Gi
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+  limits:
+    memory: 768Mi
+    cpu: 500m

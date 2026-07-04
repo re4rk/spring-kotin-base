@@ -25,7 +25,8 @@ fi
 
 echo "==> Helm repo 추가/갱신"
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts >/dev/null 2>&1 || true
-helm repo update prometheus-community
+helm repo add grafana https://grafana.github.io/helm-charts >/dev/null 2>&1 || true
+helm repo update prometheus-community grafana
 
 echo "==> Namespace 적용"
 kubectl apply -f "${ROOT_DIR}/namespace.yaml"
@@ -40,7 +41,35 @@ kubectl create secret generic grafana-admin \
 echo "==> Traefik middleware 적용"
 kubectl apply -f "${ROOT_DIR}/middleware.yaml"
 
-echo "==> Grafana Ingress 적용"
+echo "==> Loki 설치"
+helm upgrade --install loki grafana/loki \
+  --namespace "${NAMESPACE}" \
+  --create-namespace \
+  -f "${ROOT_DIR}/values-loki.yaml" \
+  --wait --timeout 10m
+
+echo "==> Tempo 설치"
+helm upgrade --install tempo grafana/tempo \
+  --namespace "${NAMESPACE}" \
+  --create-namespace \
+  -f "${ROOT_DIR}/values-tempo.yaml" \
+  --wait --timeout 10m
+
+echo "==> Alloy ConfigMap 적용"
+kubectl create configmap alloy-config \
+  --namespace="${NAMESPACE}" \
+  --from-file=config.river="${ROOT_DIR}/alloy.config.river" \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+echo "==> Alloy (Faro receiver) 설치"
+helm upgrade --install alloy grafana/alloy \
+  --namespace "${NAMESPACE}" \
+  --create-namespace \
+  -f "${ROOT_DIR}/values-alloy.yaml" \
+  --wait --timeout 10m
+
+echo "==> Faro / Grafana Ingress 적용"
+kubectl apply -f "${ROOT_DIR}/faro-ingress.yaml"
 kubectl apply -f "${ROOT_DIR}/grafana-ingress.yaml"
 
 HELM_ARGS=(
@@ -62,16 +91,13 @@ helm "${HELM_ARGS[@]}"
 echo ""
 echo "설치 완료."
 echo ""
-echo "Grafana: https://grafana.ark-base.site"
-echo "  user: admin"
-echo "  pass: \$GRAFANA_ADMIN_PASSWORD"
+echo "Grafana:  https://grafana.ark-base.site  (admin / \$GRAFANA_ADMIN_PASSWORD)"
+echo "Faro:     https://faro.ark-base.site/collect"
 echo ""
-echo "DNS에 grafana.ark-base.site A 레코드가 클러스터 노드 IP를 가리키는지 확인하세요."
+echo "DNS (ark-base.site와 동일 IP):"
+echo "  grafana.ark-base.site"
+echo "  faro.ark-base.site"
 echo ""
-echo "로컬 접속 (Ingress 없이):"
-echo "  kubectl port-forward -n ${NAMESPACE} svc/${RELEASE}-grafana 3000:80"
-echo "  → http://localhost:3000"
-echo ""
-echo "Prometheus UI (내부용):"
-echo "  kubectl port-forward -n ${NAMESPACE} svc/${RELEASE}-prometheus 9090:9090"
-echo "  → http://localhost:9090"
+echo "Grafana Explore:"
+echo "  Loki  → {app=\"base-frontend\"} 또는 service_name"
+echo "  Tempo → frontend + backend end-to-end traces"

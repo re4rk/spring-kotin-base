@@ -51,6 +51,26 @@ grafana:
     passwordKey: admin-password
   ingress:
     enabled: false
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      uid: loki
+      url: http://loki.monitoring.svc.cluster.local:3100
+      access: proxy
+    - name: Tempo
+      type: tempo
+      uid: tempo
+      url: http://tempo.monitoring.svc.cluster.local:3200
+      access: proxy
+      jsonData:
+        httpMethod: GET
+        tracesToLogs:
+          enabled: true
+          datasourceUid: loki
+        serviceMap:
+          datasourceUid: prometheus
+        nodeGraph:
+          enabled: true
   resources:
     requests:
       memory: 128Mi

@@ -1,0 +1,23 @@
+# Grafana Alloy — Faro receiver
+controller:
+  type: deployment
+  replicas: 1
+
+alloy:
+  extraPorts:
+    - name: faro
+      port: 12347
+      targetPort: 12347
+      protocol: TCP
+  configMap:
+    create: false
+    name: alloy-config
+    key: config.river
+
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 50m
+  limits:
+    memory: 256Mi
+    cpu: 200m

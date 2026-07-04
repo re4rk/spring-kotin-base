@@ -111,6 +111,21 @@ management:
     web:
       exposure:
         include: health
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      type: w3c
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          enabled: ${OTEL_TRACES_EXPORT_ENABLED:false}
+          endpoint: ${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:http://tempo.monitoring.svc.cluster.local:4318/v1/traces}
+  otlp:
+    metrics:
+      export:
+        enabled: false
   endpoint:
     health:
       probes:
@@ -129,3 +144,7 @@ management:
         include: readinessState, db, redis, minioFileClient, smtpEmailClient, fcmPushClient
       liveness:
         include: livenessState
+
+logging:
+  pattern:
+    level: "%5p [traceId=%X{traceId:-},spanId=%X{spanId:-}]"

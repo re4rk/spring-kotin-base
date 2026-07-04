@@ -2,7 +2,9 @@ FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
 WORKDIR /app
 
 ARG VITE_BUILD_HASH=
+ARG VITE_FARO_URL=https://faro.ark-base.site/collect
 ENV VITE_BUILD_HASH=${VITE_BUILD_HASH}
+ENV VITE_FARO_URL=${VITE_FARO_URL}
 
 COPY package*.json ./
 COPY packages/api/package.json ./packages/api/

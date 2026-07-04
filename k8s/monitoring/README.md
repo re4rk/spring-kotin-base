@@ -1,54 +1,81 @@
-# Kubernetes 모니터링 (kube-prometheus-stack)
+# 모니터링 (Self-hosted LGTM + Faro)
 
-클러스터 내부에 Prometheus + Grafana + Alertmanager를 설치합니다.
+Prometheus + Grafana + **Loki** + **Tempo** + **Alloy (Faro receiver)** 스택입니다.
+
+## 아키텍처
+
+```
+브라우저 (Faro SDK)
+  → faro.ark-base.site/collect → Alloy
+      ├→ Loki   (프론트 로그/에러/RUM)
+      └→ Tempo  (프론트 트레이스)
+
+API (Spring Boot OTel)
+## 백엔드 트레이싱
+
+- Spring Boot OpenTelemetry → Tempo OTLP export
+- W3C `traceparent` (Faro가 주입) 자동 연결
+- 로그 MDC `traceId`/`spanId` — Grafana Tempo ↔ Loki 상관관계용 (커스텀 헤더/API 필드 없음)
+
+Grafana (grafana.ark-base.site)
+  ├ Prometheus (메트릭)
+  ├ Loki       (로그)
+  └ Tempo      (트레이스, traces-to-logs 연동)
+```
 
 ## 사전 요구사항
 
 - `helm` 3.x, `kubectl`
-- Traefik Ingress + cert-manager (기존 `k8s/ingress.yaml`과 동일)
-- DNS: `grafana.ark-base.site` → `ark-base.site`와 **동일한 IP** (A 레코드)
+- Traefik + cert-manager
+- DNS A 레코드 (`ark-base.site`와 동일 IP):
+  - `grafana.ark-base.site`
+  - `faro.ark-base.site`
 
 ## 설치
-
-```bash
-export GRAFANA_ADMIN_PASSWORD='강력한-비밀번호'
-
-chmod +x k8s/monitoring/install.sh
-./k8s/monitoring/install.sh
-```
-
-GitHub Actions: **Deploy Monitoring** 워크플로 (수동 실행)  
-Repository Secret `GRAFANA_ADMIN_PASSWORD` 필요
-
-## 접속
-
-| 서비스 | URL |
-|--------|-----|
-| Grafana | https://grafana.ark-base.site |
-| Prometheus | `kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090` |
-
-Grafana 계정: `admin` / `GRAFANA_ADMIN_PASSWORD`
-
-## 포함 대시보드
-
-- Cluster / Node / Pod CPU·메모리
-- Namespace별 리소스
-- `base` 네임스페이스 backend/frontend Pod 모니터링
-
-## 업그레이드
 
 ```bash
 export GRAFANA_ADMIN_PASSWORD='...'
 ./k8s/monitoring/install.sh
 ```
 
+GitHub Actions: **Deploy Monitoring** (수동)
+
+## 프론트엔드 (Faro)
+
+- `@grafana/faro-web-sdk` + `@grafana/faro-web-tracing`
+- 프로덕션 collector: `https://faro.ark-base.site/collect`
+- `traceparent` 자동 주입 → 백엔드 Tempo와 end-to-end trace
+
+로컬 개발 (Alloy port-forward):
+
+```bash
+kubectl port-forward -n monitoring svc/alloy 12347:12347
+VITE_FARO_URL=/faro/collect npm run dev
+```
+
+## Grafana에서 확인
+
+| 데이터 | Explore |
+|--------|---------|
+| 프론트 에러/로그 | Loki → `{service_name="base-frontend"}` |
+| E2E 트레이스 | Tempo → Search |
+| Pod 메트릭 | Prometheus dashboards |
+
+## 구성 파일
+
+| 파일 | 역할 |
+|------|------|
+| `values.yaml` | kube-prometheus-stack + Grafana datasources |
+| `values-loki.yaml` | Loki |
+| `values-tempo.yaml` | Tempo |
+| `values-alloy.yaml` | Alloy |
+| `alloy.config.river` | Faro receiver → Loki/Tempo |
+| `grafana-ingress.yaml` | Grafana Ingress |
+| `faro-ingress.yaml` | Faro collector Ingress |
+
 ## 제거
 
 ```bash
-helm uninstall kube-prometheus-stack -n monitoring
+helm uninstall kube-prometheus-stack alloy tempo loki -n monitoring
 kubectl delete namespace monitoring
 ```
-
-## 다음 단계
-
-Spring Boot `/actuator/prometheus` + `ServiceMonitor` 추가 시 JVM·HTTP 메트릭을 Grafana에서 볼 수 있습니다.

@@ -15,6 +15,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+      '/faro': {
+        target: 'http://localhost:12347',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/faro/, ''),
+      },
     },
   },
 })

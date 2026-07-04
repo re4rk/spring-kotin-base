@@ -14,3 +14,5 @@ data:
   MAIL_SMTP_AUTH: "true"
   MAIL_SMTP_STARTTLS: "true"
   TZ: "Asia/Seoul"
+  OTEL_TRACES_EXPORT_ENABLED: "true"
+  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "http://tempo.monitoring.svc.cluster.local:4318/v1/traces"
