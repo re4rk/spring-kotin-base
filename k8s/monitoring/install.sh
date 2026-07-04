@@ -55,6 +55,10 @@ helm upgrade --install tempo grafana/tempo \
   -f "${ROOT_DIR}/values-tempo.yaml" \
   --wait --timeout 10m
 
+echo "==> Tempo pod 재시작 (설정 반영)"
+kubectl rollout restart statefulset/tempo -n "${NAMESPACE}"
+kubectl rollout status statefulset/tempo -n "${NAMESPACE}" --timeout=120s
+
 echo "==> Alloy ConfigMap 적용"
 kubectl create configmap alloy-config \
   --namespace="${NAMESPACE}" \
