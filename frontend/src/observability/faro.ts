@@ -19,7 +19,7 @@ export function initFaro() {
     instrumentations: [
       ...getWebInstrumentations({
         captureConsole: true,
-        captureConsoleDisabledLevels: [],
+        captureConsoleDisabledLevels: ['log', 'debug', 'info', 'trace'],
       }),
       new TracingInstrumentation({
         instrumentationOptions: {

@@ -117,6 +117,8 @@ management:
     propagation:
       type: w3c
   opentelemetry:
+    resource-attributes:
+      service.name: base-backend
     tracing:
       export:
         otlp:
