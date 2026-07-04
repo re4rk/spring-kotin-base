@@ -31,6 +31,13 @@ const Logo = styled.div({
   fontFamily: typography.fontFamily.sans,
 })
 
+const BoldText = styled.span({
+  fontWeight: typography.fontWeight.semibold,
+  fontFamily: typography.fontFamily.sans,
+  fontSize: typography.fontSize.base,
+  color: colors.gray[900],
+})
+
 const Content = styled.main({
   maxWidth: '960px',
   margin: '0 auto',
@@ -51,9 +58,9 @@ export function DashboardPage() {
       <Header>
         <Stack direction="row" gap={3} align="center">
           <Logo>B</Logo>
-          <Text variant="body1" style={{ fontWeight: 600 }}>Base</Text>
+          <BoldText>Base</BoldText>
         </Stack>
-        <Button variant="outline" size="sm" onClick={handleLogout}>
+        <Button variant="ghost" size="sm" onClick={handleLogout}>
           로그아웃
         </Button>
       </Header>
@@ -69,9 +76,7 @@ export function DashboardPage() {
 
           <Card padding={6}>
             <Stack gap={2}>
-              <Text variant="body1" style={{ fontWeight: 600 }}>
-                🎉 로그인 성공
-              </Text>
+              <BoldText>🎉 로그인 성공</BoldText>
               <Text variant="body2" color={colors.gray[600]}>
                 액세스 토큰이 localStorage에 저장됐습니다. 토큰 만료 시 자동으로 갱신됩니다.
               </Text>
