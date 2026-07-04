@@ -70,6 +70,7 @@ helm upgrade --install alloy grafana/alloy \
 
 echo "==> Faro route 적용 (ark-base.site/faro → Alloy)"
 kubectl apply -f "${ROOT_DIR}/../faro-route.yaml"
+kubectl delete ingressroute faro-collector -n base --ignore-not-found
 
 echo "==> Grafana Ingress 적용"
 kubectl apply -f "${ROOT_DIR}/grafana-ingress.yaml"

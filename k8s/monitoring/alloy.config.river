@@ -3,6 +3,11 @@ logging {
 }
 
 faro.receiver "default" {
+  extra_log_labels = {
+    service_name = "base-frontend",
+    app          = "base-frontend",
+  }
+
   server {
     listen_address = "0.0.0.0"
     listen_port    = 12347

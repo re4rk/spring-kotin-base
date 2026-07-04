@@ -166,6 +166,7 @@ jobs:
           kubectl apply -f k8s/cert-manager/
           kubectl apply -f k8s/ingress.yaml
           kubectl apply -f k8s/faro-route.yaml
+          kubectl delete ingressroute faro-collector -n base --ignore-not-found
 
       - name: Wait for rollout
         run: |

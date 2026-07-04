@@ -1,6 +1,15 @@
 # Loki single-binary (소형 클러스터)
 deploymentMode: SingleBinary
 
+gateway:
+  enabled: false
+
+lokiCanary:
+  enabled: false
+
+test:
+  enabled: false
+
 loki:
   auth_enabled: false
   commonConfig:
