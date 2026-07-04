@@ -55,6 +55,11 @@ helm upgrade --install tempo grafana/tempo \
   -f "${ROOT_DIR}/values-tempo.yaml" \
   --wait --timeout 10m
 
+echo "==> Tempo overrides 패치 (metrics-generator processors)"
+kubectl patch configmap tempo -n "${NAMESPACE}" --type=json -p '[
+  {"op":"replace","path":"/data/overrides.yaml","value":"overrides:\n  defaults:\n    metrics_generator:\n      processors:\n        - service-graphs\n        - span-metrics\n        - local-blocks\n"}
+]'
+
 echo "==> Tempo pod 재시작 (설정 반영)"
 kubectl rollout restart statefulset/tempo -n "${NAMESPACE}"
 kubectl rollout status statefulset/tempo -n "${NAMESPACE}" --timeout=120s
