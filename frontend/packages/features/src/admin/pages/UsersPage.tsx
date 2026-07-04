@@ -177,7 +177,7 @@ export function UsersPage() {
           {data && data.totalPages > 1 && (
             <Stack direction="row" gap={2} align="center" justify="center">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 disabled={page === 0}
                 onClick={() => setPage((p) => p - 1)}
@@ -188,7 +188,7 @@ export function UsersPage() {
                 {page + 1} / {data.totalPages}
               </Text>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 disabled={page >= data.totalPages - 1}
                 onClick={() => setPage((p) => p + 1)}

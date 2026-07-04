@@ -3,7 +3,7 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
 interface AuthProvider {
   getAccessToken(): string | null
   getRefreshToken(): string | null
-  onTokensRefreshed(tokens: { accessToken: string; refreshToken: string }): void
+  onTokensRefreshed(tokens: { accessToken: string; refreshToken: string; [key: string]: unknown }): void
   onLogout(): void
 }
 

@@ -5,5 +5,6 @@ export const adminApi = {
   listUsers: (page = 0, size = 20) =>
     request<PageResponse<UserResponse>>(
       `/admin/api/users?page=${page}&size=${size}&sort=id,desc`,
+      {},
     ),
 }
