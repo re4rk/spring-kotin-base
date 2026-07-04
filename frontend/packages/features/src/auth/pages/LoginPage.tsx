@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent, ChangeEvent } from 'react'
 import styled from '@emotion/styled'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Stack, Card, Text, Input, Button, Alert, colors, typography, radii, spacing } from '@base/ui'
 import { useLoginMutation } from '../mutations'
 
@@ -48,6 +49,10 @@ const RegisterLink = styled.span({
 })
 
 export function LoginPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const registered = location.state?.registered === true
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { mutate: login, isPending, error } = useLoginMutation()
@@ -72,7 +77,8 @@ export function LoginPage() {
           </Stack>
         </Stack>
 
-        {/* Error */}
+        {/* Success / Error */}
+        {registered && <Alert variant="success">회원가입이 완료됐습니다. 로그인해주세요.</Alert>}
         {error && <Alert variant="danger">{error.message}</Alert>}
 
         {/* Form */}
@@ -108,7 +114,7 @@ export function LoginPage() {
         {/* Register */}
         <Stack direction="row" gap={1} justify="center">
           <Text variant="body2" color={colors.gray[500]}>아직 계정이 없으신가요?</Text>
-          <RegisterLink>회원가입</RegisterLink>
+          <RegisterLink onClick={() => navigate('/auth/register')}>회원가입</RegisterLink>
         </Stack>
 
       </Stack>

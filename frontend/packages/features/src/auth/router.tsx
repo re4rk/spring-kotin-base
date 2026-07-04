@@ -2,6 +2,7 @@ import type { RouteObject } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
 import { AuthLayout } from './layouts/AuthLayout.tsx'
 import { LoginPage } from './pages/LoginPage.tsx'
+import { RegisterPage } from './pages/RegisterPage.tsx'
 
 export const authRoutes: RouteObject[] = [
   {
@@ -10,6 +11,7 @@ export const authRoutes: RouteObject[] = [
     children: [
       { index: true, element: <Navigate to="/auth/login" replace /> },
       { path: 'login', element: <LoginPage /> },
+      { path: 'register', element: <RegisterPage /> },
     ],
   },
 ]
