@@ -9,4 +9,5 @@ spec:
   ports:
     - port: 3306
       targetPort: 3306
-  clusterIP: None  # Headless — StatefulSet DNS 안정성
+  clusterIP: None
+  publishNotReadyAddresses: true  # pod가 ready 아니어도 DNS 응답
