@@ -11,10 +11,10 @@ import { NavigationPage } from './pages/NavigationPage.tsx'
 
 export const docsRoutes: RouteObject[] = [
   {
-    path: '/',
+    path: '/design-system',
     element: <DocsLayout />,
     children: [
-      { index: true, element: <Navigate to="/typography" replace /> },
+      { index: true, element: <Navigate to="/design-system/typography" replace /> },
       { path: 'typography', element: <TypographyPage /> },
       { path: 'colors', element: <ColorsPage /> },
       { path: 'buttons', element: <ButtonPage /> },

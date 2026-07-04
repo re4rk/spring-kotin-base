@@ -1,23 +1,23 @@
 import styled from '@emotion/styled'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { colors, spacing, typography, radii } from '@base/ui'
 
 const NAV = [
   {
     group: 'Foundation',
     items: [
-      { path: '/typography', label: 'Typography' },
-      { path: '/colors', label: 'Colors' },
+      { path: '/design-system/typography', label: 'Typography' },
+      { path: '/design-system/colors', label: 'Colors' },
     ],
   },
   {
     group: 'Components',
     items: [
-      { path: '/buttons', label: 'Button' },
-      { path: '/form', label: 'Form Controls' },
-      { path: '/feedback', label: 'Feedback' },
-      { path: '/overlay', label: 'Modal & Toast' },
-      { path: '/navigation', label: 'Navigation' },
+      { path: '/design-system/buttons', label: 'Button' },
+      { path: '/design-system/form', label: 'Form Controls' },
+      { path: '/design-system/feedback', label: 'Feedback' },
+      { path: '/design-system/overlay', label: 'Modal & Toast' },
+      { path: '/design-system/navigation', label: 'Navigation' },
     ],
   },
 ]
@@ -62,6 +62,26 @@ const SidebarSubtitle = styled.p({
   fontSize: typography.fontSize.xs,
   fontFamily: typography.fontFamily.sans,
   color: colors.gray[400],
+})
+
+const BackLink = styled.button({
+  display: 'flex',
+  alignItems: 'center',
+  gap: spacing[1],
+  margin: `${spacing[3]} ${spacing[3]} 0`,
+  padding: `${spacing[2]} ${spacing[3]}`,
+  background: 'none',
+  border: 'none',
+  borderRadius: radii.md,
+  fontSize: typography.fontSize.sm,
+  fontFamily: typography.fontFamily.sans,
+  color: colors.gray[500],
+  cursor: 'pointer',
+  transition: 'background 120ms, color 120ms',
+  '&:hover': {
+    background: colors.gray[100],
+    color: colors.gray[700],
+  },
 })
 
 const NavGroup = styled.div({
@@ -109,6 +129,8 @@ const Content = styled.main({
 })
 
 export function DocsLayout() {
+  const navigate = useNavigate()
+
   return (
     <Wrapper>
       <Sidebar>
@@ -116,6 +138,11 @@ export function DocsLayout() {
           <SidebarAppName>@base/ui</SidebarAppName>
           <SidebarSubtitle>Design System</SidebarSubtitle>
         </SidebarTitle>
+
+        <BackLink onClick={() => navigate('/dashboard')}>
+          ← 대시보드
+        </BackLink>
+
         {NAV.map(({ group, items }) => (
           <NavGroup key={group}>
             <NavGroupLabel>{group}</NavGroupLabel>
