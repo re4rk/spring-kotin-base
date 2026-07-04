@@ -77,8 +77,12 @@ helm upgrade --install alloy grafana/alloy \
   -f "${ROOT_DIR}/values-alloy.yaml" \
   --wait --timeout 10m
 
-echo "==> Faro route 적용 (ark-base.site/faro → Alloy)"
+echo "==> Faro route 적용 (ark-base.site/faro → Alloy, monitoring namespace)"
 kubectl apply -f "${ROOT_DIR}/../faro-route.yaml"
+# 이전 base 네임스페이스 리소스 정리 (ExternalName service + old Ingress)
+kubectl delete ingress faro-ingress -n base --ignore-not-found
+kubectl delete svc alloy-faro -n base --ignore-not-found
+kubectl delete middleware strip-faro-prefix -n base --ignore-not-found
 kubectl delete ingressroute faro-collector -n base --ignore-not-found
 
 echo "==> Grafana Ingress 적용"

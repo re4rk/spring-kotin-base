@@ -1,24 +1,11 @@
-# Faro collector — ark-base.site/faro/* → Alloy (monitoring)
-# IngressRoute 대신 표준 Ingress 사용 (app-ingress `/` 보다 우선)
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: alloy-faro
-  namespace: base
-spec:
-  type: ExternalName
-  externalName: alloy.monitoring.svc.cluster.local
-  ports:
-    - name: faro
-      port: 12347
-      protocol: TCP
+# Faro collector — ark-base.site/faro/* → Alloy (monitoring namespace)
+# Standard Ingress in monitoring namespace, directly references alloy service
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: strip-faro-prefix
-  namespace: base
+  namespace: monitoring
 spec:
   stripPrefix:
     prefixes:
@@ -28,11 +15,11 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: faro-ingress
-  namespace: base
+  namespace: monitoring
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.middlewares: base-redirect-https@kubernetescrd,base-strip-faro-prefix@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: monitoring-redirect-https@kubernetescrd,monitoring-strip-faro-prefix@kubernetescrd
     traefik.ingress.kubernetes.io/router.priority: "100"
 spec:
   ingressClassName: traefik
@@ -48,6 +35,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: alloy-faro
+                name: alloy
                 port:
                   number: 12347
