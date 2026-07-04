@@ -1,0 +1,10 @@
+# Grafana Ingress용 HTTP → HTTPS 리다이렉트 (Traefik)
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-https
+  namespace: monitoring
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true

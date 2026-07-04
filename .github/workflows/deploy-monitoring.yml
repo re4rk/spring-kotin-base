@@ -1,0 +1,43 @@
+name: Deploy Monitoring
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-monitoring:
+    name: Install kube-prometheus-stack
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.4
+
+      - name: Deploy kube-prometheus-stack
+        env:
+          GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+        run: |
+          if [[ -z "${GRAFANA_ADMIN_PASSWORD}" ]]; then
+            echo "GRAFANA_ADMIN_PASSWORD secret이 필요합니다." >&2
+            exit 1
+          fi
+          chmod +x k8s/monitoring/install.sh
+          ./k8s/monitoring/install.sh
+
+      - name: Verify pods
+        run: |
+          kubectl get pods -n monitoring
+          kubectl wait --for=condition=ready pod \
+            -l app.kubernetes.io/name=grafana \
+            -n monitoring \
+            --timeout=300s
