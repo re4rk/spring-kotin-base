@@ -18,11 +18,18 @@ spec:
           image: ghcr.io/re4rk/base-frontend:latest
           ports:
             - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /
               port: 80
-            initialDelaySeconds: 10
+            initialDelaySeconds: 15
             periodSeconds: 10
           resources:
             requests:

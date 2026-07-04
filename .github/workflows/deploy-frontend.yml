@@ -150,13 +150,16 @@ jobs:
         run: |
           IMAGE_TAG=${{ github.sha }}
 
+          kubectl apply -f k8s/backend/
+          kubectl apply -f k8s/frontend/
+
           kubectl set image deployment/backend \
             backend=${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${IMAGE_TAG:0:7} \
-            --namespace=base 2>/dev/null || kubectl apply -f k8s/backend/
+            --namespace=base
 
           kubectl set image deployment/frontend \
             frontend=${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${IMAGE_TAG:0:7} \
-            --namespace=base 2>/dev/null || kubectl apply -f k8s/frontend/
+            --namespace=base
 
       - name: Apply ingress & cert-manager
         run: |
@@ -165,5 +168,13 @@ jobs:
 
       - name: Wait for rollout
         run: |
-          kubectl rollout status deployment/backend --namespace=base --timeout=120s
-          kubectl rollout status deployment/frontend --namespace=base --timeout=60s
+          kubectl rollout status deployment/backend --namespace=base --timeout=300s
+          kubectl rollout status deployment/frontend --namespace=base --timeout=120s
+
+      - name: Dump diagnostics on failure
+        if: failure()
+        run: |
+          kubectl get pods -n base -o wide
+          kubectl describe pods -n base -l 'app in (backend, frontend)' | tail -80
+          kubectl logs -n base -l app=backend --tail=80 --prefix=true || true
+          kubectl logs -n base -l app=frontend --tail=80 --prefix=true || true

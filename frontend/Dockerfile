@@ -18,11 +18,9 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-RUN npm install -g vite@8.1.0
-
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/vite.preview.config.ts ./vite.preview.config.ts
+COPY --from=builder /app/scripts/preview-server.mjs ./scripts/preview-server.mjs
 
 EXPOSE 80
 
-CMD ["vite", "preview", "--config", "vite.preview.config.ts", "--host", "0.0.0.0", "--port", "80"]
+CMD ["node", "scripts/preview-server.mjs"]
