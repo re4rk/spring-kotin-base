@@ -1,5 +1,6 @@
 import { Stack, Card, Text, Input, Textarea, Select, Checkbox, Switch, Radio, RadioGroup, colors } from '@base/ui'
 import { SectionHeader } from '../components/SectionHeader.tsx'
+import { DemoColumn, DemoGrid, DemoRow, SelectWidth, ConstrainedWidth } from '../components/DemoLayout.tsx'
 
 export function FormPage() {
   return (
@@ -15,24 +16,24 @@ export function FormPage() {
         <Stack gap={5}>
           <Stack gap={2}>
             <Text variant="label" color={colors.gray[500]}>Sizes</Text>
-            <Stack direction="row" gap={4} align="flex-end" wrap>
+            <DemoRow gap={4} align="flex-end">
               <Input inputSize="sm" placeholder="Small" />
               <Input inputSize="md" placeholder="Medium (default)" />
               <Input inputSize="lg" placeholder="Large" />
-            </Stack>
+            </DemoRow>
           </Stack>
           <Stack gap={2}>
             <Text variant="label" color={colors.gray[500]}>States</Text>
-            <Stack direction="row" gap={6} wrap>
-              <Stack gap={3} style={{ minWidth: '240px' }}>
+            <DemoGrid>
+              <DemoColumn gap={3}>
                 <Input label="기본" placeholder="텍스트를 입력하세요" />
                 <Input label="에러" error="올바른 형식이 아닙니다" defaultValue="wrong@" />
-              </Stack>
-              <Stack gap={3} style={{ minWidth: '240px' }}>
+              </DemoColumn>
+              <DemoColumn gap={3}>
                 <Input label="도움말" helperText="8자 이상 입력해주세요" type="password" placeholder="비밀번호" />
                 <Input label="비활성화" disabled placeholder="수정할 수 없습니다" />
-              </Stack>
-            </Stack>
+              </DemoColumn>
+            </DemoGrid>
           </Stack>
         </Stack>
       </Card>
@@ -40,37 +41,41 @@ export function FormPage() {
       {/* Textarea */}
       <Card as="section">
         <SectionHeader>Textarea</SectionHeader>
-        <Stack gap={4} style={{ maxWidth: '480px' }}>
-          <Textarea label="내용" placeholder="내용을 입력하세요" rows={3} />
-          <Textarea label="에러" error="필수 항목입니다" rows={3} />
-          <Textarea label="resize 없음" resize="none" placeholder="크기 조절 불가" rows={3} />
-          <Textarea label="비활성화" disabled placeholder="수정할 수 없습니다" rows={3} />
-        </Stack>
+        <ConstrainedWidth>
+          <Stack gap={4}>
+            <Textarea label="내용" placeholder="내용을 입력하세요" rows={3} />
+            <Textarea label="에러" error="필수 항목입니다" rows={3} />
+            <Textarea label="resize 없음" resize="none" placeholder="크기 조절 불가" rows={3} />
+            <Textarea label="비활성화" disabled placeholder="수정할 수 없습니다" rows={3} />
+          </Stack>
+        </ConstrainedWidth>
       </Card>
 
       {/* Select */}
       <Card as="section">
         <SectionHeader>Select</SectionHeader>
-        <Stack gap={4} style={{ maxWidth: '320px' }}>
-          <Select label="역할" defaultValue="">
-            <option value="" disabled>선택하세요</option>
-            <option value="admin">관리자</option>
-            <option value="manager">매니저</option>
-            <option value="viewer">뷰어</option>
-          </Select>
-          <Select label="에러" error="항목을 선택해주세요" defaultValue="">
-            <option value="" disabled>선택하세요</option>
-          </Select>
-          <Select label="비활성화" disabled defaultValue="admin">
-            <option value="admin">관리자</option>
-          </Select>
-        </Stack>
+        <SelectWidth>
+          <Stack gap={4}>
+            <Select label="역할" defaultValue="">
+              <option value="" disabled>선택하세요</option>
+              <option value="admin">관리자</option>
+              <option value="manager">매니저</option>
+              <option value="viewer">뷰어</option>
+            </Select>
+            <Select label="에러" error="항목을 선택해주세요" defaultValue="">
+              <option value="" disabled>선택하세요</option>
+            </Select>
+            <Select label="비활성화" disabled defaultValue="admin">
+              <option value="admin">관리자</option>
+            </Select>
+          </Stack>
+        </SelectWidth>
       </Card>
 
       {/* Checkbox & Switch & Radio */}
       <Card as="section">
         <SectionHeader>Checkbox / Switch / Radio</SectionHeader>
-        <Stack direction="row" gap={12} wrap>
+        <DemoGrid>
           <Stack gap={2}>
             <Text variant="label" color={colors.gray[500]}>Checkbox</Text>
             <Stack gap={3}>
@@ -100,7 +105,7 @@ export function FormPage() {
               <Radio name="shipping" value="pickup" label="직접 수령" disabled />
             </RadioGroup>
           </Stack>
-        </Stack>
+        </DemoGrid>
       </Card>
     </Stack>
   )

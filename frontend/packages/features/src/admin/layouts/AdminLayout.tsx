@@ -11,17 +11,26 @@ const PageWrapper = styled.div({
 const Header = styled.header({
   background: '#fff',
   borderBottom: `1px solid ${colors.gray[200]}`,
-  padding: `0 ${spacing[6]}`,
+  padding: `0 ${spacing[4]}`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: spacing[6],
+  gap: spacing[3],
+  [`@media (min-width: 768px)`]: {
+    padding: `0 ${spacing[6]}`,
+    gap: spacing[6],
+  },
 })
 
 const HeaderLeft = styled.div({
   display: 'flex',
   alignItems: 'center',
-  gap: spacing[6],
+  gap: spacing[3],
+  minWidth: 0,
+  flex: 1,
+  [`@media (min-width: 768px)`]: {
+    gap: spacing[6],
+  },
 })
 
 const Logo = styled.div({
@@ -44,10 +53,16 @@ const TabBar = styled.nav({
   alignItems: 'stretch',
   gap: 0,
   height: '56px',
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
+  scrollbarWidth: 'none',
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
 })
 
 const Tab = styled.button<{ active?: boolean }>(({ active }) => ({
-  padding: `0 ${spacing[4]}`,
+  padding: `0 ${spacing[3]}`,
   background: 'none',
   border: 'none',
   borderBottom: `2px solid ${active ? colors.primary[500] : 'transparent'}`,
@@ -58,15 +73,22 @@ const Tab = styled.button<{ active?: boolean }>(({ active }) => ({
   cursor: 'pointer',
   transition: 'color 120ms, border-color 120ms',
   whiteSpace: 'nowrap',
+  flexShrink: 0,
   '&:hover': {
     color: active ? colors.primary[600] : colors.gray[700],
+  },
+  [`@media (min-width: 768px)`]: {
+    padding: `0 ${spacing[4]}`,
   },
 }))
 
 const Content = styled.main({
   maxWidth: '960px',
   margin: '0 auto',
-  padding: spacing[8],
+  padding: spacing[4],
+  [`@media (min-width: 768px)`]: {
+    padding: spacing[8],
+  },
 })
 
 export function AdminLayout() {

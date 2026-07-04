@@ -2,6 +2,8 @@ import styled from '@emotion/styled'
 import { NavLink, Outlet } from 'react-router-dom'
 import { colors, spacing, typography, radii } from '@base/ui'
 
+const MOBILE_BREAKPOINT = '768px'
+
 const NAV = [
   {
     group: 'Foundation',
@@ -22,21 +24,97 @@ const NAV = [
   },
 ]
 
+const FLAT_NAV = NAV.flatMap(({ items }) => items)
+
 const Wrapper = styled.div({
   display: 'flex',
+  flexDirection: 'column',
   minHeight: 'calc(100svh - 57px)',
   background: colors.gray[100],
+  [`@media (min-width: ${MOBILE_BREAKPOINT})`]: {
+    flexDirection: 'row',
+  },
+})
+
+const MobileNavBar = styled.div({
+  display: 'block',
+  background: '#fff',
+  borderBottom: `1px solid ${colors.gray[200]}`,
+  [`@media (min-width: ${MOBILE_BREAKPOINT})`]: {
+    display: 'none',
+  },
+})
+
+const MobileNavHeader = styled.div({
+  padding: `${spacing[3]} ${spacing[4]} ${spacing[2]}`,
+})
+
+const MobileAppName = styled.p({
+  margin: 0,
+  fontSize: typography.fontSize.sm,
+  fontWeight: typography.fontWeight.bold,
+  fontFamily: typography.fontFamily.sans,
+  color: colors.gray[900],
+})
+
+const MobileAppSubtitle = styled.p({
+  margin: '2px 0 0',
+  fontSize: typography.fontSize.xs,
+  fontFamily: typography.fontFamily.sans,
+  color: colors.gray[400],
+})
+
+const MobileNav = styled.nav({
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
+  scrollbarWidth: 'none',
+  paddingBottom: spacing[2],
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
+})
+
+const MobileNavInner = styled.div({
+  display: 'flex',
+  gap: spacing[2],
+  padding: `0 ${spacing[4]}`,
+  width: 'max-content',
+  minWidth: '100%',
+})
+
+const MobileNavLink = styled(NavLink)({
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: `${spacing[2]} ${spacing[3]}`,
+  borderRadius: radii.full,
+  fontSize: typography.fontSize.sm,
+  fontWeight: typography.fontWeight.medium,
+  fontFamily: typography.fontFamily.sans,
+  color: colors.gray[600],
+  textDecoration: 'none',
+  background: colors.gray[100],
+  whiteSpace: 'nowrap',
+  flexShrink: 0,
+  transition: 'background 120ms, color 120ms',
+  '&[aria-current="page"]': {
+    background: colors.primary[50],
+    color: colors.primary[600],
+    fontWeight: typography.fontWeight.semibold,
+  },
 })
 
 const Sidebar = styled.nav({
-  width: '220px',
-  flexShrink: 0,
-  background: '#fff',
-  borderRight: `1px solid ${colors.gray[200]}`,
-  overflowY: 'auto',
-  display: 'flex',
-  flexDirection: 'column',
-  padding: `${spacing[6]} 0`,
+  display: 'none',
+  [`@media (min-width: ${MOBILE_BREAKPOINT})`]: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '220px',
+    flexShrink: 0,
+    background: '#fff',
+    borderRight: `1px solid ${colors.gray[200]}`,
+    overflowY: 'auto',
+    padding: `${spacing[6]} 0`,
+  },
 })
 
 const SidebarTitle = styled.div({
@@ -99,14 +177,34 @@ const StyledNavLink = styled(NavLink)({
 
 const Content = styled.main({
   flex: 1,
-  padding: `${spacing[10]} ${spacing[8]}`,
-  maxWidth: '1080px',
+  minWidth: 0,
+  padding: spacing[4],
+  [`@media (min-width: ${MOBILE_BREAKPOINT})`]: {
+    padding: `${spacing[10]} ${spacing[8]}`,
+    maxWidth: '1080px',
+  },
 })
 
 export function AdminDocsLayout() {
   return (
     <Wrapper>
-      <Sidebar>
+      <MobileNavBar>
+        <MobileNavHeader>
+          <MobileAppName>@base/ui</MobileAppName>
+          <MobileAppSubtitle>Design System</MobileAppSubtitle>
+        </MobileNavHeader>
+        <MobileNav aria-label="디자인 시스템 메뉴">
+          <MobileNavInner>
+            {FLAT_NAV.map(({ path, label }) => (
+              <MobileNavLink key={path} to={path} end>
+                {label}
+              </MobileNavLink>
+            ))}
+          </MobileNavInner>
+        </MobileNav>
+      </MobileNavBar>
+
+      <Sidebar aria-label="디자인 시스템 사이드바">
         <SidebarTitle>
           <SidebarAppName>@base/ui</SidebarAppName>
           <SidebarSubtitle>Design System</SidebarSubtitle>
@@ -123,6 +221,7 @@ export function AdminDocsLayout() {
           </NavGroup>
         ))}
       </Sidebar>
+
       <Content>
         <Outlet />
       </Content>

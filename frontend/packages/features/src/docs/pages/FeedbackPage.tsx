@@ -1,5 +1,6 @@
 import { Stack, Card, Text, Badge, Alert, Spinner, Progress, Skeleton, Avatar, colors } from '@base/ui'
 import { SectionHeader } from '../components/SectionHeader.tsx'
+import { DemoRow } from '../components/DemoLayout.tsx'
 
 export function FeedbackPage() {
   return (
@@ -45,7 +46,7 @@ export function FeedbackPage() {
 
       <Card as="section">
         <SectionHeader>Spinner</SectionHeader>
-        <Stack direction="row" gap={8} align="center">
+        <DemoRow gap={4}>
           <Stack gap={2} align="center">
             <Spinner size="sm" />
             <Text variant="caption" color={colors.gray[500]}>sm</Text>
@@ -62,7 +63,7 @@ export function FeedbackPage() {
             <Spinner size="md" color={colors.green[600]} />
             <Text variant="caption" color={colors.gray[500]}>custom</Text>
           </Stack>
-        </Stack>
+        </DemoRow>
       </Card>
 
       <Card as="section">
