@@ -14,6 +14,14 @@ tempo:
       backend: local
       local:
         path: /var/tempo/traces
+  metricsGenerator:
+    enabled: true
+    remoteWriteUrl: "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+  global_overrides:
+    metrics_generator_processors:
+      - service-graphs
+      - span-metrics
+      - local-blocks
 
 persistence:
   enabled: true

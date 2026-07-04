@@ -92,6 +92,7 @@ prometheus:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     ruleSelectorNilUsesHelmValues: false
+    enableRemoteWriteReceiver: true
     resources:
       requests:
         memory: 512Mi
