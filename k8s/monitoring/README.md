@@ -6,7 +6,7 @@
 
 - `helm` 3.x, `kubectl`
 - Traefik Ingress + cert-manager (기존 `k8s/ingress.yaml`과 동일)
-- DNS: `grafana.ark-base.site` → 클러스터 노드 IP
+- DNS: `grafana.ark-base.site` → `ark-base.site`와 **동일한 IP** (A 레코드)
 
 ## 설치
 

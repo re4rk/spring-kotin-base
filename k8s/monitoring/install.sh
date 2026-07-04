@@ -40,6 +40,9 @@ kubectl create secret generic grafana-admin \
 echo "==> Traefik middleware 적용"
 kubectl apply -f "${ROOT_DIR}/middleware.yaml"
 
+echo "==> Grafana Ingress 적용"
+kubectl apply -f "${ROOT_DIR}/grafana-ingress.yaml"
+
 HELM_ARGS=(
   upgrade --install "${RELEASE}" "${CHART}"
   --namespace "${NAMESPACE}"

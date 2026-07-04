@@ -50,18 +50,7 @@ grafana:
     userKey: admin-user
     passwordKey: admin-password
   ingress:
-    enabled: true
-    ingressClassName: traefik
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
-      traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-      traefik.ingress.kubernetes.io/router.middlewares: monitoring-redirect-https@kubernetescrd
-    hosts:
-      - grafana.ark-base.site
-    tls:
-      - secretName: grafana-ark-base-site-tls
-        hosts:
-          - grafana.ark-base.site
+    enabled: false
   resources:
     requests:
       memory: 128Mi
