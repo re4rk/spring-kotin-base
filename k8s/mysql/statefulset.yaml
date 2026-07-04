@@ -47,7 +47,10 @@ spec:
             periodSeconds: 10
           readinessProbe:
             exec:
-              command: ["mysql", "-u", "base", "-pbase", "-e", "SELECT 1"]
+              command:
+                - sh
+                - -c
+                - "mysql -u base -p${MYSQL_PASSWORD} -e 'SELECT 1'"
             initialDelaySeconds: 10
             periodSeconds: 5
           resources:
