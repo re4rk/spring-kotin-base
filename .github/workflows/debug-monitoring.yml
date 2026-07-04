@@ -16,42 +16,36 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
 
-      - name: Tempo configmap (overrides + metrics_generator)
+      - name: Tempo overrides.yaml content
         run: |
-          echo "===== TEMPO CONFIGMAP ====="
-          kubectl get configmap tempo -n monitoring -o jsonpath='{.data.tempo\.yaml}'
+          echo "===== TEMPO OVERRIDES.YAML ====="
+          kubectl exec -n monitoring statefulset/tempo -- cat /conf/overrides.yaml 2>/dev/null || echo "(not found)"
+          echo ""
+          echo "===== ALL TEMPO CONFIGMAPS ====="
+          kubectl get configmap -n monitoring | grep -i tempo
 
-      - name: Tempo pod status & age
+      - name: Tempo ingestion check (push/receive logs, last 100 lines)
         run: |
-          echo "===== TEMPO POD ====="
-          kubectl get pods -n monitoring -l app.kubernetes.io/name=tempo -o wide
+          echo "===== TEMPO FULL LOGS (last 100 lines) ====="
+          kubectl logs statefulset/tempo -n monitoring --tail=100
 
-      - name: Tempo pod logs (errors + trace ingestion)
+      - name: Test Tempo OTLP endpoint from cluster
         run: |
-          echo "===== TEMPO LOGS ====="
-          kubectl logs statefulset/tempo -n monitoring --tail=80 \
-            | grep -E "error|warn|metrics.gen|ring|ingester|push|otlp|receiver" || echo "(no matching lines)"
+          echo "===== TEMPO OTLP HTTP CONNECTIVITY ====="
+          kubectl run tempo-test --rm -i --restart=Never --image=curlimages/curl:latest -n base \
+            -- curl -s -o /dev/null -w "%{http_code}" \
+            -X POST http://tempo.monitoring.svc.cluster.local:4318/v1/traces \
+            -H "Content-Type: application/json" -d '{}' 2>/dev/null || echo "connectivity test failed"
 
-      - name: Alloy pod status
+      - name: Test Faro/Alloy endpoint from cluster
         run: |
-          echo "===== ALLOY POD ====="
-          kubectl get pods -n monitoring -l app.kubernetes.io/name=alloy -o wide
+          echo "===== ALLOY FARO CONNECTIVITY ====="
+          kubectl run alloy-test --rm -i --restart=Never --image=curlimages/curl:latest -n base \
+            -- curl -s -o /dev/null -w "%{http_code}" \
+            -X POST http://alloy.monitoring.svc.cluster.local:12347/collect \
+            -H "Content-Type: application/json" -d '{}' 2>/dev/null || echo "connectivity test failed"
 
-      - name: Alloy logs (Faro + trace forwarding)
+      - name: Backend env (OTel config)
         run: |
-          echo "===== ALLOY LOGS ====="
-          kubectl logs -n monitoring -l app.kubernetes.io/name=alloy --tail=80 \
-            | grep -E "error|warn|faro|tempo|otlp|trace|push|failed" || echo "(no matching lines)"
-
-      - name: Backend pod logs (OTel trace export)
-        run: |
-          echo "===== BACKEND OTEL LOGS ====="
-          kubectl logs -n base -l app=backend --tail=50 \
-            | grep -iE "otel|trace|otlp|export|tempo" || echo "(no matching lines)"
-
-      - name: All pods summary
-        run: |
-          echo "===== ALL PODS ====="
-          kubectl get pods -n monitoring
-          echo "---"
-          kubectl get pods -n base
+          echo "===== BACKEND OTEL ENV ====="
+          kubectl exec -n base deployment/backend -- env | grep -iE "otel|management|tracing" 2>/dev/null || echo "(exec failed)"
