@@ -2,6 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <body>
 <nav th:fragment="sidebar(activeMenu)">
+    <div class="text-secondary text-uppercase small px-2 mb-1">관리</div>
     <a th:href="@{/admin/users}"
        th:classappend="${activeMenu == 'users'} ? 'active'"
        class="mb-1">유저 관리</a>
@@ -11,6 +12,26 @@
     <a th:href="@{/admin/orders}"
        th:classappend="${activeMenu == 'orders'} ? 'active'"
        class="mb-1">주문 관리</a>
+
+    <div class="text-secondary text-uppercase small px-2 mt-3 mb-1">알림 로그</div>
+    <a th:href="@{/admin/logs/email}"
+       th:classappend="${activeMenu == 'logs-email'} ? 'active'"
+       class="mb-1">Email</a>
+    <a th:href="@{/admin/logs/sms}"
+       th:classappend="${activeMenu == 'logs-sms'} ? 'active'"
+       class="mb-1">SMS</a>
+    <a th:href="@{/admin/logs/slack}"
+       th:classappend="${activeMenu == 'logs-slack'} ? 'active'"
+       class="mb-1">Slack</a>
+    <a th:href="@{/admin/logs/kakao}"
+       th:classappend="${activeMenu == 'logs-kakao'} ? 'active'"
+       class="mb-1">Kakao</a>
+    <a th:href="@{/admin/logs/push}"
+       th:classappend="${activeMenu == 'logs-push'} ? 'active'"
+       class="mb-1">Push</a>
+    <a th:href="@{/admin/logs/sse}"
+       th:classappend="${activeMenu == 'logs-sse'} ? 'active'"
+       class="mb-1">SSE</a>
 </nav>
 </body>
 </html>
