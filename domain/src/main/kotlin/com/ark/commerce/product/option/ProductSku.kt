@@ -5,6 +5,7 @@ import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
 import com.ark.commerce.product.Product
 import jakarta.persistence.Entity
+import jakarta.persistence.Table
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -16,10 +17,11 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Version
 
 @Entity
+@Table(name = "commerce_product_sku")
 class ProductSku(
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "product_sku_option",
+        name = "commerce_product_sku_option",
         joinColumns = [JoinColumn(name = "sku_id")],
         inverseJoinColumns = [JoinColumn(name = "option_id")],
     )

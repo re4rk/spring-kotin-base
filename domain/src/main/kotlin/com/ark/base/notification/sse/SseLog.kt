@@ -12,7 +12,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "sse_log")
+@Table(name = "base_sse_log")
 class SseLog(
     @Column(nullable = false)
     val userId: Long,

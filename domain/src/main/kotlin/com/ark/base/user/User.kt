@@ -15,7 +15,7 @@ import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "users")
+@Table(name = "base_users")
 @SQLRestriction("deleted_at IS NULL")
 class User(
     val email: String,

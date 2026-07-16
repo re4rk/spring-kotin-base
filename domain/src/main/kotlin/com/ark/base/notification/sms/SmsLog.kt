@@ -12,7 +12,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "sms_log")
+@Table(name = "base_sms_log")
 class SmsLog(
     @Column(nullable = false)
     val recipient: String,

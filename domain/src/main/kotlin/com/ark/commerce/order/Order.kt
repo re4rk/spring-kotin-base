@@ -12,7 +12,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "orders")
+@Table(name = "commerce_orders")
 class Order(
     val userId: Long,
     val productId: Long,

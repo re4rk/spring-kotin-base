@@ -12,7 +12,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "slack_log")
+@Table(name = "base_slack_log")
 class SlackLog(
     @Column(nullable = false)
     val channel: String,

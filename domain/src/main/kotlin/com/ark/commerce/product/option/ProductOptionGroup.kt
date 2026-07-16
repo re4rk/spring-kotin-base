@@ -6,6 +6,7 @@ import com.ark.base.common.ErrorCode
 import com.ark.commerce.product.Product
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
+import jakarta.persistence.Table
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -16,6 +17,7 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
 
 @Entity
+@Table(name = "commerce_product_option_group")
 class ProductOptionGroup(
     var name: String,
     var sortOrder: Int = 0,

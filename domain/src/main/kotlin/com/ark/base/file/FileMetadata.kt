@@ -3,6 +3,7 @@ package com.ark.base.file
 import com.ark.base.common.BaseAggregateEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.Table
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
@@ -12,6 +13,7 @@ import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
 
 @Entity
+@Table(name = "base_file_metadata")
 @SQLRestriction("deleted_at IS NULL")
 class FileMetadata(
     val originalName: String,

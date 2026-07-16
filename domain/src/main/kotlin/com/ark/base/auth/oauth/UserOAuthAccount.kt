@@ -11,7 +11,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "user_oauth_account")
+@Table(name = "base_user_oauth_account")
 class UserOAuthAccount(
     @Column(nullable = false)
     val userId: Long,
