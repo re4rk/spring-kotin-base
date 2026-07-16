@@ -3,12 +3,12 @@ package com.ark.base.ui.auth
 import com.ark.base.common.BaseException
 import com.ark.base.common.CurrentUserProvider
 import com.ark.base.common.ErrorCode
-import com.ark.base.order.Order
-import com.ark.base.order.OrderRepository
-import com.ark.base.order.findByIdOrThrow
-import com.ark.base.product.Product
-import com.ark.base.product.ProductRepository
-import com.ark.base.product.findByIdOrThrow
+import com.ark.commerce.order.Order
+import com.ark.commerce.order.OrderRepository
+import com.ark.commerce.order.findByIdOrThrow
+import com.ark.commerce.product.Product
+import com.ark.commerce.product.ProductRepository
+import com.ark.commerce.product.findByIdOrThrow
 import com.ark.base.user.UserRepository
 import org.springframework.stereotype.Component
 

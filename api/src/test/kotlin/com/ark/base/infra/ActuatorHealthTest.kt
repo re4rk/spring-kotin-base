@@ -1,6 +1,6 @@
 package com.ark.base.infra
 
-import com.ark.base.BaseApplication
+import com.ark.ArkApplication
 import com.ark.base.support.RedisIntegrationTest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,7 +9,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 
-@SpringBootTest(classes = [BaseApplication::class])
+@SpringBootTest(classes = [ArkApplication::class])
 @AutoConfigureMockMvc
 class ActuatorHealthTest : RedisIntegrationTest() {
     @Autowired

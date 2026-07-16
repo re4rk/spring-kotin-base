@@ -1,6 +1,6 @@
 package com.ark.base.support
 
-import com.ark.base.BaseApplication
+import com.ark.ArkApplication
 import com.ark.base.common.JwtProvider
 import com.jayway.jsonpath.JsonPath
 import io.jsonwebtoken.Jwts
@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.post
 import org.springframework.transaction.annotation.Transactional
 import java.util.Date
 
-@SpringBootTest(classes = [BaseApplication::class])
+@SpringBootTest(classes = [ArkApplication::class])
 @AutoConfigureMockMvc
 @Transactional
 abstract class ApiIntegrationTest : RedisIntegrationTest() {

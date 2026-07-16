@@ -1,5 +1,6 @@
 package com.ark.base
 
+import com.ark.ArkApplication
 import com.ark.base.support.RedisIntegrationTest
 import com.jayway.jsonpath.JsonPath
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -17,7 +18,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-@SpringBootTest(classes = [BaseApplication::class])
+@SpringBootTest(classes = [ArkApplication::class])
 @AutoConfigureMockMvc
 class RefreshTokenConcurrencyTest : RedisIntegrationTest() {
     @Autowired

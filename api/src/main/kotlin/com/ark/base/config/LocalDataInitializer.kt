@@ -1,11 +1,11 @@
 package com.ark.base.config
 
-import com.ark.base.product.Product
-import com.ark.base.product.ProductRepository
-import com.ark.base.product.ProductStatus
-import com.ark.base.product.option.ProductOption
-import com.ark.base.product.option.ProductOptionGroup
-import com.ark.base.product.option.ProductSku
+import com.ark.commerce.product.Product
+import com.ark.commerce.product.ProductRepository
+import com.ark.commerce.product.ProductStatus
+import com.ark.commerce.product.option.ProductOption
+import com.ark.commerce.product.option.ProductOptionGroup
+import com.ark.commerce.product.option.ProductSku
 import com.ark.base.user.PasswordEncoder
 import com.ark.base.user.User
 import com.ark.base.user.UserRepository
