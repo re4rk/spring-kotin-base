@@ -31,6 +31,41 @@
         </section>
 
         <section class="panel">
+            <div class="panel-title"
+                 th:text="${hasPassword} ? '비밀번호 변경' : '비밀번호 설정'">비밀번호</div>
+            <form th:action="@{/admin/settings/password}" method="post" class="panel-form" id="passwordForm">
+                <div class="mb-3" th:if="${hasPassword}">
+                    <label for="currentPassword" class="form-label">현재 비밀번호</label>
+                    <input type="password" id="currentPassword" name="currentPassword"
+                           class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label"
+                           th:text="${hasPassword} ? '새 비밀번호' : '비밀번호'">비밀번호</label>
+                    <input type="password" id="password" name="password" class="form-control"
+                           minlength="8" required>
+                </div>
+                <div class="mb-3">
+                    <label for="passwordConfirm" class="form-label">비밀번호 확인</label>
+                    <input type="password" id="passwordConfirm" class="form-control"
+                           minlength="8" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm"
+                        th:text="${hasPassword} ? '비밀번호 변경' : '비밀번호 설정'">저장</button>
+            </form>
+            <script>
+                document.getElementById('passwordForm')?.addEventListener('submit', function (e) {
+                    var password = document.getElementById('password').value;
+                    var confirm = document.getElementById('passwordConfirm').value;
+                    if (password !== confirm) {
+                        e.preventDefault();
+                        alert('비밀번호 확인이 일치하지 않습니다.');
+                    }
+                });
+            </script>
+        </section>
+
+        <section class="panel">
             <div class="panel-title">소셜 로그인 연동</div>
             <div class="social-list">
                 <div class="social-row">

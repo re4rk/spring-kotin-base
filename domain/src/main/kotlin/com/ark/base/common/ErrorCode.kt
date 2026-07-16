@@ -51,4 +51,6 @@ enum class ErrorCode(
     OAUTH_UNSUPPORTED_PROVIDER("지원하지 않는 OAuth 공급자입니다."),
     OAUTH_ACCOUNT_ALREADY_LINKED("이미 다른 계정에 연동된 소셜 계정입니다."),
     OAUTH_ALREADY_CONNECTED("이미 연동된 소셜 로그인입니다."),
+    ADMIN_SETUP_ALREADY_DONE("이미 초기 관리자 설정이 완료되었습니다."),
+    ADMIN_PASSWORD_TOO_SHORT("비밀번호는 8자 이상이어야 합니다."),
 }

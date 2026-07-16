@@ -1,5 +1,7 @@
 package com.ark.base.ui.admin
 
+import com.ark.base.application.AdminBootstrapService
+import com.ark.base.application.AdminSetPasswordRequest
 import com.ark.base.application.OAuthCallbackRequest
 import com.ark.base.application.OAuthService
 import com.ark.base.auth.oauth.OAuthProvider
@@ -21,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 class AdminSettingsController(
     private val userRepository: UserRepository,
     private val oauthService: OAuthService,
+    private val adminBootstrapService: AdminBootstrapService,
 ) {
     @GetMapping
     fun settings(
@@ -28,6 +31,7 @@ class AdminSettingsController(
         model: Model,
         @RequestParam(required = false) linked: String?,
         @RequestParam(required = false) unlinked: String?,
+        @RequestParam(required = false) password: String?,
         @RequestParam(required = false) error: String?,
     ): String {
         val user =
@@ -39,18 +43,59 @@ class AdminSettingsController(
                 .firstOrNull { it.provider == OAuthProvider.KAKAO }
 
         model.addAttribute("user", user)
+        model.addAttribute("hasPassword", user.hasPassword())
         model.addAttribute("kakaoLinked", kakaoAccount != null)
         model.addAttribute("kakaoEmail", kakaoAccount?.providerEmail)
 
         when {
             linked != null -> model.addAttribute("success", "카카오 계정이 연동되었습니다.")
             unlinked != null -> model.addAttribute("success", "카카오 연동이 해제되었습니다.")
+            password == "set" -> model.addAttribute("success", "비밀번호가 설정되었습니다.")
+            password == "changed" -> model.addAttribute("success", "비밀번호가 변경되었습니다.")
             error == "link" -> model.addAttribute("error", "카카오 계정 연동에 실패했습니다.")
             error == "already_linked" -> model.addAttribute("error", "이미 다른 계정에 연동된 카카오 계정입니다.")
             error == "already_connected" -> model.addAttribute("error", "이미 연동된 카카오 계정입니다.")
+            error == "password_short" -> model.addAttribute("error", "비밀번호는 8자 이상이어야 합니다.")
+            error == "password_current" -> model.addAttribute("error", "현재 비밀번호가 올바르지 않습니다.")
+            error == "password" -> model.addAttribute("error", "비밀번호 변경에 실패했습니다.")
         }
 
         return "base/admin/settings"
+    }
+
+    @PostMapping("/password")
+    fun updatePassword(
+        authentication: Authentication,
+        @RequestParam password: String,
+        @RequestParam(required = false) currentPassword: String?,
+    ): String {
+        val user =
+            userRepository.findByEmail(authentication.name)
+                ?: throw BaseException(ErrorCode.USER_NOT_FOUND)
+        val hadPassword = user.hasPassword()
+        return try {
+            adminBootstrapService.setPassword(
+                userId = user.id,
+                request =
+                    AdminSetPasswordRequest(
+                        password = password,
+                        currentPassword = currentPassword,
+                    ),
+            )
+            if (hadPassword) {
+                "redirect:/admin/settings?password=changed"
+            } else {
+                "redirect:/admin/settings?password=set"
+            }
+        } catch (e: BaseException) {
+            when (e.errorCode) {
+                ErrorCode.ADMIN_PASSWORD_TOO_SHORT -> "redirect:/admin/settings?error=password_short"
+                ErrorCode.USER_LOGIN_FAILED -> "redirect:/admin/settings?error=password_current"
+                else -> "redirect:/admin/settings?error=password"
+            }
+        } catch (e: Exception) {
+            "redirect:/admin/settings?error=password"
+        }
     }
 
     @GetMapping("/oauth/kakao/link")

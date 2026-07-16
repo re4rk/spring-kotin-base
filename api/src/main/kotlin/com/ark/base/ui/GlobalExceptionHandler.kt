@@ -90,9 +90,12 @@ class GlobalExceptionHandler {
             ErrorCode.OAUTH_EMAIL_REQUIRED,
             ErrorCode.OAUTH_UNSUPPORTED_PROVIDER,
             ErrorCode.OAUTH_ALREADY_CONNECTED,
+            ErrorCode.ADMIN_PASSWORD_TOO_SHORT,
             -> HttpStatus.BAD_REQUEST
 
-            ErrorCode.OAUTH_ACCOUNT_ALREADY_LINKED -> HttpStatus.CONFLICT
+            ErrorCode.OAUTH_ACCOUNT_ALREADY_LINKED,
+            ErrorCode.ADMIN_SETUP_ALREADY_DONE,
+            -> HttpStatus.CONFLICT
 
             ErrorCode.OAUTH_PROVIDER_ERROR -> HttpStatus.BAD_GATEWAY
         }

@@ -13,6 +13,7 @@ import com.ark.base.common.ErrorCode
 import com.ark.base.common.JwtProvider
 import com.ark.base.user.User
 import com.ark.base.user.UserRepository
+import com.ark.base.user.UserRole
 import com.ark.base.user.findByIdOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -141,9 +142,13 @@ class OAuthService(
             ?.let { return userRepository.findByIdOrThrow(it.userId) }
 
         val email = userInfo.email ?: throw BaseException(ErrorCode.OAUTH_EMAIL_REQUIRED)
+        val isFirstUser = userRepository.count() == 0L
         val user =
-            userRepository.findByEmail(email)
-                ?: userRepository.save(User(email = email, name = userInfo.name))
+            userRepository.findByEmail(email) ?: run {
+                val created = User(email = email, name = userInfo.name)
+                if (isFirstUser) created.role = UserRole.ADMIN
+                userRepository.save(created)
+            }
 
         userOAuthAccountRepository.save(
             UserOAuthAccount(

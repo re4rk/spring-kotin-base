@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Login</title>
+    <title th:text="${needsSetup} ? '초기 설정' : 'Admin Login'">Admin Login</title>
     <link rel="stylesheet" as="style" crossorigin
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
@@ -11,25 +11,63 @@
 <body class="login-page">
 <div class="login-card">
     <h1 class="login-title">Ark Admin</h1>
-    <p class="login-subtitle">관리자 계정으로 로그인하세요</p>
+    <p class="login-subtitle"
+       th:text="${needsSetup} ? '첫 관리자 계정을 만들어 주세요' : '관리자 계정으로 로그인하세요'">
+        관리자 계정으로 로그인하세요
+    </p>
 
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
 
-    <form th:action="@{/admin/login}" method="post">
-        <div class="mb-3">
-            <label for="username" class="form-label">이메일</label>
-            <input type="email" id="username" name="username" class="form-control" required autofocus>
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">비밀번호</label>
-            <input type="password" id="password" name="password" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">로그인</button>
-    </form>
+    <th:block th:if="${needsSetup}">
+        <form th:action="@{/admin/setup}" method="post" id="setupForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">이메일</label>
+                <input type="email" id="email" name="email" class="form-control" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">비밀번호</label>
+                <input type="password" id="password" name="password" class="form-control"
+                       minlength="8" required>
+            </div>
+            <div class="mb-3">
+                <label for="passwordConfirm" class="form-label">비밀번호 확인</label>
+                <input type="password" id="passwordConfirm" class="form-control"
+                       minlength="8" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">관리자 계정 만들기</button>
+        </form>
 
-    <div class="login-divider"><span>또는</span></div>
-    <a th:href="@{/admin/oauth/kakao}" class="btn btn-kakao btn-block">카카오로 로그인</a>
+        <div class="login-divider"><span>또는</span></div>
+        <a th:href="@{/admin/oauth/kakao}" class="btn btn-kakao btn-block">카카오로 시작하기</a>
+        <script>
+            document.getElementById('setupForm')?.addEventListener('submit', function (e) {
+                var password = document.getElementById('password').value;
+                var confirm = document.getElementById('passwordConfirm').value;
+                if (password !== confirm) {
+                    e.preventDefault();
+                    alert('비밀번호 확인이 일치하지 않습니다.');
+                }
+            });
+        </script>
+    </th:block>
+
+    <th:block th:unless="${needsSetup}">
+        <form th:action="@{/admin/login}" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">이메일</label>
+                <input type="email" id="username" name="username" class="form-control" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label for="loginPassword" class="form-label">비밀번호</label>
+                <input type="password" id="loginPassword" name="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">로그인</button>
+        </form>
+
+        <div class="login-divider"><span>또는</span></div>
+        <a th:href="@{/admin/oauth/kakao}" class="btn btn-kakao btn-block">카카오로 로그인</a>
+    </th:block>
 </div>
 </body>
 </html>
