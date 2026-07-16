@@ -9,5 +9,6 @@ data class OAuthState(
     @Id val state: String,
     val provider: String,
     val redirectUri: String,
+    val linkUserId: Long? = null,
     @TimeToLive val ttl: Long = 300,
 )

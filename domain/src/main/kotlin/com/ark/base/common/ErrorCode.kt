@@ -49,4 +49,6 @@ enum class ErrorCode(
     OAUTH_PROVIDER_ERROR("OAuth 공급자로부터 오류 응답을 받았습니다."),
     OAUTH_EMAIL_REQUIRED("OAuth 공급자로부터 이메일 정보를 가져올 수 없습니다."),
     OAUTH_UNSUPPORTED_PROVIDER("지원하지 않는 OAuth 공급자입니다."),
+    OAUTH_ACCOUNT_ALREADY_LINKED("이미 다른 계정에 연동된 소셜 계정입니다."),
+    OAUTH_ALREADY_CONNECTED("이미 연동된 소셜 로그인입니다."),
 }

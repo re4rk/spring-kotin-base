@@ -35,7 +35,12 @@ class AdminController(
         @RequestParam(required = false) logout: String?,
         model: Model,
     ): String {
-        if (error != null) model.addAttribute("error", "이메일 또는 비밀번호가 올바르지 않습니다.")
+        when (error) {
+            "oauth_forbidden" -> model.addAttribute("error", "관리자 권한이 없는 카카오 계정입니다.")
+            "oauth" -> model.addAttribute("error", "카카오 로그인에 실패했습니다.")
+            null -> Unit
+            else -> model.addAttribute("error", "이메일 또는 비밀번호가 올바르지 않습니다.")
+        }
         if (logout != null) model.addAttribute("message", "로그아웃되었습니다.")
         return "base/admin/login"
     }

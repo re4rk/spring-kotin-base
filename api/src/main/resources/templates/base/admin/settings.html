@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin}"
+      th:with="activeMenu='settings'">
+<head>
+    <title>설정</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="page-header">
+        <h1 class="page-title">설정</h1>
+    </div>
+
+    <div class="settings-stack">
+        <section class="panel">
+            <div class="panel-title">계정</div>
+            <dl class="detail-list">
+                <dt>이메일</dt>
+                <dd th:text="${user.email}">email</dd>
+                <dt>이름</dt>
+                <dd th:text="${user.name}">name</dd>
+                <dt>역할</dt>
+                <dd>
+                    <span class="badge"
+                          th:classappend="'badge-' + ${user.role.name()}"
+                          th:text="${user.role.name()}">ADMIN</span>
+                </dd>
+            </dl>
+        </section>
+
+        <section class="panel">
+            <div class="panel-title">소셜 로그인 연동</div>
+            <div class="social-list">
+                <div class="social-row">
+                    <div class="social-info">
+                        <div class="social-name">카카오</div>
+                        <div class="social-meta muted"
+                             th:if="${kakaoLinked}"
+                             th:text="${kakaoEmail != null ? kakaoEmail : '연동됨'}">연동됨</div>
+                        <div class="social-meta muted" th:unless="${kakaoLinked}">연동되지 않음</div>
+                    </div>
+                    <div class="social-actions">
+                        <a th:unless="${kakaoLinked}"
+                           th:href="@{/admin/settings/oauth/kakao/link}"
+                           class="btn btn-sm btn-social-kakao">카카오 연동</a>
+                        <form th:if="${kakaoLinked}"
+                              th:action="@{/admin/settings/oauth/kakao/unlink}"
+                              method="post">
+                            <button type="submit" class="btn btn-secondary btn-sm">연동 해제</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</th:block>
+</body>
+</html>

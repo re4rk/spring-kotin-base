@@ -1,9 +1,9 @@
 package com.ark.clients.slack
 
-import com.ark.clients.config.SlackProperties
 import com.ark.base.notification.slack.SlackClient
 import com.ark.base.notification.slack.SlackLog
 import com.ark.base.notification.slack.SlackLogRepository
+import com.ark.clients.config.SlackProperties
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component

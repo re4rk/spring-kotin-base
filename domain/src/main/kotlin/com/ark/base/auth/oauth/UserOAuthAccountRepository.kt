@@ -9,4 +9,9 @@ interface UserOAuthAccountRepository : JpaRepository<UserOAuthAccount, Long> {
     ): UserOAuthAccount?
 
     fun findAllByUserId(userId: Long): List<UserOAuthAccount>
+
+    fun findByUserIdAndProvider(
+        userId: Long,
+        provider: OAuthProvider,
+    ): UserOAuthAccount?
 }

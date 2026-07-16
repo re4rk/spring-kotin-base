@@ -46,7 +46,7 @@ class SecurityConfig(
             .securityMatcher(adminWebMatcher)
             .authenticationProvider(authProvider)
             .authorizeHttpRequests {
-                it.requestMatchers("/admin/login").permitAll()
+                it.requestMatchers("/admin/login", "/admin/oauth/**").permitAll()
                 it.requestMatchers("/admin/**").hasRole("ADMIN")
             }.formLogin {
                 it.loginPage("/admin/login")

@@ -1,10 +1,10 @@
 package com.ark.clients.storage
 
-import com.ark.clients.config.MinioProperties
 import com.ark.base.file.FileClient
 import com.ark.base.file.FileMetadata
 import com.ark.base.file.FileMetadataRepository
 import com.ark.base.file.FileUpload
+import com.ark.clients.config.MinioProperties
 import io.minio.BucketExistsArgs
 import io.minio.GetPresignedObjectUrlArgs
 import io.minio.MakeBucketArgs

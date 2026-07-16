@@ -32,17 +32,75 @@ class OAuthService(
     fun getAuthorizationUrl(
         provider: String,
         redirectUri: String,
+        linkUserId: Long? = null,
     ): OAuthAuthorizationResponse {
         val oauthProvider = parseProvider(provider)
         val oAuthHttpClient =
             oAuthHttpClientsByProvider[oauthProvider]
                 ?: throw BaseException(ErrorCode.OAUTH_UNSUPPORTED_PROVIDER)
         val state = UUID.randomUUID().toString()
-        oAuthStateRepository.save(OAuthState(state = state, provider = provider, redirectUri = redirectUri))
+        oAuthStateRepository.save(
+            OAuthState(
+                state = state,
+                provider = provider,
+                redirectUri = redirectUri,
+                linkUserId = linkUserId,
+            ),
+        )
         return OAuthAuthorizationResponse(
             state = state,
             authorizationUrl = oAuthHttpClient.buildAuthorizationUrl(state, redirectUri),
         )
+    }
+
+    @Transactional(readOnly = true)
+    fun listLinkedAccounts(userId: Long): List<UserOAuthAccount> = userOAuthAccountRepository.findAllByUserId(userId)
+
+    @Transactional
+    fun authenticate(
+        provider: String,
+        request: OAuthCallbackRequest,
+    ): User {
+        val userInfo = exchangeCode(provider, request, expectLinkUserId = null)
+        return findOrCreateUser(userInfo)
+    }
+
+    @Transactional
+    fun linkAccount(
+        provider: String,
+        request: OAuthCallbackRequest,
+        userId: Long,
+    ): UserOAuthAccount {
+        val userInfo = exchangeCode(provider, request, expectLinkUserId = userId)
+
+        userOAuthAccountRepository.findByUserIdAndProvider(userId, userInfo.provider)?.let {
+            throw BaseException(ErrorCode.OAUTH_ALREADY_CONNECTED)
+        }
+
+        userOAuthAccountRepository
+            .findByProviderAndProviderUserId(userInfo.provider, userInfo.providerUserId)
+            ?.let { throw BaseException(ErrorCode.OAUTH_ACCOUNT_ALREADY_LINKED) }
+
+        return userOAuthAccountRepository.save(
+            UserOAuthAccount(
+                userId = userId,
+                provider = userInfo.provider,
+                providerUserId = userInfo.providerUserId,
+                providerEmail = userInfo.email,
+            ),
+        )
+    }
+
+    @Transactional
+    fun unlinkAccount(
+        userId: Long,
+        provider: String,
+    ) {
+        val oauthProvider = parseProvider(provider)
+        val account =
+            userOAuthAccountRepository.findByUserIdAndProvider(userId, oauthProvider)
+                ?: throw BaseException(ErrorCode.NOT_FOUND)
+        userOAuthAccountRepository.delete(account)
     }
 
     @Transactional
@@ -50,6 +108,17 @@ class OAuthService(
         provider: String,
         request: OAuthCallbackRequest,
     ): TokenResponse {
+        val user = authenticate(provider, request)
+        val accessToken = jwtProvider.generate(user.id)
+        val refreshToken = refreshTokenRepository.issue(user.id)
+        return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token)
+    }
+
+    private fun exchangeCode(
+        provider: String,
+        request: OAuthCallbackRequest,
+        expectLinkUserId: Long?,
+    ): OAuthUserInfo {
         val savedState =
             oAuthStateRepository.findById(request.state).orElseThrow {
                 BaseException(ErrorCode.OAUTH_INVALID_STATE)
@@ -57,17 +126,13 @@ class OAuthService(
         oAuthStateRepository.deleteById(request.state)
 
         if (savedState.provider != provider) throw BaseException(ErrorCode.OAUTH_INVALID_STATE)
+        if (savedState.linkUserId != expectLinkUserId) throw BaseException(ErrorCode.OAUTH_INVALID_STATE)
 
         val oauthProvider = parseProvider(provider)
         val oAuthHttpClient =
             oAuthHttpClientsByProvider[oauthProvider]
                 ?: throw BaseException(ErrorCode.OAUTH_UNSUPPORTED_PROVIDER)
-        val userInfo = oAuthHttpClient.getUserInfo(request.code, request.redirectUri, request.state)
-
-        val user = findOrCreateUser(userInfo)
-        val accessToken = jwtProvider.generate(user.id)
-        val refreshToken = refreshTokenRepository.issue(user.id)
-        return TokenResponse(accessToken = accessToken, refreshToken = refreshToken.token)
+        return oAuthHttpClient.getUserInfo(request.code, request.redirectUri, request.state)
     }
 
     private fun findOrCreateUser(userInfo: OAuthUserInfo): User {

@@ -480,6 +480,33 @@ a {
     margin-top: 8px;
 }
 
+.login-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0 16px;
+    color: var(--grey-500);
+    font-size: 13px;
+}
+
+.login-divider::before,
+.login-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--grey-200);
+}
+
+.btn-kakao {
+    background: #fee500;
+    color: #191919;
+}
+
+.btn-kakao:hover {
+    background: #f5dc00;
+    color: #191919;
+}
+
 .truncate {
     max-width: 320px;
     overflow: hidden;
@@ -622,6 +649,55 @@ a {
 
 .text-danger {
     color: var(--red-500);
+}
+
+.settings-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 640px;
+}
+
+.social-list {
+    padding: 4px 0;
+}
+
+.social-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--grey-100);
+}
+
+.social-row:last-child {
+    border-bottom: none;
+}
+
+.social-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--grey-900);
+}
+
+.social-meta {
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+.social-actions {
+    flex-shrink: 0;
+}
+
+.btn-social-kakao {
+    background: #fee500;
+    color: #191919;
+}
+
+.btn-social-kakao:hover {
+    background: #f5dc00;
+    color: #191919;
 }
 
 @media (max-width: 900px) {

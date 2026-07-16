@@ -89,7 +89,10 @@ class GlobalExceptionHandler {
             ErrorCode.OAUTH_INVALID_STATE,
             ErrorCode.OAUTH_EMAIL_REQUIRED,
             ErrorCode.OAUTH_UNSUPPORTED_PROVIDER,
+            ErrorCode.OAUTH_ALREADY_CONNECTED,
             -> HttpStatus.BAD_REQUEST
+
+            ErrorCode.OAUTH_ACCOUNT_ALREADY_LINKED -> HttpStatus.CONFLICT
 
             ErrorCode.OAUTH_PROVIDER_ERROR -> HttpStatus.BAD_GATEWAY
         }

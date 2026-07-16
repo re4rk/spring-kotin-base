@@ -1,9 +1,9 @@
 package com.ark.clients.email
 
-import com.ark.clients.config.EmailProperties
 import com.ark.base.notification.email.EmailClient
 import com.ark.base.notification.email.EmailLog
 import com.ark.base.notification.email.EmailLogRepository
+import com.ark.clients.config.EmailProperties
 import org.slf4j.LoggerFactory
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper

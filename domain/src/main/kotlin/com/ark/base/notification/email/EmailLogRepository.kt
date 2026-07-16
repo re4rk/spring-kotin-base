@@ -7,4 +7,3 @@ interface EmailLogRepository : JpaRepository<EmailLog, Long> {
     @Query("SELECT l.status, COUNT(l) FROM EmailLog l GROUP BY l.status")
     fun countGroupedByStatus(): List<Array<Any>>
 }
-
