@@ -35,7 +35,7 @@ class ProductAdminController(
         model.addAttribute("products", productService.listProducts(filter, pageable))
         model.addAttribute("filter", filter)
         model.addAttribute("statuses", ProductStatus.entries)
-        return "admin/products"
+        return "commerce/admin/products"
     }
 
     @GetMapping("/{id}")
@@ -44,7 +44,7 @@ class ProductAdminController(
         model: Model,
     ): String {
         model.addAttribute("product", productService.findById(id))
-        return "admin/product-detail"
+        return "commerce/admin/product-detail"
     }
 
     @PostMapping("/{id}/approve")

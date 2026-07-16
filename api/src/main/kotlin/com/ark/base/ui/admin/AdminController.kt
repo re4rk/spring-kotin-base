@@ -26,7 +26,7 @@ class AdminController(
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"))
         val users = userService.listUsers(pageable)
         model.addAttribute("users", users)
-        return "admin/users"
+        return "base/admin/users"
     }
 
     @GetMapping("/login")
@@ -37,6 +37,6 @@ class AdminController(
     ): String {
         if (error != null) model.addAttribute("error", "이메일 또는 비밀번호가 올바르지 않습니다.")
         if (logout != null) model.addAttribute("message", "로그아웃되었습니다.")
-        return "admin/login"
+        return "base/admin/login"
     }
 }

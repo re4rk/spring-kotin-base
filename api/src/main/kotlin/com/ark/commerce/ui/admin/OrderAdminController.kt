@@ -25,7 +25,7 @@ class OrderAdminController(
     ): String {
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"))
         model.addAttribute("orders", orderService.listOrders(pageable))
-        return "admin/orders"
+        return "commerce/admin/orders"
     }
 
     @PostMapping("/{id}/confirm")
