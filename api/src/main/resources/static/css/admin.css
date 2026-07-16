@@ -715,6 +715,22 @@ a {
     margin-bottom: 16px;
 }
 
+.sse-log {
+    margin: 0;
+    padding: 16px 20px 20px;
+    min-height: 280px;
+    max-height: 480px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--grey-800);
+    background: var(--grey-50);
+    border-top: 1px solid var(--grey-200);
+}
+
 @media (max-width: 900px) {
     .admin-shell {
         flex-direction: column;

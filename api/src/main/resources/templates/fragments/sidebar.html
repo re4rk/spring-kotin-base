@@ -27,6 +27,10 @@
        th:classappend="${activeMenu == 'logs-push'} ? ' active'">Push</a>
     <a th:href="@{/admin/logs/sse}"
        th:classappend="${activeMenu == 'logs-sse'} ? ' active'">SSE</a>
+
+    <div class="admin-nav-label">도구</div>
+    <a th:href="@{/admin/sse-test}"
+       th:classappend="${activeMenu == 'sse-test'} ? ' active'">SSE 테스트</a>
 </nav>
 </body>
 </html>

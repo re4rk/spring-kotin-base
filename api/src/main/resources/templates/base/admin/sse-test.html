@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin}"
+      th:with="activeMenu='sse-test'">
+<head>
+    <title>SSE 테스트</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="page-header">
+        <h1 class="page-title">SSE 테스트</h1>
+        <div class="page-meta">
+            현재 관리자 <span th:text="${userEmail}">admin</span>
+            · userId <span th:text="${userId}">1</span>
+        </div>
+    </div>
+
+    <div class="settings-stack">
+        <section class="panel">
+            <div class="panel-title">연결</div>
+            <p class="muted" style="margin:0 0 16px">
+                실제 API <code>/sse/connect</code>에 Bearer JWT로 연결합니다.
+                연결 후 아래 전송으로 이벤트가 도착하는지 확인하세요.
+            </p>
+            <div class="panel-form">
+                <div class="mb-3">
+                    <label class="form-label" for="connectUrl">Connect URL</label>
+                    <input id="connectUrl" class="form-control" type="text"
+                           th:value="@{/sse/connect}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="accessToken">Access Token</label>
+                    <input id="accessToken" class="form-control" type="text"
+                           th:value="${accessToken}">
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap">
+                    <button type="button" id="connectBtn" class="btn btn-primary btn-sm">연결</button>
+                    <button type="button" id="disconnectBtn" class="btn btn-ghost btn-sm">끊기</button>
+                    <button type="button" id="clearBtn" class="btn btn-ghost btn-sm">로그 비우기</button>
+                </div>
+                <div id="status" class="muted" style="margin-top:12px">상태: 대기</div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-title">테스트 이벤트 전송</div>
+            <div class="panel-form">
+                <div class="mb-3">
+                    <label class="form-label" for="targetUserId">대상 userId</label>
+                    <input id="targetUserId" class="form-control" type="number"
+                           th:value="${userId}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="eventType">eventType</label>
+                    <input id="eventType" class="form-control" type="text" value="test">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="eventData">data</label>
+                    <input id="eventData" class="form-control" type="text" value="hello from admin">
+                </div>
+                <button type="button" id="sendBtn" class="btn btn-primary btn-sm">전송</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-title">수신 로그</div>
+            <pre id="log" class="sse-log"></pre>
+        </section>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const csrfToken = /*[[${_csrf.token}]]*/ '';
+        const csrfHeader = /*[[${_csrf.headerName}]]*/ 'X-CSRF-TOKEN';
+        const sendUrl = /*[[@{/admin/sse-test/send}]]*/ '/admin/sse-test/send';
+        /*]]>*/
+
+        let abortController = null;
+        const logEl = document.getElementById('log');
+        const statusEl = document.getElementById('status');
+
+        function setStatus(text) {
+            statusEl.textContent = '상태: ' + text;
+        }
+
+        function log(msg) {
+            const ts = new Date().toISOString().replace('T', ' ').slice(0, 19);
+            logEl.textContent += '[' + ts + '] ' + msg + '\n';
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function disconnect() {
+            if (abortController) {
+                abortController.abort();
+                abortController = null;
+                setStatus('끊김');
+                log('연결 종료');
+            }
+        }
+
+        async function connect() {
+            disconnect();
+
+            const url = document.getElementById('connectUrl').value.trim();
+            const token = document.getElementById('accessToken').value.trim();
+            if (!url) {
+                log('Connect URL이 비어 있습니다.');
+                return;
+            }
+            if (!token) {
+                log('Access Token이 비어 있습니다.');
+                return;
+            }
+
+            abortController = new AbortController();
+            setStatus('연결 중…');
+            log('연결 시도: ' + url);
+
+            try {
+                const res = await fetch(url, {
+                    method: 'GET',
+                    headers: { Authorization: 'Bearer ' + token },
+                    signal: abortController.signal,
+                });
+
+                if (!res.ok) {
+                    setStatus('실패 (' + res.status + ')');
+                    log('HTTP ' + res.status + ' ' + res.statusText);
+                    return;
+                }
+                if (!res.body) {
+                    setStatus('실패');
+                    log('응답 body가 없습니다.');
+                    return;
+                }
+
+                setStatus('연결됨');
+                log('연결 성공');
+
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let buffer = '';
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) {
+                        setStatus('서버가 스트림을 닫음');
+                        log('스트림 종료');
+                        break;
+                    }
+
+                    buffer += decoder.decode(value, { stream: true });
+                    let idx;
+                    while ((idx = buffer.indexOf('\n\n')) >= 0) {
+                        const raw = buffer.slice(0, idx);
+                        buffer = buffer.slice(idx + 2);
+
+                        let eventName = 'message';
+                        const dataLines = [];
+                        raw.split('\n').forEach(function (line) {
+                            if (line.startsWith('event:')) eventName = line.slice(6).trim();
+                            if (line.startsWith('data:')) dataLines.push(line.slice(5).trim());
+                        });
+                        if (dataLines.length > 0) {
+                            log('[' + eventName + '] ' + dataLines.join('\n'));
+                        }
+                    }
+                }
+            } catch (e) {
+                if (e && e.name === 'AbortError') return;
+                setStatus('에러');
+                log('연결 실패: ' + (e && e.message ? e.message : e));
+            } finally {
+                abortController = null;
+            }
+        }
+
+        async function sendEvent() {
+            const userId = document.getElementById('targetUserId').value.trim();
+            const eventType = document.getElementById('eventType').value.trim() || 'test';
+            const data = document.getElementById('eventData').value.trim() || 'ping';
+
+            const body = new URLSearchParams();
+            if (userId) body.set('userId', userId);
+            body.set('eventType', eventType);
+            body.set('data', data);
+
+            try {
+                const res = await fetch(sendUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        [csrfHeader]: csrfToken,
+                    },
+                    body: body.toString(),
+                    credentials: 'same-origin',
+                });
+                const json = await res.json().catch(function () { return null; });
+                if (!res.ok) {
+                    log('전송 실패 HTTP ' + res.status);
+                    return;
+                }
+                log('전송 요청 완료 → userId=' + json.userId + ' event=' + json.eventType + ' data=' + json.data);
+            } catch (e) {
+                log('전송 실패: ' + (e && e.message ? e.message : e));
+            }
+        }
+
+        document.getElementById('connectBtn').addEventListener('click', connect);
+        document.getElementById('disconnectBtn').addEventListener('click', disconnect);
+        document.getElementById('clearBtn').addEventListener('click', function () { logEl.textContent = ''; });
+        document.getElementById('sendBtn').addEventListener('click', sendEvent);
+    </script>
+</th:block>
+</body>
+</html>
