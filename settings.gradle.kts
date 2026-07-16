@@ -1,3 +1,3 @@
 rootProject.name = "base"
 
-include("api", "domain")
+include("api", "domain", "clients")
