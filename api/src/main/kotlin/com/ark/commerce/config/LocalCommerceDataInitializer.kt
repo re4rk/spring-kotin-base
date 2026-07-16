@@ -1,4 +1,4 @@
-package com.ark.base.config
+package com.ark.commerce.config
 
 import com.ark.commerce.product.Product
 import com.ark.commerce.product.ProductRepository
@@ -6,51 +6,24 @@ import com.ark.commerce.product.ProductStatus
 import com.ark.commerce.product.option.ProductOption
 import com.ark.commerce.product.option.ProductOptionGroup
 import com.ark.commerce.product.option.ProductSku
-import com.ark.base.user.PasswordEncoder
-import com.ark.base.user.User
-import com.ark.base.user.UserRepository
-import com.ark.base.user.UserRole
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Profile
+import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Profile("local")
 @Component
-class LocalDataInitializer(
-    private val userRepository: UserRepository,
+@Order(2)
+class LocalCommerceDataInitializer(
     private val productRepository: ProductRepository,
-    private val passwordEncoder: PasswordEncoder,
 ) : ApplicationRunner {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Transactional
     override fun run(args: ApplicationArguments) {
-        seedUsers()
-        seedProducts()
-    }
-
-    private fun seedUsers() {
-        if (userRepository.count() > 0) {
-            log.info("[Seed] 유저 데이터 이미 존재 — skip")
-            return
-        }
-        val admin =
-            User(email = "admin@test.com", name = "관리자", password = "password123!", passwordEncoder = passwordEncoder)
-                .also { it.role = UserRole.ADMIN }
-        val users =
-            listOf(
-                admin,
-                User(email = "user1@test.com", name = "테스트유저1", password = "password123!", passwordEncoder = passwordEncoder),
-                User(email = "user2@test.com", name = "테스트유저2", password = "password123!", passwordEncoder = passwordEncoder),
-            )
-        userRepository.saveAll(users)
-        log.info("[Seed] 유저 {}명 생성 완료", users.size)
-    }
-
-    private fun seedProducts() {
         if (productRepository.count() > 0) {
             log.info("[Seed] 상품 데이터 이미 존재 — skip")
             return

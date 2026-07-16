@@ -25,8 +25,7 @@ class AuthController(
     private val passwordTransportCrypto: PasswordTransportCrypto,
 ) {
     @GetMapping("/crypto/public-key")
-    fun publicKey(): PasswordPublicKeyResponse =
-        PasswordPublicKeyResponse(publicKey = passwordTransportCrypto.publicKeySpkiBase64())
+    fun publicKey(): PasswordPublicKeyResponse = PasswordPublicKeyResponse(publicKey = passwordTransportCrypto.publicKeySpkiBase64())
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)

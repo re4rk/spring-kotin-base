@@ -42,6 +42,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:2.0.5")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("io.minio:minio:8.5.17")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")

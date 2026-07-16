@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 @Component
 class AuthorizationAspect(
     private val accessGuard: AccessGuard,
+    private val accessTypeHandlers: List<AccessTypeHandler>,
 ) {
     @Before("@annotation(authorize)")
     fun authorize(
@@ -19,9 +20,12 @@ class AuthorizationAspect(
         when (authorize.value) {
             AccessType.SELF -> accessGuard.requireSelf(resolveLong(joinPoint, authorize.param))
             AccessType.SELF_BY_EMAIL -> accessGuard.requireSelfByEmail(resolveString(joinPoint, authorize.param))
-            AccessType.PRODUCT_OWNER -> accessGuard.requireProductOwner(resolveLong(joinPoint, authorize.param))
-            AccessType.ORDER_BUYER -> accessGuard.requireOrderBuyer(resolveLong(joinPoint, authorize.param))
-            AccessType.ORDER_SELLER -> accessGuard.requireOrderSeller(resolveLong(joinPoint, authorize.param))
+            else -> {
+                val handler =
+                    accessTypeHandlers.find { it.type == authorize.value }
+                        ?: error("No AccessTypeHandler registered for ${authorize.value}")
+                handler.authorize(resolveParam(joinPoint, authorize.param))
+            }
         }
     }
 

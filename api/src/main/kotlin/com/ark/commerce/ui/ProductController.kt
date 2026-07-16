@@ -1,5 +1,7 @@
 package com.ark.commerce.ui
 
+import com.ark.base.ui.auth.AccessType
+import com.ark.base.ui.auth.Authorize
 import com.ark.commerce.application.ProductCreateRequest
 import com.ark.commerce.application.ProductOptionGroupCreateRequest
 import com.ark.commerce.application.ProductQueryFilterRequest
@@ -7,8 +9,6 @@ import com.ark.commerce.application.ProductResponse
 import com.ark.commerce.application.ProductService
 import com.ark.commerce.application.ProductSkuCreateRequest
 import com.ark.commerce.application.ProductUpdateRequest
-import com.ark.base.ui.auth.AccessType
-import com.ark.base.ui.auth.Authorize
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -34,8 +34,7 @@ class ProductController(
     fun findAll(
         @ModelAttribute request: ProductQueryFilterRequest,
         @PageableDefault(size = 20, sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable,
-    ): Page<ProductResponse> =
-        productService.listProducts(request, pageable).map { ProductResponse.from(it) }
+    ): Page<ProductResponse> = productService.listProducts(request, pageable).map { ProductResponse.from(it) }
 
     @GetMapping("/{productId}")
     fun findById(

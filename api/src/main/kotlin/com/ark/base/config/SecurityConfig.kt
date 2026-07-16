@@ -37,9 +37,10 @@ class SecurityConfig(
         val authProvider = DaoAuthenticationProvider(adminUserDetailsService)
         authProvider.setPasswordEncoder(springPasswordEncoder())
 
-        val adminWebMatcher = RequestMatcher { req: HttpServletRequest ->
-            req.requestURI.startsWith("/admin") && !req.requestURI.startsWith("/admin/api")
-        }
+        val adminWebMatcher =
+            RequestMatcher { req: HttpServletRequest ->
+                req.requestURI.startsWith("/admin") && !req.requestURI.startsWith("/admin/api")
+            }
 
         return http
             .securityMatcher(adminWebMatcher)
@@ -92,6 +93,6 @@ class SecurityConfig(
                             ErrorCode.ACCESS_DENIED,
                         )
                     }
-            }            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            }.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .build()
 }

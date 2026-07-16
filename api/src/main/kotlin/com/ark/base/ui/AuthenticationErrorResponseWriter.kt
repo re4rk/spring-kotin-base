@@ -2,10 +2,10 @@ package com.ark.base.ui
 
 import com.ark.base.common.ErrorCode
 import jakarta.servlet.http.HttpServletResponse
-import java.nio.charset.StandardCharsets
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import tools.jackson.databind.json.JsonMapper
+import java.nio.charset.StandardCharsets
 
 @Component
 class AuthenticationErrorResponseWriter(
