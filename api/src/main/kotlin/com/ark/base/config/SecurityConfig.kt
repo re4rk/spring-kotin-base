@@ -76,6 +76,8 @@ class SecurityConfig(
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/products", "/products/**")
                     .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/posts", "/posts/**")
+                    .permitAll()
                     .requestMatchers("/admin/api/**")
                     .hasRole("ADMIN")
                     .anyRequest()

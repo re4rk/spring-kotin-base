@@ -267,9 +267,16 @@ a {
 
 .badge-PLACED,
 .badge-PENDING_REVIEW,
-.badge-CONFIRMED {
+.badge-CONFIRMED,
+.badge-PUBLISHED {
     background: var(--blue-50);
     color: var(--blue-500);
+}
+
+.badge-DRAFT,
+.badge-ARCHIVED {
+    background: var(--grey-100);
+    color: var(--grey-700);
 }
 
 .btn {

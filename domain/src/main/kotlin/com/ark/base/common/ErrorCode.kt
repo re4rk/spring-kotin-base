@@ -53,4 +53,8 @@ enum class ErrorCode(
     OAUTH_ALREADY_CONNECTED("이미 연동된 소셜 로그인입니다."),
     ADMIN_SETUP_ALREADY_DONE("이미 초기 관리자 설정이 완료되었습니다."),
     ADMIN_PASSWORD_TOO_SHORT("비밀번호는 8자 이상이어야 합니다."),
+
+    // Blog
+    BLOG_POST_NOT_FOUND("블로그 포스트를 찾을 수 없습니다."),
+    BLOG_POST_INVALID_STATUS("현재 상태에서 해당 작업을 수행할 수 없습니다."),
 }

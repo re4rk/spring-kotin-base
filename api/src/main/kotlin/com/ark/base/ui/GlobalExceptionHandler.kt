@@ -59,6 +59,7 @@ class GlobalExceptionHandler {
             ErrorCode.PRODUCT_SKU_NOT_FOUND,
             ErrorCode.ORDER_NOT_FOUND,
             ErrorCode.FILE_NOT_FOUND,
+            ErrorCode.BLOG_POST_NOT_FOUND,
             -> HttpStatus.NOT_FOUND
 
             ErrorCode.INVALID_INPUT,
@@ -67,6 +68,7 @@ class GlobalExceptionHandler {
             ErrorCode.USER_NAME_TOO_LONG,
             ErrorCode.ORDER_INVALID_STATUS,
             ErrorCode.PRODUCT_INVALID_STATUS,
+            ErrorCode.BLOG_POST_INVALID_STATUS,
             ErrorCode.FILE_INVALID_TYPE,
             ErrorCode.FILE_EMPTY,
             -> HttpStatus.BAD_REQUEST

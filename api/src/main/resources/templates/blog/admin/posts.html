@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin}"
+      th:with="activeMenu='posts'">
+<head>
+    <title>블로그</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="page-header">
+        <h1 class="page-title">블로그</h1>
+        <div class="page-meta">
+            총 <span th:text="${posts.totalElements}">0</span>건
+            <a th:href="@{/admin/posts/new}" class="btn btn-primary btn-sm" style="margin-left:12px">새 글</a>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="table-wrap">
+            <table class="toss-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>상태</th>
+                    <th>작성일</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="post : ${posts.content}">
+                    <td class="muted" th:text="${post.id}"></td>
+                    <td th:text="${post.title}"></td>
+                    <td class="muted" th:text="${post.authorId}"></td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="'badge-' + ${post.status.name()}"
+                              th:text="${post.status.name()}"></span>
+                    </td>
+                    <td class="muted" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td>
+                        <a th:href="@{/admin/posts/{id}(id=${post.id})}" class="btn btn-secondary btn-sm">편집</a>
+                    </td>
+                </tr>
+                <tr th:if="${posts.content.empty}">
+                    <td colspan="6" class="empty">포스트가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav th:if="${posts.totalPages > 1}">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${posts.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/posts(page=${posts.number - 1})}">이전</a>
+            </li>
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(0, posts.totalPages - 1)}"
+                th:classappend="${i == posts.number} ? 'active'">
+                <a class="page-link" th:href="@{/admin/posts(page=${i})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${posts.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/posts(page=${posts.number + 1})}">다음</a>
+            </li>
+        </ul>
+    </nav>
+</th:block>
+</body>
+</html>
