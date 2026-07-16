@@ -2,13 +2,13 @@ package com.ark.base.ui
 
 import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
-import com.ark.base.ui.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -25,6 +25,13 @@ class GlobalExceptionHandler {
             HttpStatus.CONFLICT,
         )
     }
+
+    @ExceptionHandler(NoResourceFoundException::class)
+    fun handleNoResourceFound(e: NoResourceFoundException): ResponseEntity<ApiResponse> =
+        ResponseEntity(
+            ApiResponse.Error(code = ErrorCode.NOT_FOUND.name, message = ErrorCode.NOT_FOUND.message),
+            HttpStatus.NOT_FOUND,
+        )
 
     @ExceptionHandler(BaseException::class)
     fun handleBaseException(e: BaseException): ResponseEntity<ApiResponse> =

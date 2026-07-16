@@ -25,6 +25,7 @@ class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 ) : BaseAggregateEntity<User>() {
+    @Column(name = "password_hash")
     var passwordHash: String? = if (password != null && passwordEncoder != null) passwordEncoder.encode(password) else null
 
     @Enumerated(EnumType.STRING)

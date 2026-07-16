@@ -56,7 +56,9 @@ class KakaoOAuthHttpClient(
                 add("code", code)
                 add("redirect_uri", redirectUri)
                 add("client_id", props.clientId)
-                add("client_secret", props.clientSecret)
+                if (props.clientSecret.isNotBlank()) {
+                    add("client_secret", props.clientSecret)
+                }
             }
         return runCatching {
             restClient

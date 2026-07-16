@@ -7,6 +7,7 @@ import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Controller
@@ -23,6 +24,8 @@ class AdminController(
     private val adminBootstrapService: AdminBootstrapService,
     private val adminSessionLogin: AdminSessionLogin,
 ) {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     @GetMapping("", "/")
     fun index() = "redirect:/admin/users"
 
@@ -49,6 +52,9 @@ class AdminController(
 
         when (error) {
             "oauth_forbidden" -> model.addAttribute("error", "관리자 권한이 없는 카카오 계정입니다.")
+            "oauth_provider" -> model.addAttribute("error", "카카오 인증 서버 연동에 실패했습니다. Redirect URI·앱 키를 확인하세요.")
+            "oauth_state" -> model.addAttribute("error", "카카오 로그인 세션이 만료되었습니다. 다시 시도해 주세요.")
+            "oauth_email" -> model.addAttribute("error", "카카오 계정 이메일 정보가 필요합니다.")
             "oauth" -> model.addAttribute("error", "카카오 로그인에 실패했습니다.")
             "setup_done" -> model.addAttribute("error", "이미 초기 설정이 완료되었습니다.")
             "password_short" -> model.addAttribute("error", "비밀번호는 8자 이상이어야 합니다.")
@@ -87,6 +93,7 @@ class AdminController(
             adminSessionLogin.establish(user.email, request, response)
             "redirect:/admin/users"
         } catch (e: BaseException) {
+            log.warn("Admin setup failed code={} message={}", e.errorCode.name, e.errorCode.message, e)
             when (e.errorCode) {
                 ErrorCode.ADMIN_SETUP_ALREADY_DONE -> "redirect:/admin/login?error=setup_done"
                 ErrorCode.ADMIN_PASSWORD_TOO_SHORT -> "redirect:/admin/login?error=password_short"
@@ -98,6 +105,7 @@ class AdminController(
                 else -> "redirect:/admin/login?error=setup"
             }
         } catch (e: Exception) {
+            log.error("Admin setup failed", e)
             "redirect:/admin/login?error=setup"
         }
     }

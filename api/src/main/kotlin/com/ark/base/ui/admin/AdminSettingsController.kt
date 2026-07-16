@@ -9,6 +9,7 @@ import com.ark.base.common.BaseException
 import com.ark.base.common.ErrorCode
 import com.ark.base.user.UserRepository
 import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -25,6 +26,8 @@ class AdminSettingsController(
     private val oauthService: OAuthService,
     private val adminBootstrapService: AdminBootstrapService,
 ) {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     @GetMapping
     fun settings(
         authentication: Authentication,
@@ -88,12 +91,14 @@ class AdminSettingsController(
                 "redirect:/admin/settings?password=set"
             }
         } catch (e: BaseException) {
+            log.warn("Admin password update failed code={} message={}", e.errorCode.name, e.errorCode.message, e)
             when (e.errorCode) {
                 ErrorCode.ADMIN_PASSWORD_TOO_SHORT -> "redirect:/admin/settings?error=password_short"
                 ErrorCode.USER_LOGIN_FAILED -> "redirect:/admin/settings?error=password_current"
                 else -> "redirect:/admin/settings?error=password"
             }
         } catch (e: Exception) {
+            log.error("Admin password update failed", e)
             "redirect:/admin/settings?error=password"
         }
     }
@@ -133,6 +138,7 @@ class AdminSettingsController(
             )
             "redirect:/admin/settings?linked=kakao"
         } catch (e: BaseException) {
+            log.warn("Admin Kakao link failed code={} message={}", e.errorCode.name, e.errorCode.message, e)
             when (e.errorCode) {
                 ErrorCode.OAUTH_ACCOUNT_ALREADY_LINKED ->
                     "redirect:/admin/settings?error=already_linked"
@@ -141,6 +147,7 @@ class AdminSettingsController(
                 else -> "redirect:/admin/settings?error=link"
             }
         } catch (e: Exception) {
+            log.error("Admin Kakao link failed", e)
             "redirect:/admin/settings?error=link"
         }
     }

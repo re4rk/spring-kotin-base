@@ -141,12 +141,14 @@ class OAuthService(
             .findByProviderAndProviderUserId(userInfo.provider, userInfo.providerUserId)
             ?.let { return userRepository.findByIdOrThrow(it.userId) }
 
-        val email = userInfo.email ?: throw BaseException(ErrorCode.OAUTH_EMAIL_REQUIRED)
-        val isFirstUser = userRepository.count() == 0L
+        val email =
+            userInfo.email?.takeIf { it.isNotBlank() }
+                ?: "${userInfo.provider.name.lowercase()}_${userInfo.providerUserId}@oauth.local"
+        val needsAdmin = !userRepository.existsByRole(UserRole.ADMIN)
         val user =
             userRepository.findByEmail(email) ?: run {
                 val created = User(email = email, name = userInfo.name)
-                if (isFirstUser) created.role = UserRole.ADMIN
+                if (needsAdmin) created.role = UserRole.ADMIN
                 userRepository.save(created)
             }
 

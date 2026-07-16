@@ -16,11 +16,11 @@ class AdminBootstrapService(
     private val passwordEncoder: PasswordEncoder,
 ) {
     @Transactional(readOnly = true)
-    fun needsSetup(): Boolean = userRepository.count() == 0L
+    fun needsSetup(): Boolean = !userRepository.existsByRole(UserRole.ADMIN)
 
     @Transactional
     fun createInitialAdmin(request: CreateInitialAdminRequest): User {
-        if (userRepository.count() > 0L) {
+        if (userRepository.existsByRole(UserRole.ADMIN)) {
             throw BaseException(ErrorCode.ADMIN_SETUP_ALREADY_DONE)
         }
         validateNewPassword(request.password)
