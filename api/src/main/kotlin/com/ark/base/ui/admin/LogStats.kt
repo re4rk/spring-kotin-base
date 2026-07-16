@@ -3,7 +3,6 @@ package com.ark.base.ui.admin
 data class LogStatusStat(
     val status: String,
     val count: Long,
-    val badgeClass: String,
 )
 
 data class LogStats(
@@ -26,7 +25,6 @@ fun buildLogStats(
             LogStatusStat(
                 status = status.name,
                 count = counts[status.name] ?: 0L,
-                badgeClass = statusBadgeClass(status.name),
             )
         }
     return LogStats(
@@ -34,12 +32,3 @@ fun buildLogStats(
         items = items,
     )
 }
-
-private fun statusBadgeClass(status: String): String =
-    when (status) {
-        "SUCCESS", "DELIVERED" -> "bg-success"
-        "FAILED" -> "bg-danger"
-        "PENDING" -> "bg-secondary"
-        "BOUNCED", "MISSED" -> "bg-warning text-dark"
-        else -> "bg-light text-dark"
-    }

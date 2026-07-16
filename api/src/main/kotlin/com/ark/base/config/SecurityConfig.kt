@@ -70,6 +70,8 @@ class SecurityConfig(
                 it
                     .requestMatchers("/actuator/health", "/actuator/health/**")
                     .permitAll()
+                    .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico")
+                    .permitAll()
                     .requestMatchers("/auth/**")
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/products", "/products/**")

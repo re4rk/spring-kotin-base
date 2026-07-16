@@ -9,17 +9,17 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="mb-0">SSE 로그</h5>
-        <small class="text-muted">총 <span th:text="${logs.totalElements}"></span>건</small>
+    <div class="page-header">
+        <h1 class="page-title">SSE 로그</h1>
+        <div class="page-meta">총 <span th:text="${logs.totalElements}"></span>건</div>
     </div>
 
     <th:block th:replace="~{fragments/log :: stats(${stats})}"></th:block>
 
-    <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
-                <thead class="table-light">
+    <div class="panel">
+        <div class="table-wrap">
+            <table class="toss-table">
+                <thead>
                 <tr>
                     <th>ID</th>
                     <th>유저 ID</th>
@@ -31,21 +31,19 @@
                 </tr>
                 </thead>
                 <tbody>
+
                 <tr th:each="log : ${logs.content}">
-                    <td class="text-muted" th:text="${log.id}"></td>
+                    <td class="muted" th:text="${log.id}"></td>
                     <td th:text="${log.userId}"></td>
                     <td th:text="${log.eventType}"></td>
-                    <td style="max-width: 280px">
-                        <div class="text-truncate" th:text="${log.data}"></div>
-                        <small th:if="${log.errorMessage}" class="text-danger" th:text="${log.errorMessage}"></small>
-                    </td>
+                    <td><div class="truncate" th:text="${log.data}"></div>
+                        <small th:if="${log.errorMessage}" style="color:var(--red-500)" th:text="${log.errorMessage}"></small></td>
                     <td><th:block th:replace="~{fragments/log :: statusBadge(${log.status})}"></th:block></td>
-                    <td class="text-muted"
-                        th:text="${log.sentAt != null ? #temporals.format(log.sentAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
-                    <td class="text-muted" th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td class="muted" th:text="${log.sentAt != null ? #temporals.format(log.sentAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+                    <td class="muted" th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
                 </tr>
                 <tr th:if="${logs.content.empty}">
-                    <td colspan="7" class="text-center text-muted py-4">로그가 없습니다.</td>
+                    <td colspan="7" class="empty">로그가 없습니다.</td>
                 </tr>
                 </tbody>
             </table>
